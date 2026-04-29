@@ -50,6 +50,9 @@ export default async function AdminDashboardPage() {
             <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', fontFamily: 'var(--font-mono)', fontSize: 10, color: '#5A5855', border: '1.5px solid #5A5855', padding: '6px 14px', borderRadius: 2, textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase' }}>
               ← Xem site
             </Link>
+            <Link href="/admin/categories" style={{ display: 'inline-flex', alignItems: 'center', fontFamily: 'var(--font-mono)', fontSize: 10, color: '#5A5855', border: '1.5px solid #5A5855', padding: '6px 14px', borderRadius: 2, textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase' }}>
+              Chủ đề
+            </Link>
             <LogoutButton />
             <Link href="/admin/vibe-editor" style={{ display: 'inline-flex', alignItems: 'center', backgroundColor: 'transparent', color: '#3D5A3E', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '1px', textTransform: 'uppercase', padding: '9px 18px', borderRadius: 2, border: '2px solid #3D5A3E', textDecoration: 'none' }}>
               + Vô Tri Mới

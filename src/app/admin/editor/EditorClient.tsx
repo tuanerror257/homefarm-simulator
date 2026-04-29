@@ -8,10 +8,14 @@ import Placeholder from '@tiptap/extension-placeholder'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Tag } from '@/lib/types'
 import slugify from 'slugify'
 
-const TAGS: Tag[] = ['Kinh Doanh', 'AI / Tech', 'Lifestyle']
+interface Category {
+  id: string
+  name: string
+  color_bg: string
+  color_text: string
+}
 
 function ToolbarBtn({ onClick, children, active }: { onClick: () => void; children: React.ReactNode; active?: boolean }) {
   return (
@@ -26,8 +30,9 @@ export default function EditorClient() {
   const searchParams = useSearchParams()
   const editId = searchParams.get('id')
 
+  const [categories, setCategories] = useState<Category[]>([])
   const [title, setTitle] = useState('')
-  const [tag, setTag] = useState<Tag>('Kinh Doanh')
+  const [tag, setTag] = useState('')
   const [published, setPublished] = useState(false)
   const [thumbnailUrl, setThumbnailUrl] = useState('')
   const [thumbnailPreview, setThumbnailPreview] = useState('')
@@ -44,11 +49,21 @@ export default function EditorClient() {
       Placeholder.configure({ placeholder: 'Bắt đầu viết...' }),
     ],
     editorProps: {
-      attributes: {
-        style: 'outline:none; min-height:300px; font-size:16px; line-height:1.85; color:#5A5855; font-weight:300; font-family:var(--font-sans);',
-      },
+      attributes: { style: 'outline:none; min-height:300px; font-size:16px; line-height:1.85; color:#5A5855; font-weight:300; font-family:var(--font-sans);' },
     },
   })
+
+  useEffect(() => {
+    async function loadCategories() {
+      const supabase = createClient()
+      const { data } = await supabase.from('categories').select('*').order('created_at', { ascending: true })
+      if (data && data.length > 0) {
+        setCategories(data)
+        if (!tag && !editId) setTag(data[0].name)
+      }
+    }
+    loadCategories()
+  }, [])
 
   useEffect(() => {
     if (!editId || !editor) return
@@ -56,11 +71,8 @@ export default function EditorClient() {
       const supabase = createClient()
       const { data } = await supabase.from('posts').select('*').eq('id', editId).single()
       if (data) {
-        setTitle(data.title)
-        setTag(data.tag)
-        setPublished(data.published)
-        setThumbnailUrl(data.thumbnail_url || '')
-        setThumbnailPreview(data.thumbnail_url || '')
+        setTitle(data.title); setTag(data.tag); setPublished(data.published)
+        setThumbnailUrl(data.thumbnail_url || ''); setThumbnailPreview(data.thumbnail_url || '')
         editor?.commands.setContent(data.content || '')
       }
     }
@@ -68,17 +80,14 @@ export default function EditorClient() {
   }, [editId, editor])
 
   async function handleThumbnailUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0]; if (!file) return
     setUploading(true)
     const supabase = createClient()
-    const ext = file.name.split('.').pop()
-    const fileName = `${Date.now()}.${ext}`
+    const fileName = `${Date.now()}.${file.name.split('.').pop()}`
     const { error } = await supabase.storage.from('thumbnails').upload(fileName, file)
-    if (error) { console.error(error); setUploading(false); return }
+    if (error) { setUploading(false); return }
     const { data: urlData } = supabase.storage.from('thumbnails').getPublicUrl(fileName)
-    setThumbnailUrl(urlData.publicUrl)
-    setThumbnailPreview(urlData.publicUrl)
+    setThumbnailUrl(urlData.publicUrl); setThumbnailPreview(urlData.publicUrl)
     setUploading(false)
   }
 
@@ -90,13 +99,7 @@ export default function EditorClient() {
     const shouldPublish = publish !== undefined ? publish : published
     const excerpt = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200) + '...'
     const slug = slugify(title, { lower: true, locale: 'vi', strict: true })
-
-    const payload = {
-      title: title.trim(), slug, excerpt, content, tag,
-      published: shouldPublish,
-      thumbnail_url: thumbnailUrl || null,
-      updated_at: new Date().toISOString(),
-    }
+    const payload = { title: title.trim(), slug, excerpt, content, tag, published: shouldPublish, thumbnail_url: thumbnailUrl || null, updated_at: new Date().toISOString() }
 
     if (editId) {
       const { error } = await supabase.from('posts').update(payload).eq('id', editId)
@@ -106,41 +109,39 @@ export default function EditorClient() {
       if (error) { setSaveMsg('Lỗi: ' + error.message); setSaving(false); return }
     }
 
-    setSaving(false)
-    setPublished(shouldPublish)
+    setSaving(false); setPublished(shouldPublish)
     setSaveMsg(shouldPublish ? 'Đã publish ✓' : 'Đã lưu draft ✓')
     setTimeout(() => setSaveMsg(''), 3000)
     if (!editId) setTimeout(() => router.push('/admin/dashboard'), 1000)
   }
 
+  const selectedCat = categories.find(c => c.name === tag)
+
   return (
     <div style={{ background: '#F5F0E8', minHeight: '100vh' }}>
       <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 0 20px', borderBottom: '1px solid #DDD8CC' }}>
-          <a href="/admin/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '1px', textTransform: 'uppercase', backgroundColor: 'transparent', color: '#1C1A16', border: '2px solid #1C1A16', padding: '7px 16px', borderRadius: 2, textDecoration: 'none' }}>
-            ← Dashboard
-          </a>
+          <a href="/admin/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '1px', textTransform: 'uppercase', backgroundColor: 'transparent', color: '#1C1A16', border: '2px solid #1C1A16', padding: '7px 16px', borderRadius: 2, textDecoration: 'none' }}>← Dashboard</a>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             {saveMsg && <span style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: saveMsg.includes('Lỗi') ? '#C8102E' : '#3D5A3E' }}>{saveMsg}</span>}
             <button onClick={() => handleSave(false)} disabled={saving}
-              style={{ display: 'inline-flex', alignItems: 'center', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '1px', textTransform: 'uppercase', backgroundColor: 'transparent', color: '#1C1A16', border: '2px solid #1C1A16', padding: '7px 16px', borderRadius: 2, cursor: 'pointer' }}>
+              style={{ display: 'inline-flex', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '1px', textTransform: 'uppercase', backgroundColor: 'transparent', color: '#1C1A16', border: '2px solid #1C1A16', padding: '7px 16px', borderRadius: 2, cursor: 'pointer' }}>
               Lưu Draft
             </button>
             <button onClick={() => handleSave(true)} disabled={saving}
-              style={{ display: 'inline-flex', alignItems: 'center', backgroundColor: '#3D5A3E', color: '#FAF7F2', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '1px', textTransform: 'uppercase', padding: '9px 18px', borderRadius: 2, cursor: 'pointer', border: 'none' }}>
+              style={{ display: 'inline-flex', backgroundColor: '#3D5A3E', color: '#FAF7F2', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '1px', textTransform: 'uppercase', padding: '9px 18px', borderRadius: 2, cursor: 'pointer', border: 'none' }}>
               {saving ? 'Đang lưu...' : published ? 'Cập nhật' : 'Publish'}
             </button>
           </div>
         </div>
 
         <div style={{ padding: '32px 0' }}>
+          {/* Thumbnail */}
           <div style={{ marginBottom: 24 }}>
             <label style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#9A9895', letterSpacing: '1px', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Thumbnail</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <div style={{ width: 160, height: 120, background: '#EDE8DC', borderRadius: 2, border: '1px dashed #DDD8CC', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                {thumbnailPreview
-                  ? <img src={thumbnailPreview} alt="thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#9A9895' }}>No image</span>}
+                {thumbnailPreview ? <img src={thumbnailPreview} alt="thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#9A9895' }}>No image</span>}
               </div>
               <div>
                 <input type="file" id="thumb-upload" accept="image/*" style={{ display: 'none' }} onChange={handleThumbnailUpload} />
@@ -153,11 +154,17 @@ export default function EditorClient() {
             </div>
           </div>
 
+          {/* Tag — dynamic từ DB */}
           <div style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'center' }}>
-            <select value={tag} onChange={e => setTag(e.target.value as Tag)}
+            <select value={tag} onChange={e => setTag(e.target.value)}
               style={{ padding: '7px 12px', border: '1px solid #DDD8CC', borderRadius: 2, fontFamily: 'var(--font-mono)', fontSize: 11, color: '#1C1A16', background: '#FAF7F2', cursor: 'pointer' }}>
-              {TAGS.map(t => <option key={t} value={t}>{t}</option>)}
+              {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
             </select>
+            {selectedCat && (
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, padding: '4px 10px', borderRadius: 2, background: selectedCat.color_bg, color: selectedCat.color_text, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                {selectedCat.name}
+              </span>
+            )}
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, padding: '4px 10px', borderRadius: 2, background: published ? '#EAF0EA' : '#EDE8DC', color: published ? '#3D5A3E' : '#9A9895' }}>
               {published ? 'Published' : 'Draft'}
             </div>
@@ -165,8 +172,7 @@ export default function EditorClient() {
 
           <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Tiêu đề bài viết..."
             style={{ width: '100%', fontFamily: 'var(--font-serif)', fontSize: 32, border: 'none', background: 'none', color: '#1C1A16', marginBottom: 14, fontWeight: 400, outline: 'none' }} />
-
-          <div style={{ borderTop: '1px solid #DDD8CC', marginBottom: 0 }} />
+          <div style={{ borderTop: '1px solid #DDD8CC' }} />
 
           {editor && (
             <div style={{ display: 'flex', gap: 4, padding: '10px 0', borderBottom: '1px solid #DDD8CC', marginBottom: 20, flexWrap: 'wrap' }}>
@@ -181,7 +187,6 @@ export default function EditorClient() {
               <ToolbarBtn onClick={() => editor.chain().focus().toggleCode().run()} active={editor.isActive('code')}>Code</ToolbarBtn>
             </div>
           )}
-
           <EditorContent editor={editor} />
         </div>
       </div>
