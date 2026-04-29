@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 
 interface Props {
   id: string
-  table: 'posts' | 'vibes'
+  table: 'posts' | 'vibes' | 'comments'
 }
 
 export default function DeleteButton({ id, table }: Props) {
