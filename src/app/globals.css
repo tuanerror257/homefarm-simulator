@@ -1,26 +1,18 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background-color: #F5F0E8; color: #1C1A16; font-family: var(--font-sans); }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+.article-content h2 { font-family: var(--font-serif); font-size: 22px; font-weight: 400; color: #1C1A16; margin: 36px 0 14px; }
+.article-content blockquote { border-left: 2px solid #C8102E; padding-left: 18px; font-family: var(--font-serif); font-style: italic; font-size: 18px; color: #1C1A16; margin: 28px 0; }
+.article-content p { margin-bottom: 22px; }
+.article-content ul { padding-left: 20px; margin-bottom: 22px; }
+.article-content a { color: #3D5A3E; text-decoration: underline; }
+.article-content img { max-width: 100%; border-radius: 2px; margin: 20px 0; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+.ProseMirror h2 { font-family: var(--font-serif); font-size: 22px; font-weight: 400; color: #1C1A16; margin: 36px 0 14px; }
+.ProseMirror blockquote { border-left: 2px solid #C8102E; padding-left: 18px; font-family: var(--font-serif); font-style: italic; font-size: 18px; color: #1C1A16; margin: 28px 0; }
+.ProseMirror p { margin-bottom: 22px; }
+.ProseMirror p.is-editor-empty:first-child::before { color: #9A9895; content: attr(data-placeholder); float: left; height: 0; pointer-events: none; }
