@@ -13,14 +13,13 @@ export default function Navbar() {
     { href: '/about', label: 'About' },
   ]
 
+  const isActive = (href: string) => {
+    if (href === '/') return pathname === '/'
+    return pathname.startsWith(href)
+  }
+
   return (
-    <nav style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '24px 0 20px',
-      borderBottom: '1px solid #DDD8CC',
-    }}>
+    <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 0 20px', borderBottom: '1px solid #DDD8CC' }}>
       {/* Logo */}
       <Link href="/" style={{ textDecoration: 'none' }}>
         <div>
@@ -38,24 +37,20 @@ export default function Navbar() {
       {/* Nav links */}
       <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
         {links.map(link => (
-          <Link
-            key={link.href}
-            href={link.href}
-            style={{
-              fontSize: 13,
-              color: pathname === link.href ? '#1C1A16' : '#5A5855',
-              textDecoration: 'none',
-              fontFamily: 'var(--font-sans)',
-            }}
-          >
+          <Link key={link.href} href={link.href} style={{ fontSize: 13, color: isActive(link.href) ? '#1C1A16' : '#5A5855', textDecoration: 'none', fontFamily: 'var(--font-sans)' }}>
             {link.label}
           </Link>
         ))}
-        <Link
-          href="/admin"
-          style={{ fontSize: 13, color: '#3D5A3E', textDecoration: 'none', fontFamily: 'var(--font-sans)' }}
-        >
+        <Link href="/admin" style={{ fontSize: 13, color: '#3D5A3E', textDecoration: 'none', fontFamily: 'var(--font-sans)' }}>
           Admin
+        </Link>
+
+        {/* Search icon */}
+        <Link href="/search" style={{ color: isActive('/search') ? '#1C1A16' : '#5A5855', display: 'flex', alignItems: 'center' }}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.2"/>
+            <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+          </svg>
         </Link>
       </div>
     </nav>
