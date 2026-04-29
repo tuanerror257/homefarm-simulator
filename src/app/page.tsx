@@ -4,28 +4,23 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { Post, Vibe } from '@/lib/types'
 
-function tagStyle(tag: string) {
-  if (tag === 'Kinh Doanh') return { background: '#EAF0EA', color: '#3D5A3E' }
-  if (tag === 'AI / Tech') return { background: '#FEF0E6', color: '#B85C1A' }
-  return { background: '#F3EDF8', color: '#7B4FA6' }
-}
-
 export default async function HomePage() {
   const supabase = await createClient()
 
-  const { data: posts } = await supabase
-    .from('posts')
-    .select('*')
-    .eq('published', true)
-    .order('created_at', { ascending: false })
-    .limit(3)
+  const [
+    { data: posts },
+    { data: vibes },
+    { data: categories },
+  ] = await Promise.all([
+    supabase.from('posts').select('*').eq('published', true).order('created_at', { ascending: false }).limit(3),
+    supabase.from('vibes').select('*').eq('published', true).order('created_at', { ascending: false }).limit(4),
+    supabase.from('categories').select('*').order('created_at', { ascending: true }),
+  ])
 
-  const { data: vibes } = await supabase
-    .from('vibes')
-    .select('*')
-    .eq('published', true)
-    .order('created_at', { ascending: false })
-    .limit(4)
+  function getCatStyle(tagName: string) {
+    const cat = categories?.find(c => c.name === tagName)
+    return { background: cat?.color_bg || '#EAF0EA', color: cat?.color_text || '#3D5A3E' }
+  }
 
   return (
     <div style={{ background: '#F5F0E8', minHeight: '100vh' }}>
@@ -56,22 +51,15 @@ export default async function HomePage() {
         {(posts as Post[])?.map(post => (
           <Link key={post.id} href={`/blog/${post.slug}`} style={{ textDecoration: 'none' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '88px 1fr', gap: '0 16px', padding: '20px 0', borderBottom: '1px solid #DDD8CC', alignItems: 'start' }}>
-
-              {/* Thumbnail */}
               <div style={{ width: 88, height: 72, borderRadius: 2, flexShrink: 0, overflow: 'hidden', background: '#2C3E50' }}>
                 {post.thumbnail_url && (
-                  <img
-                    src={post.thumbnail_url}
-                    alt={post.title}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  />
+                  <img src={post.thumbnail_url} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 )}
               </div>
-
-              {/* Content */}
               <div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, padding: '3px 8px', borderRadius: 2, textTransform: 'uppercase', letterSpacing: '0.5px', ...tagStyle(post.tag) }}>
+                  {/* Tag dùng màu từ DB */}
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, padding: '3px 8px', borderRadius: 2, textTransform: 'uppercase', letterSpacing: '0.5px', ...getCatStyle(post.tag) }}>
                     {post.tag}
                   </span>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#9A9895' }}>
@@ -104,9 +92,7 @@ export default async function HomePage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: '#DDD8CC', border: '1px solid #DDD8CC', marginTop: 16 }}>
           {(vibes as Vibe[])?.map(vibe => (
             <div key={vibe.id} style={{ background: '#F5F0E8', padding: '24px 20px', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ fontSize: 15, lineHeight: 1.7, color: '#1C1A16', fontWeight: 300, flex: 1, marginBottom: 14 }}>
-                {vibe.text}
-              </div>
+              <div style={{ fontSize: 15, lineHeight: 1.7, color: '#1C1A16', fontWeight: 300, flex: 1, marginBottom: 14 }}>{vibe.text}</div>
               <div style={{ marginTop: 'auto' }}>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#9A9895' }}>
                   {new Date(vibe.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: 'short' })}
@@ -122,7 +108,7 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <Footer />
+        <Footer categories={categories || []} />
       </div>
     </div>
   )
