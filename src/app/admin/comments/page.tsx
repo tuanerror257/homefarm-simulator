@@ -2,213 +2,162 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import ApproveButton from '@/components/ApproveButton'
 import DeleteButton from '@/components/DeleteButton'
+import AdminFooter from '@/components/AdminFooter'
 import Footer from '@/components/Footer'
 
-export default async function AdminCommentsPage() {
+interface Category {
+  id: string
+  name: string
+  slug: string
+  color_bg: string
+  color_text: string
+}
+
+interface Comment {
+  id: string
+  post_id: string
+  author_name: string
+  content: string
+  approved: boolean
+  created_at: string
+  posts?: { title: string; slug: string }
+}
+
+export default async function CommentsPage() {
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/admin/login')
 
-  if (!user) {
-    redirect('/login')
+  const [{ data: pending }, { data: approved }, { data: categories }] = await Promise.all([
+    supabase
+      .from('comments')
+      .select('*, posts(title, slug)')
+      .eq('approved', false)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('comments')
+      .select('*, posts(title, slug)')
+      .eq('approved', true)
+      .order('created_at', { ascending: false })
+      .limit(20),
+    supabase
+      .from('categories')
+      .select('id, name, slug, color_bg, color_text')
+      .order('created_at', { ascending: true }),
+  ])
+
+  const mono = 'var(--font-mono)'
+  const sans = 'var(--font-sans)'
+
+  function CommentRow({ comment }: { comment: Comment }) {
+    return (
+      <div style={{
+        padding: '16px 20px',
+        borderBottom: '1px solid #EDE8DC',
+        display: 'grid',
+        gridTemplateColumns: '1fr auto',
+        gap: 12,
+        alignItems: 'start',
+      }}>
+        <div>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'baseline', marginBottom: 4 }}>
+            <span style={{ fontFamily: mono, fontSize: 11, fontWeight: 600, color: '#1C1A16' }}>
+              {comment.author_name}
+            </span>
+            <span style={{ fontFamily: mono, fontSize: 10, color: '#9A9895' }}>
+              {new Date(comment.created_at).toLocaleDateString('vi-VN')}
+            </span>
+            {comment.posts && (
+              <a
+                href={`/blog/${comment.posts.slug}`}
+                target="_blank"
+                style={{ fontFamily: mono, fontSize: 9, color: '#9A9895', textDecoration: 'underline', letterSpacing: '0.5px' }}
+              >
+                {comment.posts.title}
+              </a>
+            )}
+          </div>
+          <p style={{ fontSize: 13, color: '#3D3A35', lineHeight: 1.6, margin: 0, fontWeight: 300 }}>
+            {comment.content}
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
+          {!comment.approved && <ApproveButton id={comment.id} />}
+          <DeleteButton id={comment.id} table="comments" />
+        </div>
+      </div>
+    )
   }
-
-  // Check if user is admin
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-
-  if (profile?.role !== 'admin') {
-    redirect('/')
-  }
-
-  // Fetch all comments with post info
-  const { data: comments } = await supabase
-    .from('comments')
-    .select(`
-      id,
-      content,
-      created_at,
-      approved,
-      author_name,
-      author_email,
-      posts (
-        id,
-        title,
-        slug
-      )
-    `)
-    .order('created_at', { ascending: false })
-
-  const pendingComments = comments?.filter((c) => !c.approved) || []
-  const approvedComments = comments?.filter((c) => c.approved) || []
-
-  // Fetch categories for footer
-  const { data: categories } = await supabase
-    .from('categories')
-    .select('id, name, slug')
-    .order('name')
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <a href="/" className="text-red-600 font-bold text-xl">
-              Tadavibes
+    <div style={{ background: '#F5F0E8', minHeight: '100vh' }}>
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 24px' }}>
+        {/* Header */}
+        <div style={{ padding: '32px 0 24px', borderBottom: '1px solid #DDD8CC' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+            <a href="/admin/dashboard" style={{ fontFamily: mono, fontSize: 10, color: '#9A9895', letterSpacing: '1px', textDecoration: 'none' }}>
+              ← DASHBOARD
             </a>
-            <span className="text-gray-300">|</span>
-            <span className="text-gray-600 font-medium">Quản lý bình luận</span>
           </div>
-          <nav className="flex items-center gap-4 text-sm">
-            <a href="/admin" className="text-gray-500 hover:text-gray-900">
-              Dashboard
-            </a>
-            <a href="/admin/posts" className="text-gray-500 hover:text-gray-900">
-              Bài viết
-            </a>
-            <a href="/admin/comments" className="text-red-600 font-medium">
-              Bình luận
-            </a>
-            <a href="/admin/categories" className="text-gray-500 hover:text-gray-900">
-              Danh mục
-            </a>
-          </nav>
+          <h1 style={{ fontFamily: sans, fontSize: 24, fontWeight: 400, color: '#1C1A16', margin: 0 }}>
+            Quản lý Comments
+          </h1>
         </div>
-      </header>
 
-      {/* Main content */}
-      <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
-        {/* Pending comments */}
-        <section className="mb-10">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">
+        {/* Pending */}
+        <div style={{ padding: '28px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+            <span style={{ fontFamily: mono, fontSize: 10, letterSpacing: '1.5px', color: '#1C1A16', textTransform: 'uppercase' }}>
               Chờ duyệt
-              {pendingComments.length > 0 && (
-                <span className="ml-2 bg-red-100 text-red-700 text-xs font-medium px-2 py-0.5 rounded-full">
-                  {pendingComments.length}
-                </span>
-              )}
-            </h2>
+            </span>
+            {pending && pending.length > 0 && (
+              <span style={{
+                background: '#C8102E',
+                color: '#FAF7F2',
+                fontFamily: mono,
+                fontSize: 9,
+                padding: '2px 7px',
+                borderRadius: 999,
+              }}>
+                {pending.length}
+              </span>
+            )}
           </div>
 
-          {pendingComments.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400">
-              Không có bình luận nào đang chờ duyệt
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {pendingComments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="bg-white rounded-xl border border-orange-200 p-5 shadow-sm"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-gray-900 text-sm">
-                          {comment.author_name || 'Ẩn danh'}
-                        </span>
-                        {comment.author_email && (
-                          <span className="text-gray-400 text-xs">
-                            {comment.author_email}
-                          </span>
-                        )}
-                        <span className="text-gray-300 text-xs">·</span>
-                        <span className="text-gray-400 text-xs">
-                          {new Date(comment.created_at).toLocaleDateString('vi-VN', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </span>
-                      </div>
-                      <p className="text-gray-700 text-sm mb-2">{comment.content}</p>
-                      {comment.posts && (
-                        <a
-                          href={`/blog/${(comment.posts as any).slug}`}
-                          className="text-xs text-red-500 hover:underline"
-                        >
-                          Bài: {(comment.posts as any).title}
-                        </a>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <ApproveButton id={comment.id} />
-                      <DeleteButton id={comment.id} table="comments" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+          <div style={{ background: '#FAF7F2', border: '1px solid #DDD8CC', borderRadius: 4 }}>
+            {!pending || pending.length === 0 ? (
+              <div style={{ padding: '24px 20px', fontFamily: mono, fontSize: 11, color: '#9A9895', textAlign: 'center' }}>
+                Không có comment nào chờ duyệt
+              </div>
+            ) : (
+              (pending as Comment[]).map(c => <CommentRow key={c.id} comment={c} />)
+            )}
+          </div>
+        </div>
 
-        {/* Approved comments */}
-        <section>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Đã duyệt
-            <span className="ml-2 text-gray-400 text-sm font-normal">
-              ({approvedComments.length})
+        {/* Approved */}
+        <div style={{ padding: '0 0 40px' }}>
+          <div style={{ marginBottom: 16 }}>
+            <span style={{ fontFamily: mono, fontSize: 10, letterSpacing: '1.5px', color: '#1C1A16', textTransform: 'uppercase' }}>
+              Đã duyệt (20 mới nhất)
             </span>
-          </h2>
+          </div>
 
-          {approvedComments.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400">
-              Chưa có bình luận nào được duyệt
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {approvedComments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-gray-900 text-sm">
-                          {comment.author_name || 'Ẩn danh'}
-                        </span>
-                        <span className="text-gray-300 text-xs">·</span>
-                        <span className="text-gray-400 text-xs">
-                          {new Date(comment.created_at).toLocaleDateString('vi-VN', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                          })}
-                        </span>
-                        <span className="text-green-500 text-xs">✓ Đã duyệt</span>
-                      </div>
-                      <p className="text-gray-600 text-sm mb-2">{comment.content}</p>
-                      {comment.posts && (
-                        <a
-                          href={`/blog/${(comment.posts as any).slug}`}
-                          className="text-xs text-red-500 hover:underline"
-                        >
-                          Bài: {(comment.posts as any).title}
-                        </a>
-                      )}
-                    </div>
-                    <div className="shrink-0">
-                      <DeleteButton id={comment.id} table="comments" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-      </main>
+          <div style={{ background: '#FAF7F2', border: '1px solid #DDD8CC', borderRadius: 4 }}>
+            {!approved || approved.length === 0 ? (
+              <div style={{ padding: '24px 20px', fontFamily: mono, fontSize: 11, color: '#9A9895', textAlign: 'center' }}>
+                Chưa có comment nào được duyệt
+              </div>
+            ) : (
+              (approved as Comment[]).map(c => <CommentRow key={c.id} comment={c} />)
+            )}
+          </div>
+        </div>
 
-      <Footer categories={categories || []} />
+        <Footer categories={(categories as Category[]) || []} />
+        <AdminFooter />
+      </div>
     </div>
   )
 }
