@@ -8,14 +8,12 @@ const playfair = Playfair_Display({
   display: 'swap',
 })
 
-// Inter: support tiếng Việt hoàn hảo, thay DM Sans
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
   variable: '--font-sans',
   display: 'swap',
 })
 
-// JetBrains Mono: thay DM Mono, có latin-ext
 const mono = JetBrains_Mono({
   subsets: ['latin', 'latin-ext'],
   variable: '--font-mono',
@@ -24,8 +22,21 @@ const mono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'tadavibes — Góc nhỏ của Tada',
+  title: {
+    default: 'tada.vibes — Góc nhỏ của Tada',
+    template: '%s | tada.vibes',
+  },
   description: 'Thoughts, vibes, và những thứ linh tinh.',
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
+  openGraph: {
+    title: 'tada.vibes',
+    description: 'Góc nhỏ của Tada',
+    type: 'website',
+  },
 }
 
 export default function RootLayout({
