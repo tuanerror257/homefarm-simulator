@@ -41,7 +41,7 @@ export default async function CategoriesPage() {
 
           <CategoryActions categories={categories || []} />
         </div>
-        <AdminFooter />
+        <Footer categories={categories || []} />
       </div>
     </div>
   )
