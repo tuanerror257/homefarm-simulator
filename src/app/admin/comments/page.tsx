@@ -2,146 +2,213 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import ApproveButton from '@/components/ApproveButton'
 import DeleteButton from '@/components/DeleteButton'
-import AdminFooter from '@/components/AdminFooter'
+import Footer from '@/components/Footer'
 
-export default async function CommentsPage() {
+export default async function AdminCommentsPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/admin/login')
 
-  const [
-    { data: pending },
-    { data: approved },
-    { data: categories },
-  ] = await Promise.all([
-    supabase.from('comments').select('*, posts(title, slug)').eq('approved', false).order('created_at', { ascending: false }),
-    supabase.from('comments').select('*, posts(title, slug)').eq('approved', true).order('created_at', { ascending: false }).limit(20),
-    supabase.from('categories').select('*').order('created_at', { ascending: true }),
-  ])
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  // Check if user is admin
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'admin') {
+    redirect('/')
+  }
+
+  // Fetch all comments with post info
+  const { data: comments } = await supabase
+    .from('comments')
+    .select(`
+      id,
+      content,
+      created_at,
+      approved,
+      author_name,
+      author_email,
+      posts (
+        id,
+        title,
+        slug
+      )
+    `)
+    .order('created_at', { ascending: false })
+
+  const pendingComments = comments?.filter((c) => !c.approved) || []
+  const approvedComments = comments?.filter((c) => c.approved) || []
+
+  // Fetch categories for footer
+  const { data: categories } = await supabase
+    .from('categories')
+    .select('id, name, slug')
+    .order('name')
 
   return (
-    <div style={{ background: '#F5F0E8', minHeight: '100vh' }}>
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 24px' }}>
-
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 0 20px', borderBottom: '1px solid #DDD8CC' }}>
-          <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline' }}>
-            <span style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 400, color: '#1C1A16' }}>tada</span>
-            <span style={{ fontFamily: 'var(--font-serif)', fontSize: 26, color: '#C8102E', lineHeight: '0.85' }}>.</span>
-            <span style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 500, fontStyle: 'italic', color: '#1C1A16' }}>vibes</span>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#9A9895', marginLeft: 12, letterSpacing: '1px' }}>COMMENTS</span>
-          </a>
-          <a href="/admin/dashboard" style={{ display: 'inline-flex', alignItems: 'center', fontFamily: 'var(--font-mono)', fontSize: 10, color: '#5A5855', border: '1.5px solid #5A5855', padding: '6px 14px', borderRadius: 2, textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase' }}>
-            ← Dashboard
-          </a>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <a href="/" className="text-red-600 font-bold text-xl">
+              Tadavibes
+            </a>
+            <span className="text-gray-300">|</span>
+            <span className="text-gray-600 font-medium">Quản lý bình luận</span>
+          </div>
+          <nav className="flex items-center gap-4 text-sm">
+            <a href="/admin" className="text-gray-500 hover:text-gray-900">
+              Dashboard
+            </a>
+            <a href="/admin/posts" className="text-gray-500 hover:text-gray-900">
+              Bài viết
+            </a>
+            <a href="/admin/comments" className="text-red-600 font-medium">
+              Bình luận
+            </a>
+            <a href="/admin/categories" className="text-gray-500 hover:text-gray-900">
+              Danh mục
+            </a>
+          </nav>
         </div>
+      </header>
 
-        <div style={{ padding: '36px 0' }}>
-
-          {/* Pending */}
-          <div style={{ marginBottom: 48 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#5A5855', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                Chờ duyệt
-              </div>
-              {pending && pending.length > 0 && (
-                <span style={{ background: '#C8102E', color: '#FAF7F2', fontFamily: 'var(--font-mono)', fontSize: 10, padding: '2px 8px', borderRadius: 10 }}>
-                  {pending.length}
+      {/* Main content */}
+      <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
+        {/* Pending comments */}
+        <section className="mb-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">
+              Chờ duyệt
+              {pendingComments.length > 0 && (
+                <span className="ml-2 bg-red-100 text-red-700 text-xs font-medium px-2 py-0.5 rounded-full">
+                  {pendingComments.length}
                 </span>
               )}
-            </div>
+            </h2>
+          </div>
 
-            {!pending?.length ? (
-              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: '#9A9895', padding: '20px 0' }}>
-                Không có comment nào chờ duyệt ✓
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: '#DDD8CC', border: '1px solid #DDD8CC' }}>
-                {pending.map((comment: any) => (
-                  <div key={comment.id} style={{ background: '#FAF7F2', padding: '20px 24px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-                      <div>
-                        <span style={{ fontSize: 13, fontWeight: 500, color: '#1C1A16', fontFamily: 'var(--font-sans)' }}>
-                          {comment.author_name}
+          {pendingComments.length === 0 ? (
+            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400">
+              Không có bình luận nào đang chờ duyệt
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {pendingComments.map((comment) => (
+                <div
+                  key={comment.id}
+                  className="bg-white rounded-xl border border-orange-200 p-5 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-gray-900 text-sm">
+                          {comment.author_name || 'Ẩn danh'}
                         </span>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#9A9895', marginLeft: 10 }}>
-                          {comment.author_email}
-                        </span>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#9A9895', marginLeft: 10 }}>
-                          {new Date(comment.created_at).toLocaleDateString('vi-VN')}
+                        {comment.author_email && (
+                          <span className="text-gray-400 text-xs">
+                            {comment.author_email}
+                          </span>
+                        )}
+                        <span className="text-gray-300 text-xs">·</span>
+                        <span className="text-gray-400 text-xs">
+                          {new Date(comment.created_at).toLocaleDateString('vi-VN', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
                         </span>
                       </div>
-                      <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexShrink: 0 }}>
-                        <ApproveButton id={comment.id} />
-                        <DeleteButton id={comment.id} table="comments" />
-                      </div>
+                      <p className="text-gray-700 text-sm mb-2">{comment.content}</p>
+                      {comment.posts && (
+                        <a
+                          href={`/blog/${(comment.posts as any).slug}`}
+                          className="text-xs text-red-500 hover:underline"
+                        >
+                          Bài: {(comment.posts as any).title}
+                        </a>
+                      )}
                     </div>
-                    <div style={{ fontSize: 14, color: '#5A5855', lineHeight: 1.65, fontFamily: 'var(--font-sans)', marginBottom: 8 }}>
-                      {comment.body}
-                    </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#9A9895' }}>
-                      Bài: <a href={`/blog/${(comment.posts as any)?.slug}`} target="_blank" style={{ color: '#3D5A3E', textDecoration: 'none' }}>
-                        {(comment.posts as any)?.title}
-                      </a>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <ApproveButton commentId={comment.id} />
+                      <DeleteButton commentId={comment.id} />
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Approved */}
-          <div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#5A5855', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: 16 }}>
-              Đã duyệt (20 gần nhất)
+                </div>
+              ))}
             </div>
+          )}
+        </section>
 
-            {!approved?.length ? (
-              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: '#9A9895', padding: '20px 0' }}>
-                Chưa có comment nào được duyệt
-              </div>
-            ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr>
-                    {['Tên', 'Nội dung', 'Bài viết', 'Ngày', ''].map(h => (
-                      <th key={h} style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#9A9895', textTransform: 'uppercase', letterSpacing: '1px', padding: '10px 0', borderBottom: '1px solid #DDD8CC', textAlign: 'left' }}>
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {approved.map((comment: any) => (
-                    <tr key={comment.id}>
-                      <td style={{ padding: '12px 0', borderBottom: '1px solid #DDD8CC', fontSize: 13, color: '#1C1A16', whiteSpace: 'nowrap', paddingRight: 16 }}>
-                        {comment.author_name}
-                      </td>
-                      <td style={{ padding: '12px 0', borderBottom: '1px solid #DDD8CC', fontSize: 13, color: '#5A5855', maxWidth: 300 }}>
-                        <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 300 }}>
-                          {comment.body}
-                        </div>
-                      </td>
-                      <td style={{ padding: '12px 0', borderBottom: '1px solid #DDD8CC', fontSize: 12, color: '#3D5A3E', whiteSpace: 'nowrap', paddingRight: 16 }}>
-                        <a href={`/blog/${(comment.posts as any)?.slug}`} target="_blank" style={{ color: '#3D5A3E', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: 10 }}>
-                          {(comment.posts as any)?.title?.slice(0, 30)}...
+        {/* Approved comments */}
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Đã duyệt
+            <span className="ml-2 text-gray-400 text-sm font-normal">
+              ({approvedComments.length})
+            </span>
+          </h2>
+
+          {approvedComments.length === 0 ? (
+            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400">
+              Chưa có bình luận nào được duyệt
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {approvedComments.map((comment) => (
+                <div
+                  key={comment.id}
+                  className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-gray-900 text-sm">
+                          {comment.author_name || 'Ẩn danh'}
+                        </span>
+                        <span className="text-gray-300 text-xs">·</span>
+                        <span className="text-gray-400 text-xs">
+                          {new Date(comment.created_at).toLocaleDateString('vi-VN', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                          })}
+                        </span>
+                        <span className="text-green-500 text-xs">✓ Đã duyệt</span>
+                      </div>
+                      <p className="text-gray-600 text-sm mb-2">{comment.content}</p>
+                      {comment.posts && (
+                        <a
+                          href={`/blog/${(comment.posts as any).slug}`}
+                          className="text-xs text-red-500 hover:underline"
+                        >
+                          Bài: {(comment.posts as any).title}
                         </a>
-                      </td>
-                      <td style={{ padding: '12px 0', borderBottom: '1px solid #DDD8CC', fontFamily: 'var(--font-mono)', fontSize: 10, color: '#9A9895', whiteSpace: 'nowrap', paddingRight: 16 }}>
-                        {new Date(comment.created_at).toLocaleDateString('vi-VN')}
-                      </td>
-                      <td style={{ padding: '12px 0', borderBottom: '1px solid #DDD8CC' }}>
-                        <DeleteButton id={comment.id} table="comments" />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+                      )}
+                    </div>
+                    <div className="shrink-0">
+                      <DeleteButton commentId={comment.id} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
 
-        <AdminFooter />
-      </div>
+      <Footer categories={categories || []} />
     </div>
   )
 }
