@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import ApproveButton from '@/components/ApproveButton'
 import DeleteButton from '@/components/DeleteButton'
+import AdminFooter from '@/components/AdminFooter'
+
 
 export default async function CommentsPage() {
   const supabase = await createClient()
@@ -144,6 +146,7 @@ export default async function CommentsPage() {
 
         </div>
       </div>
+      <AdminFooter />
     </div>
   )
 }

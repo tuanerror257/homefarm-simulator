@@ -4,6 +4,7 @@ import Link from 'next/link'
 import LogoutButton from '@/components/LogoutButton'
 import DeleteButton from '@/components/DeleteButton'
 import { Post, Vibe } from '@/lib/types'
+import AdminFooter from '@/components/AdminFooter'
 
 function tagBadge(tag: string, categories: any[]) {
   const cat = categories.find(c => c.name === tag)
@@ -256,6 +257,8 @@ export default async function AdminDashboardPage({
         )}
 
       </div>
+      <AdminFooter />
     </div>
+    
   )
 }

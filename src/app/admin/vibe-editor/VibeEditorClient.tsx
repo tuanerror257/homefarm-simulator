@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
+import AdminFooter from '@/components/AdminFooter'
+
 
 export default function VibeEditorClient() {
   const router = useRouter()
@@ -102,6 +104,7 @@ export default function VibeEditorClient() {
           )}
         </div>
       </div>
+      <AdminFooter />
     </div>
   )
 }
