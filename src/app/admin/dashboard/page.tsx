@@ -15,6 +15,7 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleString('vi-VN', {
     day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
+    timeZone: 'Asia/Ho_Chi_Minh',
   })
 }
 
@@ -100,7 +101,6 @@ export default async function AdminDashboardPage({
       `}</style>
 
       <div className="adm">
-        {/* Header */}
         <div className="adm-hdr">
           <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline' }}>
             <span style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 400, color: '#1C1A16' }}>tada</span>
@@ -120,7 +120,6 @@ export default async function AdminDashboardPage({
           </div>
         </div>
 
-        {/* Stats */}
         <div className="adm-stats">
           {[
             { label: 'Tổng Bài', value: totalPosts || 0, delta: 'posts', alert: false },
@@ -136,7 +135,6 @@ export default async function AdminDashboardPage({
           ))}
         </div>
 
-        {/* Tabs */}
         <div className="adm-tabs">
           <Link href="?tab=posts" style={{ padding: '10px 20px', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none', whiteSpace: 'nowrap', color: activeTab === 'posts' ? '#1C1A16' : '#9A9895', borderBottom: activeTab === 'posts' ? '2px solid #1C1A16' : '2px solid transparent', marginBottom: -2 }}>
             Bài viết ({totalPosts || 0})
@@ -146,7 +144,6 @@ export default async function AdminDashboardPage({
           </Link>
         </div>
 
-        {/* Posts tab */}
         {activeTab === 'posts' && (
           <div>
             <div className="adm-tbl-wrap">
@@ -205,7 +202,6 @@ export default async function AdminDashboardPage({
           </div>
         )}
 
-        {/* Vibes tab */}
         {activeTab === 'vibes' && (
           <div>
             <div className="adm-tbl-wrap">
