@@ -2,26 +2,22 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import ApproveButton from '@/components/ApproveButton'
 import DeleteButton from '@/components/DeleteButton'
-import AdminFooter from '@/components/AdminFooter'
-
+import Footer from '@/components/Footer'
 
 export default async function CommentsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/admin/login')
 
-  const { data: pending } = await supabase
-    .from('comments')
-    .select('*, posts(title, slug)')
-    .eq('approved', false)
-    .order('created_at', { ascending: false })
-
-  const { data: approved } = await supabase
-    .from('comments')
-    .select('*, posts(title, slug)')
-    .eq('approved', true)
-    .order('created_at', { ascending: false })
-    .limit(20)
+  const [
+    { data: pending },
+    { data: approved },
+    { data: categories },
+  ] = await Promise.all([
+    supabase.from('comments').select('*, posts(title, slug)').eq('approved', false).order('created_at', { ascending: false }),
+    supabase.from('comments').select('*, posts(title, slug)').eq('approved', true).order('created_at', { ascending: false }).limit(20),
+    supabase.from('categories').select('*').order('created_at', { ascending: true }),
+  ])
 
   return (
     <div style={{ background: '#F5F0E8', minHeight: '100vh' }}>
@@ -144,9 +140,8 @@ export default async function CommentsPage() {
             )}
           </div>
 
-        </div>
+        <Footer categories={categories || []} />
       </div>
-      <AdminFooter />
     </div>
   )
 }
