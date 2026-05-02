@@ -219,9 +219,8 @@ export default function EditorClient() {
             >
               {thumbnailPreview
                 ? <img src={thumbnailPreview} alt="thumb" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 20, marginBottom: 4 }}>🖼</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: '#9A9895' }}>COVER</div>
+                : <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: '#9A9895', letterSpacing: '1px' }}>
+                    TẢI COVER
                   </div>
               }
               {uploading && (
