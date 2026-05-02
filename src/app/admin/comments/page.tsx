@@ -141,8 +141,8 @@ export default async function AdminCommentsPage() {
                       )}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <ApproveButton commentId={comment.id} />
-                      <DeleteButton commentId={comment.id} />
+                      <ApproveButton id={comment.id} />
+                      <DeleteButton id={comment.id} />
                     </div>
                   </div>
                 </div>
@@ -198,7 +198,7 @@ export default async function AdminCommentsPage() {
                       )}
                     </div>
                     <div className="shrink-0">
-                      <DeleteButton commentId={comment.id} />
+                      <DeleteButton id={comment.id} />
                     </div>
                   </div>
                 </div>
