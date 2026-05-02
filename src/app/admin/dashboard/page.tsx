@@ -64,73 +64,83 @@ export default async function AdminDashboardPage({
   const totalPostPages = Math.ceil((totalPosts || 0) / PER_PAGE)
   const totalVibePages = Math.ceil((totalVibes || 0) / PER_PAGE)
 
+  const btnSm = (extra: object = {}) => ({
+    display: 'inline-flex' as const,
+    alignItems: 'center' as const,
+    fontFamily: 'var(--font-mono)',
+    fontSize: 10,
+    letterSpacing: '1px',
+    textTransform: 'uppercase' as const,
+    padding: '6px 10px',
+    borderRadius: 2,
+    textDecoration: 'none',
+    whiteSpace: 'nowrap' as const,
+    border: '1.5px solid',
+    cursor: 'pointer',
+    background: 'transparent',
+    ...extra,
+  })
+
   return (
     <div style={{ background: '#F5F0E8', minHeight: '100vh' }}>
       <style>{`
-        .admin-wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
-        .admin-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 0 14px; border-bottom: 1px solid #DDD8CC; flex-wrap: wrap; gap: 10px; }
-        .admin-logo { display: flex; align-items: baseline; }
-        .admin-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .admin-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: #DDD8CC; border: 1px solid #DDD8CC; margin: 20px 0; }
-        .stat-card { background: #FAF7F2; padding: 14px; }
-        .admin-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .admin-table { width: 100%; border-collapse: collapse; min-width: 500px; }
-        .admin-table th { font-family: var(--font-mono); font-size: 10px; color: #9A9895; text-transform: uppercase; letter-spacing: 1px; padding: 10px 8px 10px 0; border-bottom: 1px solid #DDD8CC; text-align: left; white-space: nowrap; }
-        .admin-table td { padding: 12px 8px 12px 0; border-bottom: 1px solid #DDD8CC; font-size: 13px; vertical-align: middle; }
-        .admin-tabs { display: flex; gap: 0; border-bottom: 2px solid #DDD8CC; margin-bottom: 20px; }
-        .admin-tab { padding: 10px 20px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; white-space: nowrap; }
-        .btn-sm { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 6px 10px; border-radius: 2px; text-decoration: none; white-space: nowrap; border: 1.5px solid; cursor: pointer; }
+        .adm { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+        .adm-hdr { display: flex; align-items: center; justify-content: space-between; padding: 16px 0 14px; border-bottom: 1px solid #DDD8CC; flex-wrap: wrap; gap: 10px; }
+        .adm-acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .adm-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: #DDD8CC; border: 1px solid #DDD8CC; margin: 20px 0; }
+        .adm-tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .adm-tbl { width: 100%; border-collapse: collapse; min-width: 480px; }
+        .adm-tbl th { font-family: var(--font-mono); font-size: 10px; color: #9A9895; text-transform: uppercase; letter-spacing: 1px; padding: 10px 8px 10px 0; border-bottom: 1px solid #DDD8CC; text-align: left; white-space: nowrap; }
+        .adm-tbl td { padding: 12px 8px 12px 0; border-bottom: 1px solid #DDD8CC; font-size: 13px; vertical-align: middle; }
+        .adm-tabs { display: flex; border-bottom: 2px solid #DDD8CC; margin-bottom: 20px; }
         @media (max-width: 640px) {
-          .admin-stats { grid-template-columns: repeat(2,1fr); }
-          .stat-num { font-size: 22px !important; }
-          .admin-actions { width: 100%; }
-          .admin-tab { padding: 8px 14px; font-size: 10px; }
+          .adm-stats { grid-template-columns: repeat(2,1fr); }
         }
       `}</style>
 
-      <div class="admin-wrap">
+      <div className="adm">
         {/* Header */}
-        <div class="admin-header">
-          <div class="admin-logo">
+        <div className="adm-hdr">
+          <div style={{ display: 'flex', alignItems: 'baseline' }}>
             <span style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 400, color: '#1C1A16' }}>tada</span>
             <span style={{ fontFamily: 'var(--font-serif)', fontSize: 24, color: '#C8102E', lineHeight: '0.85' }}>.</span>
             <span style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 500, fontStyle: 'italic', color: '#1C1A16' }}>vibes</span>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: '#9A9895', marginLeft: 10, letterSpacing: '1px' }}>ADMIN</span>
           </div>
-          <div class="admin-actions">
-            <Link href="/" className="btn-sm" style={{ color: '#5A5855', borderColor: '#5A5855', display: 'inline-flex' }}>← Site</Link>
-            <Link href="/admin/categories" className="btn-sm" style={{ color: '#5A5855', borderColor: '#5A5855', display: 'inline-flex' }}>Chủ đề</Link>
-            <Link href="/admin/comments" className="btn-sm" style={{ color: pendingComments ? '#C8102E' : '#5A5855', borderColor: pendingComments ? '#C8102E' : '#5A5855', display: 'inline-flex' }}>
+          <div className="adm-acts">
+            <Link href="/" style={btnSm({ color: '#5A5855', borderColor: '#5A5855' })}>← Site</Link>
+            <Link href="/admin/categories" style={btnSm({ color: '#5A5855', borderColor: '#5A5855' })}>Chủ đề</Link>
+            <Link href="/admin/comments" style={btnSm({ color: pendingComments ? '#C8102E' : '#5A5855', borderColor: pendingComments ? '#C8102E' : '#5A5855' })}>
               Comments{pendingComments ? ` (${pendingComments})` : ''}
             </Link>
             <LogoutButton />
-            <Link href="/admin/vibe-editor" className="btn-sm" style={{ color: '#3D5A3E', borderColor: '#3D5A3E', display: 'inline-flex' }}>+ Vô Tri</Link>
-            <Link href="/admin/editor" style={{ display: 'inline-flex', alignItems: 'center', backgroundColor: '#1C1A16', color: '#F5F0E8', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '1px', textTransform: 'uppercase', padding: '8px 14px', borderRadius: 2, textDecoration: 'none' }}>+ Bài Mới</Link>
+            <Link href="/admin/vibe-editor" style={btnSm({ color: '#3D5A3E', borderColor: '#3D5A3E' })}>+ Vô Tri</Link>
+            <Link href="/admin/editor" style={{ display: 'inline-flex', alignItems: 'center', backgroundColor: '#1C1A16', color: '#F5F0E8', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '1px', textTransform: 'uppercase', padding: '8px 14px', borderRadius: 2, textDecoration: 'none', whiteSpace: 'nowrap' }}>+ Bài Mới</Link>
           </div>
         </div>
 
         {/* Stats */}
-        <div class="admin-stats">
+        <div className="adm-stats">
           {[
-            { label: 'Tổng Bài', value: totalPosts || 0, delta: 'posts' },
-            { label: 'Tổng Vô Tri', value: totalVibes || 0, delta: 'vibes' },
+            { label: 'Tổng Bài', value: totalPosts || 0, delta: 'posts', alert: false },
+            { label: 'Tổng Vô Tri', value: totalVibes || 0, delta: 'vibes', alert: false },
             { label: 'Comments', value: totalComments || 0, delta: `${pendingComments || 0} chờ duyệt`, alert: !!pendingComments },
-            { label: 'Reactions', value: totalReactions || 0, delta: 'total' },
+            { label: 'Reactions', value: totalReactions || 0, delta: 'total', alert: false },
           ].map(stat => (
-            <div key={stat.label} class="stat-card">
+            <div key={stat.label} style={{ background: '#FAF7F2', padding: 16 }}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: '#9A9895', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>{stat.label}</div>
-              <div className="stat-num" style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 400, color: '#1C1A16' }}>{stat.value}</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 400, color: '#1C1A16' }}>{stat.value}</div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: stat.alert ? '#C8102E' : '#3D5A3E', marginTop: 3 }}>{stat.delta}</div>
             </div>
           ))}
         </div>
 
         {/* Tabs */}
-        <div class="admin-tabs">
-          <Link href="?tab=posts" className="admin-tab" style={{ color: activeTab === 'posts' ? '#1C1A16' : '#9A9895', borderBottom: activeTab === 'posts' ? '2px solid #1C1A16' : '2px solid transparent', marginBottom: -2, textDecoration: 'none' }}>
+        <div className="adm-tabs">
+          <Link href="?tab=posts" style={{ padding: '10px 20px', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none', whiteSpace: 'nowrap', color: activeTab === 'posts' ? '#1C1A16' : '#9A9895', borderBottom: activeTab === 'posts' ? '2px solid #1C1A16' : '2px solid transparent', marginBottom: -2 }}>
             Bài viết ({totalPosts || 0})
           </Link>
-          <Link href="?tab=vibes" className="admin-tab" style={{ color: activeTab === 'vibes' ? '#1C1A16' : '#9A9895', borderBottom: activeTab === 'vibes' ? '2px solid #1C1A16' : '2px solid transparent', marginBottom: -2, textDecoration: 'none' }}>
+          <Link href="?tab=vibes" style={{ padding: '10px 20px', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none', whiteSpace: 'nowrap', color: activeTab === 'vibes' ? '#1C1A16' : '#9A9895', borderBottom: activeTab === 'vibes' ? '2px solid #1C1A16' : '2px solid transparent', marginBottom: -2 }}>
             Vô Tri ({totalVibes || 0})
           </Link>
         </div>
@@ -138,8 +148,8 @@ export default async function AdminDashboardPage({
         {/* Posts tab */}
         {activeTab === 'posts' && (
           <div>
-            <div class="admin-table-wrap">
-              <table class="admin-table">
+            <div className="adm-tbl-wrap">
+              <table className="adm-tbl">
                 <thead>
                   <tr>
                     <th>Tiêu đề</th>
@@ -181,7 +191,6 @@ export default async function AdminDashboardPage({
                 </tbody>
               </table>
             </div>
-
             {totalPostPages > 1 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '20px 0', flexWrap: 'wrap' }}>
                 {currentPostPage > 1 && <Link href={`?tab=posts&postPage=${currentPostPage - 1}`} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)', fontSize: 12, border: '2px solid #5A5855', backgroundColor: '#F5F0E8', color: '#1C1A16', padding: '6px 12px', borderRadius: 2, textDecoration: 'none' }}>←</Link>}
@@ -198,8 +207,8 @@ export default async function AdminDashboardPage({
         {/* Vibes tab */}
         {activeTab === 'vibes' && (
           <div>
-            <div class="admin-table-wrap">
-              <table class="admin-table">
+            <div className="adm-tbl-wrap">
+              <table className="adm-tbl">
                 <thead>
                   <tr>
                     <th>Nội dung</th>
@@ -233,7 +242,6 @@ export default async function AdminDashboardPage({
                 </tbody>
               </table>
             </div>
-
             {totalVibePages > 1 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '20px 0', flexWrap: 'wrap' }}>
                 {currentVibePage > 1 && <Link href={`?tab=vibes&vibePage=${currentVibePage - 1}`} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)', fontSize: 12, border: '2px solid #5A5855', backgroundColor: '#F5F0E8', color: '#1C1A16', padding: '6px 12px', borderRadius: 2, textDecoration: 'none' }}>←</Link>}
