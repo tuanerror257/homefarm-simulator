@@ -22,22 +22,46 @@ export default function DeleteButton({ id, table }: Props) {
   }
 
   if (deleting) {
-    return <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#9A9895' }}>Đang xoá...</span>
+    return (
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#9A9895' }}>
+        Đang xoá...
+      </span>
+    )
   }
 
   if (confirming) {
     return (
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: '#C8102E' }}>Chắc chắn?</span>
+        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: '#C8102E' }}>
+          Chắc chắn?
+        </span>
         <button
           onClick={handleDelete}
-          style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#FAF7F2', background: '#C8102E', border: 'none', padding: '3px 10px', borderRadius: 2, cursor: 'pointer' }}
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 10,
+            color: '#FAF7F2',
+            background: '#C8102E',
+            border: 'none',
+            padding: '3px 10px',
+            borderRadius: 2,
+            cursor: 'pointer',
+          }}
         >
           Xoá
         </button>
         <button
           onClick={() => setConfirming(false)}
-          style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#5A5855', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 10,
+            color: '#9A9895',
+            background: 'transparent',
+            border: '1px solid #DDD8CC',
+            padding: '3px 10px',
+            borderRadius: 2,
+            cursor: 'pointer',
+          }}
         >
           Huỷ
         </button>
@@ -48,7 +72,15 @@ export default function DeleteButton({ id, table }: Props) {
   return (
     <button
       onClick={() => setConfirming(true)}
-      style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#C8102E', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+      style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: 10,
+        color: '#C8102E',
+        background: 'transparent',
+        border: 'none',
+        padding: 0,
+        cursor: 'pointer',
+      }}
     >
       Xoá
     </button>
