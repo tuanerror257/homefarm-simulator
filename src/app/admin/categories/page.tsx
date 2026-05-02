@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import CategoryActions from './CategoryActions'
-import Footer from '@/components/Footer'
+import AdminFooter from '@/components/AdminFooter'
 
 export default async function CategoriesPage() {
   const supabase = await createClient()
@@ -41,7 +41,7 @@ export default async function CategoriesPage() {
 
           <CategoryActions categories={categories || []} />
         </div>
-        <Footer categories={categories || []} />
+        <AdminFooter />
       </div>
     </div>
   )

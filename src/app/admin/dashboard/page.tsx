@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import LogoutButton from '@/components/LogoutButton'
 import DeleteButton from '@/components/DeleteButton'
-import Footer from '@/components/Footer'
+import AdminFooter from '@/components/AdminFooter'
 import { Post, Vibe } from '@/lib/types'
 
 function tagBadge(tag: string, categories: any[]) {
@@ -256,7 +256,7 @@ export default async function AdminDashboardPage({
           </div>
         )}
 
-        <Footer categories={categories || []} />
+        <AdminFooter />
       </div>
     </div>
   )
