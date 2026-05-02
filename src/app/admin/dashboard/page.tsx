@@ -101,12 +101,12 @@ export default async function AdminDashboardPage({
       <div className="adm">
         {/* Header */}
         <div className="adm-hdr">
-          <div style={{ display: 'flex', alignItems: 'baseline' }}>
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline' }}>
             <span style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 400, color: '#1C1A16' }}>tada</span>
             <span style={{ fontFamily: 'var(--font-serif)', fontSize: 24, color: '#C8102E', lineHeight: '0.85' }}>.</span>
             <span style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 500, fontStyle: 'italic', color: '#1C1A16' }}>vibes</span>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: '#9A9895', marginLeft: 10, letterSpacing: '1px' }}>ADMIN</span>
-          </div>
+          </Link>
           <div className="adm-acts">
             <Link href="/" style={btnSm({ color: '#5A5855', borderColor: '#5A5855' })}>← Site</Link>
             <Link href="/admin/categories" style={btnSm({ color: '#5A5855', borderColor: '#5A5855' })}>Chủ đề</Link>
