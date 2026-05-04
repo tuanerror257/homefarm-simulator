@@ -2,11 +2,11 @@ import type { Customer, CustomerType, Product, ShopEvent } from "@/types/homefar
 import { ALL_PRODUCTS, CUSTOMER_TYPES, SHOP_EVENTS } from "./data";
 
 const PRODUCT_WEIGHTS: Record<string, number> = {
-  salmon: 34,
-  beef: 22,
-  egg: 14,
-  sausage: 10,
-  grape: 8,
+  salmon: 30,
+  beef: 15,
+  egg: 12,
+  sausage: 8,
+  grape: 7,
   cherry: 6,
   shrimp: 6,
   squid: 5,
@@ -32,7 +32,7 @@ const PRODUCT_WEIGHTS: Record<string, number> = {
   orange: 5,
   ham: 4,
   bread: 5,
-  wholeSalmon: 4,
+  wholeSalmon: 3,
   headBone: 2,
 };
 
@@ -54,11 +54,24 @@ function weightedPick(ids: string[]) {
   return sample(pool);
 }
 
-export function getUnlockedProducts(day: number, currentProducts: Product[]) {
-  const currentMap = new Map(currentProducts.map((p) => [p.id, p]));
-  return ALL_PRODUCTS
-    .filter((p) => (p.unlockDay || 1) <= day)
-    .map((p) => currentMap.get(p.id) || p);
+export function getUnlockedProducts(
+  arg1: number | Product[],
+  arg2?: number | Product[],
+): Product[] {
+  // Backward compatible:
+  // - getUnlockedProducts(day, products)
+  // - getUnlockedProducts(products, day)
+  const day = typeof arg1 === "number" ? arg1 : typeof arg2 === "number" ? arg2 : 1;
+  const products = Array.isArray(arg1)
+    ? arg1
+    : Array.isArray(arg2)
+      ? arg2
+      : ALL_PRODUCTS;
+
+  // 5 ngày đầu giữ 8 mặt hàng để người chơi làm quen.
+  // Từ ngày 6 mở thêm 2 món, sau đó tăng dần tới tối đa 32 món.
+  const unlockedCount = Math.min(32, day <= 5 ? 8 : 8 + Math.floor(((day - 6) / 2 + 1)) * 2);
+  return products.slice(0, unlockedCount);
 }
 
 function randomQty(product: Product, day: number) {
@@ -84,7 +97,7 @@ function randomQty(product: Product, day: number) {
 function buildOrder(products: Product[], customerType: CustomerType, day: number) {
   // First 5 days are calmer. Complexity only starts growing from day 6.
   const maxItemsByDay = day <= 5 ? 3 : day <= 9 ? 4 : day <= 15 ? 5 : 6;
-  const maxItems = Math.min(products.length, Math.max(2, Math.min(maxItemsByDay, customerType.size)));
+  const maxItems = day <= 5 ? 2 : Math.min(5, 2 + Math.floor((day - 6) / 5));
   const itemCountPool =
     day <= 5
       ? [2, 2, 2, 3]
@@ -144,10 +157,16 @@ export function calcTipRate(customer: Customer, timeLeft: number, moodScore: num
 }
 
 export function getStockShortageMessage(product: Product) {
-  if (product.id === "salmon") return "Thiếu cá hồi fillet. Có thể fillet thêm cá nguyên hoặc nhập hàng.";
-  if (product.id === "headBone") return "Thiếu đầu xương. Có thể fillet cá nguyên để ra thêm đầu xương hoặc nhập hàng.";
-  if (product.id === "wholeSalmon") return "Thiếu cá nguyên con. Cần nhập thêm cá nguyên theo con.";
-  return `Thiếu ${product.name}. Cần nhập thêm hàng.`;
+  if (product.id === "salmon") {
+    return "Thiếu cá hồi fillet. Hãy fillet cá nguyên hoặc nhập thêm cá hồi.";
+  }
+  if (product.id === "headBone") {
+    return "Thiếu đầu xương cá hồi. Hãy fillet cá nguyên để có thêm đầu xương.";
+  }
+  if (product.id === "wholeSalmon") {
+    return "Thiếu cá nguyên con. Hãy nhập cá nguyên theo con.";
+  }
+  return `Thiếu ${product.name}. Hãy nhập thêm hàng.`;
 }
 
 export function maybeCreateEvent(day: number): ShopEvent | null {

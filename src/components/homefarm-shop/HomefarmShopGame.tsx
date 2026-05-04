@@ -220,7 +220,7 @@ export function HomefarmShopGame() {
     );
 
     setMascotState("trust");
-    setToast("Fillet 1 con cá 6kg: -1 con cá nguyên, +4.8kg fillet, +1.2kg đầu xương.");
+    setToast("Fillet 1 con cá nguyên (6kg): +4.8kg fillet, +1.2kg đầu xương.");
   }
 
   function setQty(id: string, value: number) {
@@ -251,39 +251,36 @@ export function HomefarmShopGame() {
   }
 
   function endDay() {
-    if (customer && customerIndex < customers.length) {
-      setMascotState("idea");
-      setToast("Vẫn còn khách trong ngày. Phục vụ hết rồi hãy End Day nhé.");
-      return;
-    }
-
+    const remainingCustomers = Math.max(0, customers.length - customerIndex);
     const nextDay = day + 1;
-    const unlocked = getUnlockedProducts(nextDay, products);
-    const event = maybeCreateEvent(nextDay);
-    const eventProducts = applyEventToProducts(unlocked, event);
-    const newCustomers = generateCustomers(eventProducts, nextDay);
 
-    const cashDelta = event?.cashDelta ?? 0;
-    if (cashDelta !== 0) {
-      setCash((v) => Math.max(0, v + cashDelta));
+    const unlockedProducts = getUnlockedProducts(nextDay, products);
+    const nextEvent = maybeCreateEvent(nextDay);
+    const nextProducts = applyEventToProducts(unlockedProducts, nextEvent);
+    const nextCustomers = generateCustomers(nextProducts, nextDay);
+
+    if (nextEvent?.cashDelta) {
+      setCash((value) => Math.max(0, value + nextEvent.cashDelta!));
     }
-
-    const moodDelta = event?.moodDelta ?? 0;
-    setEventMoodPenalty(moodDelta);
 
     setDay(nextDay);
     setRevenue(0);
     setProfit(0);
-    setProducts(eventProducts);
-    setCustomers(newCustomers);
+    setProducts(nextProducts);
+    setCustomers(nextCustomers);
     setCustomerIndex(0);
-    setTimeLeft(newCustomers[0].patience);
+    setTimeLeft(nextCustomers[0]?.patience ?? 30);
     setMoodScore(100);
     setSelected([]);
     setProductPage(0);
+    setCombo(0);
+    setWrongFlash(false);
     setMascotState("idle");
-    setActiveEvent(event);
-    setToast(`Ngày ${nextDay}: mở khóa ${eventProducts.length} mặt hàng · có ${newCustomers.length} khách.`);
+    setEventMoodPenalty(nextEvent?.moodDelta ?? 0);
+    setActiveEvent(nextEvent);
+
+    const skippedText = remainingCustomers > 0 ? ` · bỏ qua ${remainingCustomers} khách còn lại` : "";
+    setToast(`Ngày ${nextDay}: mở khóa ${nextProducts.length} mặt hàng · có ${nextCustomers.length} khách${skippedText}.`);
   }
 
   async function finishRun() {
@@ -454,9 +451,7 @@ export function HomefarmShopGame() {
           <button onClick={fillet} className="hfs-action hfs-fillet">🔪 Fillet</button>
           <button onClick={deliver} className={`hfs-action hfs-deliver ${isComplete ? "ready" : ""}`}>✅ Giao</button>
           <button onClick={() => { setMascotState("thinking"); setShowImport(true); }} className="hfs-action hfs-import">🚚 Nhập</button>
-          <button onClick={customer ? finishRun : endDay} className="hfs-action hfs-end">
-            {customer ? "🏁 Kết thúc" : "🌙 End"}
-          </button>
+          <button onClick={endDay} className="hfs-action hfs-end">🌙 Qua ngày</button>
         </footer>
 
         {activeEvent && (
