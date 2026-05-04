@@ -50,3 +50,8 @@ function getLocalLeaderboard(): LeaderboardEntry[] {
     return [];
   }
 }
+
+
+export function getLeaderboardMode() {
+  return isSupabaseReady && supabase ? "supabase" : "local";
+}

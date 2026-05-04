@@ -14,7 +14,7 @@ import {
   money,
   qty,
 } from "@/lib/homefarm-shop/gameUtils";
-import { fetchLeaderboard, saveLeaderboardEntry, type LeaderboardEntry } from "@/lib/homefarm-shop/leaderboard";
+import { fetchLeaderboard, getLeaderboardMode, saveLeaderboardEntry, type LeaderboardEntry } from "@/lib/homefarm-shop/leaderboard";
 import "./homefarm-shop.css";
 
 type OrderProduct = Product & { wantQty: number };
@@ -315,7 +315,7 @@ export function HomefarmShopGame() {
       });
       setScoreSaved(true);
       await loadLeaderboard();
-      setToast("Đã lưu điểm lên leaderboard.");
+      setToast(getLeaderboardMode() === "supabase" ? "Đã lưu điểm lên Supabase leaderboard." : "Đã lưu điểm local. Kiểm tra .env.local để bật Supabase.");
     } catch {
       setToast("Lưu điểm lỗi. Kiểm tra Supabase table/env nhé.");
     }
@@ -434,6 +434,7 @@ export function HomefarmShopGame() {
                 <button
                   className="hfs-board-pill"
                   onClick={async () => {
+                    setScoreSaved(false);
                     setShowLeaderboard(true);
                     await loadLeaderboard();
                   }}
