@@ -64,7 +64,7 @@ export function getUnlockedProducts(day: number, currentProducts: Product[]) {
 function randomQty(product: Product, day: number) {
   const levelBoost = day >= 12 ? 1.25 : day >= 8 ? 1.15 : 1;
 
-  if (product.id === "wholeSalmon") return 6;
+  if (product.id === "wholeSalmon") return 1; // bán theo con; 1 con mặc định 6kg
   if (["egg", "sausage", "cheese", "milk", "blueberry", "butter", "yogurt", "bacon", "ham", "bread"].includes(product.id)) {
     return sample([1, 2, 2, 3, day >= 10 ? 4 : 2]);
   }
@@ -146,7 +146,7 @@ export function calcTipRate(customer: Customer, timeLeft: number, moodScore: num
 export function getStockShortageMessage(product: Product) {
   if (product.id === "salmon") return "Thiếu cá hồi fillet. Có thể fillet thêm cá nguyên hoặc nhập hàng.";
   if (product.id === "headBone") return "Thiếu đầu xương. Có thể fillet cá nguyên để ra thêm đầu xương hoặc nhập hàng.";
-  if (product.id === "wholeSalmon") return "Thiếu cá nguyên con. Cần nhập thêm cá nguyên.";
+  if (product.id === "wholeSalmon") return "Thiếu cá nguyên con. Cần nhập thêm cá nguyên theo con.";
   return `Thiếu ${product.name}. Cần nhập thêm hàng.`;
 }
 

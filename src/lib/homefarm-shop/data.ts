@@ -3,7 +3,7 @@ import type { CustomerType, MascotState, Product, ShopEvent } from "@/types/home
 export const ALL_PRODUCTS: Product[] = [
   // Day 1-5: core calm mode, 8 items only
   { id: "salmon", name: "Cá hồi", icon: "🐟", stock: 12.4, unit: "kg", price: 769, cost: 520, unlockDay: 1, category: "seafood" },
-  { id: "wholeSalmon", name: "Cá nguyên", icon: "🎣", stock: 18, unit: "kg", price: 559, cost: 430, unlockDay: 1, category: "seafood" },
+  { id: "wholeSalmon", name: "Cá nguyên", icon: "🎣", stock: 3, unit: "con", price: 559 * 6, cost: 430 * 6, unlockDay: 1, category: "seafood" },
   { id: "beef", name: "Bò Mỹ", icon: "🥩", stock: 8.6, unit: "kg", price: 429, cost: 260, unlockDay: 1, category: "meat" },
   { id: "egg", name: "Trứng", icon: "🥚", stock: 18, unit: "hộp", price: 69, cost: 42, unlockDay: 1, category: "core" },
   { id: "sausage", name: "Xúc xích", icon: "🌭", stock: 16, unit: "gói", price: 89, cost: 55, unlockDay: 1, category: "addon" },

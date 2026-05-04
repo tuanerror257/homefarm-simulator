@@ -201,7 +201,7 @@ export function HomefarmShopGame() {
 
   function fillet() {
     const whole = products.find((p) => p.id === "wholeSalmon");
-    if (!whole || whole.stock < 6) {
+    if (!whole || whole.stock < 1) {
       setMascotState("thinking");
       setToast("Không đủ cá nguyên con để fillet. Cần nhập thêm cá nguyên.");
       return;
@@ -210,7 +210,7 @@ export function HomefarmShopGame() {
     setProducts((prev) =>
       prev.map((p) =>
         p.id === "wholeSalmon"
-          ? { ...p, stock: Number((p.stock - 6).toFixed(1)) }
+          ? { ...p, stock: Number((p.stock - 1).toFixed(1)) }
           : p.id === "salmon"
             ? { ...p, stock: Number((p.stock + 4.8).toFixed(1)) }
             : p.id === "headBone"
@@ -220,7 +220,7 @@ export function HomefarmShopGame() {
     );
 
     setMascotState("trust");
-    setToast("Fillet 1 cá 6kg: +4.8kg fillet, +1.2kg đầu xương.");
+    setToast("Fillet 1 con cá 6kg: -1 con cá nguyên, +4.8kg fillet, +1.2kg đầu xương.");
   }
 
   function setQty(id: string, value: number) {
@@ -487,7 +487,7 @@ export function HomefarmShopGame() {
                       <div className="hfs-import-info">
                         <div className="hfs-import-name">{product.name}</div>
                         <div className="hfs-import-sub">
-                          Tồn {qty(product.stock)} {product.unit} · Vốn {money(product.cost)}/{product.unit}
+                          Tồn {qty(product.stock)} {product.unit} · {product.id === "wholeSalmon" ? "1 con = 6kg · Vốn 2.580k/con" : `Vốn ${money(product.cost)}/${product.unit}`}
                         </div>
                       </div>
                       <div className="hfs-stepper">
@@ -626,7 +626,7 @@ function ProductCard({
       <div className="hfs-product-foot">
         <div className="hfs-product-name">{product.name}</div>
         <div className="hfs-product-price">
-          {product.price ? `${money(product.price)}/${product.unit}` : "nguyên liệu"}
+          {product.id === "wholeSalmon" ? "559k/kg · 3.354k/con" : product.price ? `${money(product.price)}/${product.unit}` : "nguyên liệu"}
         </div>
       </div>
     </button>
