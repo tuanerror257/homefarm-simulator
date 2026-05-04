@@ -77,6 +77,9 @@ export function HomefarmShopGame() {
     maxCombo,
   });
 
+  const comboMultiplier = combo >= 10 ? 2 : combo >= 5 ? 1.5 : combo >= 3 ? 1.2 : 1;
+  const comboLabel = combo > 0 ? `x${comboMultiplier}` : "x1";
+
   useEffect(() => {
     if (!customer) {
       setMascotState("happy");
@@ -122,7 +125,7 @@ export function HomefarmShopGame() {
     setSelected([]);
     if (customerIndex >= customers.length - 1) {
       setCustomerIndex(customers.length);
-      setToast("Hết khách hôm nay. Bấm End Day để sang ngày mới.");
+      setToast("Hết khách hôm nay. Bấm Qua ngày để sang ngày mới.");
     } else {
       setCustomerIndex((v) => v + 1);
       setToast(msg);
@@ -146,34 +149,40 @@ export function HomefarmShopGame() {
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
     setMoodScore((m) => Math.min(100, m + 4));
     setMascotState(combo >= 2 ? "combo" : "happy");
-    setToast("Đã chọn đúng món. Mood +4");
+    setToast(combo > 0 ? `Đúng món! Giữ nhịp combo ${comboLabel} 🔥` : "Đã chọn đúng món. Mood +4");
   }
 
   function deliver() {
     if (!customer) {
-      setToast("Hết khách rồi. Bấm End Day để sang ngày mới.");
+      setToast("Hết khách rồi. Bấm Qua ngày để sang ngày mới.");
       return;
     }
 
     if (!isComplete) {
       setMascotState("idea");
-      setToast("Chưa đủ món trong order, chọn tiếp đã bro");
+      setMoodScore((m) => Math.max(0, m - 3));
+      setToast("Chưa đủ món trong order, chọn tiếp đã bro. Mood -3");
       return;
     }
 
     const notEnough = orderProducts.find((p) => p.stock < p.wantQty);
     if (notEnough) {
       setCombo(0);
-      setMoodScore((m) => Math.max(0, m - 10));
+      setMoodScore((m) => Math.max(0, m - 12));
       setMascotState("thinking");
+      setWrongFlash(true);
+      window.setTimeout(() => setWrongFlash(false), 260);
       setToast(`${getStockShortageMessage(notEnough)} Combo reset.`);
       return;
     }
 
     const speedRatio = timeLeft / customer.patience;
-    const tip = bill * calcTipRate(customer, timeLeft, moodScore, combo);
-    const thisOrderProfit = orderProfit + tip;
-    const nextCombo = speedRatio > 0.5 && moodScore >= 45 ? combo + 1 : 0;
+    const baseTip = bill * calcTipRate(customer, timeLeft, moodScore, combo);
+    const nextCombo = speedRatio > 0.45 && moodScore >= 40 ? combo + 1 : 0;
+    const nextMultiplier = nextCombo >= 10 ? 2 : nextCombo >= 5 ? 1.5 : nextCombo >= 3 ? 1.2 : 1;
+    const comboBonus = nextCombo >= 3 ? Math.round(bill * (nextMultiplier - 1) * 0.12) : 0;
+    const tip = Math.round(baseTip * nextMultiplier);
+    const thisOrderProfit = orderProfit + tip + comboBonus;
 
     setProducts((prev) =>
       prev.map((p) => {
@@ -182,7 +191,7 @@ export function HomefarmShopGame() {
       }),
     );
 
-    setCash((v) => v + bill + tip);
+    setCash((v) => v + bill + tip + comboBonus);
     setRevenue((v) => v + bill);
     setProfit((v) => v + thisOrderProfit);
     setTotalRevenue((v) => v + bill);
@@ -190,12 +199,16 @@ export function HomefarmShopGame() {
     setServedCount((v) => v + 1);
     setCombo(nextCombo);
     setMaxCombo((v) => Math.max(v, nextCombo));
+    setMoodScore((m) => Math.min(100, m + (nextCombo >= 3 ? 7 : 4)));
     setMascotState(nextCombo >= 3 ? "combo" : "happy");
 
-    let msg = `Bill +${money(bill)} / Lãi ${money(thisOrderProfit)}`;
-    if (tip > 0) msg += ` / Tip +${money(tip)}`;
-    if (nextCombo > 1) msg += ` / Combo x${nextCombo} 🔥`;
-    if (customer.repeat) msg += " / Khách quen quay lại 🔁";
+    let msg = `Chuẩn! Bill +${money(bill)} · Lãi ${money(thisOrderProfit)}`;
+    if (tip > 0) msg += ` · Tip +${money(tip)}`;
+    if (comboBonus > 0) msg += ` · Bonus +${money(comboBonus)}`;
+    if (nextCombo >= 3) msg += ` · Combo ${nextCombo} (${nextMultiplier}x) 🔥`;
+    else if (nextCombo > 0) msg += ` · Combo ${nextCombo}`;
+    if (customer.repeat) msg += " · Khách quen 🔁";
+
     skipCustomer(msg);
   }
 
@@ -280,7 +293,7 @@ export function HomefarmShopGame() {
     setActiveEvent(nextEvent);
 
     const skippedText = remainingCustomers > 0 ? ` · bỏ qua ${remainingCustomers} khách còn lại` : "";
-    setToast(`Ngày ${nextDay}: mở khóa ${nextProducts.length} mặt hàng · có ${nextCustomers.length} khách${skippedText}.`);
+    setToast(`Ngày ${nextDay}: mở khóa ${nextProducts.length} mặt hàng · có ${nextCustomers.length} khách${skippedText}. Combo tốt nhất: ${maxCombo}.`);
   }
 
   async function finishRun() {
@@ -344,7 +357,7 @@ export function HomefarmShopGame() {
                       <div className="hfs-order-id">
                         ORDER #{customer.orderNo} · {servedToday + 1}/{totalCustomers}
                       </div>
-                      <div className="hfs-combo">🔥 x{combo}</div>
+                      <div className={`hfs-combo ${combo >= 3 ? "hot" : ""}`}>🔥 {combo} · {comboLabel}</div>
                     </div>
 
                     <div className="hfs-customer-line">

@@ -1978,3 +1978,27 @@
     width: 198px !important;
   }
 }
+
+
+/* v0.4 gameplay feel */
+.hfs-combo.hot {
+  background: linear-gradient(180deg, #ffda62, #ff8a1f);
+  color: #2d2118;
+  border-color: #2d2118;
+  animation: hfs-combo-pop 0.85s ease-in-out infinite alternate;
+}
+
+@keyframes hfs-combo-pop {
+  from { transform: scale(1); filter: brightness(1); }
+  to { transform: scale(1.045); filter: brightness(1.08); }
+}
+
+.hfs-phone.wrong {
+  animation: hfs-wrong-shake 0.22s linear;
+}
+
+@keyframes hfs-wrong-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
