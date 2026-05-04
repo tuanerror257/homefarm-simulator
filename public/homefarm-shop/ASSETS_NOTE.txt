@@ -1,0 +1,9 @@
+Keep your current assets here:
+
+public/homefarm-shop/logo-homefarm.png
+public/homefarm-shop/mascot/*.webp
+
+This pack includes:
+public/homefarm-shop/header-brand.png
+
+Do not delete your mascot folder.

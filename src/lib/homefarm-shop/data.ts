@@ -1,0 +1,106 @@
+import type { CustomerType, MascotState, Product, ShopEvent } from "@/types/homefarm-shop";
+
+export const ALL_PRODUCTS: Product[] = [
+  // Day 1-5: core calm mode, 8 items only
+  { id: "salmon", name: "Cá hồi", icon: "🐟", stock: 12.4, unit: "kg", price: 769, cost: 520, unlockDay: 1, category: "seafood" },
+  { id: "wholeSalmon", name: "Cá nguyên", icon: "🎣", stock: 18, unit: "kg", price: 559, cost: 430, unlockDay: 1, category: "seafood" },
+  { id: "beef", name: "Bò Mỹ", icon: "🥩", stock: 8.6, unit: "kg", price: 429, cost: 260, unlockDay: 1, category: "meat" },
+  { id: "egg", name: "Trứng", icon: "🥚", stock: 18, unit: "hộp", price: 69, cost: 42, unlockDay: 1, category: "core" },
+  { id: "sausage", name: "Xúc xích", icon: "🌭", stock: 16, unit: "gói", price: 89, cost: 55, unlockDay: 1, category: "addon" },
+  { id: "grape", name: "Nho Mỹ", icon: "🍇", stock: 7.8, unit: "kg", price: 199, cost: 125, unlockDay: 1, category: "fruit" },
+  { id: "cherry", name: "Cherry", icon: "🍒", stock: 4.4, unit: "kg", price: 459, cost: 310, unlockDay: 1, category: "fruit" },
+  { id: "headBone", name: "Đầu xương", icon: "🍲", stock: 2.2, unit: "kg", price: 89, cost: 0, unlockDay: 1, category: "addon" },
+
+  // From day 6 onward: +2 products every 2 days, max 32 items
+  { id: "shrimp", name: "Tôm sú", icon: "🦐", stock: 4.5, unit: "kg", price: 329, cost: 220, unlockDay: 6, category: "seafood" },
+  { id: "squid", name: "Mực", icon: "🦑", stock: 4.2, unit: "kg", price: 259, cost: 175, unlockDay: 6, category: "seafood" },
+
+  { id: "pork", name: "Heo Iberico", icon: "🥓", stock: 5.5, unit: "kg", price: 359, cost: 230, unlockDay: 8, category: "meat" },
+  { id: "chicken", name: "Gà sạch", icon: "🍗", stock: 7, unit: "kg", price: 149, cost: 95, unlockDay: 8, category: "meat" },
+
+  { id: "avocado", name: "Bơ", icon: "🥑", stock: 5, unit: "kg", price: 169, cost: 105, unlockDay: 10, category: "fruit" },
+  { id: "blueberry", name: "Việt quất", icon: "🫐", stock: 3.5, unit: "hộp", price: 139, cost: 88, unlockDay: 10, category: "fruit" },
+
+  { id: "cheese", name: "Phô mai", icon: "🧀", stock: 8, unit: "gói", price: 119, cost: 72, unlockDay: 12, category: "addon" },
+  { id: "milk", name: "Sữa tươi", icon: "🥛", stock: 10, unit: "chai", price: 49, cost: 30, unlockDay: 12, category: "core" },
+
+  { id: "oyster", name: "Hàu", icon: "🦪", stock: 4, unit: "kg", price: 219, cost: 145, unlockDay: 14, category: "seafood" },
+  { id: "crab", name: "Cua", icon: "🦀", stock: 3.5, unit: "kg", price: 499, cost: 340, unlockDay: 14, category: "seafood" },
+
+  { id: "lamb", name: "Cừu", icon: "🍖", stock: 4.8, unit: "kg", price: 389, cost: 255, unlockDay: 16, category: "meat" },
+  { id: "duck", name: "Vịt", icon: "🦆", stock: 5, unit: "kg", price: 189, cost: 120, unlockDay: 16, category: "meat" },
+
+  { id: "strawberry", name: "Dâu tây", icon: "🍓", stock: 4.2, unit: "kg", price: 299, cost: 195, unlockDay: 18, category: "fruit" },
+  { id: "kiwi", name: "Kiwi", icon: "🥝", stock: 5, unit: "kg", price: 169, cost: 108, unlockDay: 18, category: "fruit" },
+
+  { id: "butter", name: "Bơ lạt", icon: "🧈", stock: 8, unit: "hộp", price: 99, cost: 62, unlockDay: 20, category: "addon" },
+  { id: "yogurt", name: "Sữa chua", icon: "🥣", stock: 10, unit: "hộp", price: 59, cost: 36, unlockDay: 20, category: "core" },
+
+  { id: "scallop", name: "Sò điệp", icon: "🐚", stock: 3.2, unit: "kg", price: 459, cost: 315, unlockDay: 22, category: "seafood" },
+  { id: "cod", name: "Cá tuyết", icon: "🐠", stock: 3.8, unit: "kg", price: 399, cost: 270, unlockDay: 22, category: "seafood" },
+
+  { id: "wagyu", name: "Wagyu", icon: "🥩", stock: 2.5, unit: "kg", price: 1299, cost: 920, unlockDay: 24, category: "meat" },
+  { id: "bacon", name: "Bacon", icon: "🥓", stock: 7, unit: "gói", price: 129, cost: 78, unlockDay: 24, category: "meat" },
+
+  { id: "mango", name: "Xoài Úc", icon: "🥭", stock: 5, unit: "kg", price: 189, cost: 118, unlockDay: 26, category: "fruit" },
+  { id: "orange", name: "Cam", icon: "🍊", stock: 6, unit: "kg", price: 129, cost: 78, unlockDay: 26, category: "fruit" },
+
+  { id: "ham", name: "Jambon", icon: "🍖", stock: 8, unit: "gói", price: 109, cost: 68, unlockDay: 28, category: "addon" },
+  { id: "bread", name: "Bánh mì", icon: "🥖", stock: 12, unit: "ổ", price: 39, cost: 22, unlockDay: 28, category: "core" },
+];
+
+export const START_PRODUCTS = ALL_PRODUCTS.filter((p) => (p.unlockDay || 1) <= 1);
+
+export const CUSTOMER_TYPES: CustomerType[] = [
+  { name: "Mẹ đảm", avatar: "👩‍🍳", mood: "Soi kỹ", patience: 24, size: 4, prefer: ["salmon", "beef", "egg", "chicken"], quote: "Cá phải tươi, thịt phải đẹp." },
+  { name: "Gym Bro", avatar: "💪", mood: "Protein", patience: 26, size: 3, prefer: ["beef", "egg", "salmon", "chicken", "wagyu"], quote: "Full protein cho anh." },
+  { name: "Gen Z", avatar: "🧋", mood: "Ăn clean", patience: 36, size: 3, prefer: ["salmon", "grape", "cherry", "avocado", "blueberry", "yogurt"], quote: "Set healthy xinh xinh nha!" },
+  { name: "Khách VIP", avatar: "😎", mood: "Chi mạnh", patience: 22, size: 5, prefer: ["salmon", "beef", "cherry", "shrimp", "wagyu", "crab"], quote: "Lấy đồ ngon nhất." },
+  { name: "Khó tính", avatar: "😤", mood: "Gắt", patience: 16, size: 4, prefer: ["salmon", "beef", "wagyu"], quote: "Nhanh lên." },
+  { name: "Dễ tính", avatar: "😊", mood: "Chill", patience: 42, size: 2, prefer: ["egg", "sausage", "grape", "milk", "bread"], quote: "Từ từ cũng được." },
+  { name: "Gia đình", avatar: "👨‍👩‍👧", mood: "Mua nhiều", patience: 30, size: 5, prefer: ["salmon", "beef", "egg", "sausage", "chicken", "orange"], quote: "Mỗi thứ một ít." },
+  { name: "Dân văn phòng", avatar: "💼", mood: "Ăn trưa", patience: 28, size: 3, prefer: ["sausage", "egg", "beef", "milk", "bread"], quote: "Nhanh gọn nhé." },
+  { name: "Foodie", avatar: "🤤", mood: "Sành ăn", patience: 25, size: 4, prefer: ["salmon", "beef", "cherry", "cheese", "oyster", "scallop"], quote: "Phải ngon nhé." },
+  { name: "Sinh viên", avatar: "🎓", mood: "Tiết kiệm", patience: 35, size: 2, prefer: ["egg", "sausage", "milk", "bread"], quote: "Món rẻ thôi." },
+  { name: "Người già", avatar: "👴", mood: "Chậm rãi", patience: 45, size: 2, prefer: ["salmon", "egg", "headBone", "yogurt"], quote: "Cho tôi đồ dễ ăn." },
+  { name: "Streamer", avatar: "🎥", mood: "Content", patience: 20, size: 3, prefer: ["salmon", "beef", "sausage", "strawberry"], quote: "Làm nhanh tôi còn lên sóng." },
+  { name: "Cặp đôi", avatar: "💑", mood: "Hẹn hò", patience: 30, size: 3, prefer: ["cherry", "grape", "salmon", "cheese", "strawberry"], quote: "Đồ romantic nhé." },
+  { name: "Shipper app", avatar: "🛵", mood: "Đơn online", patience: 17, size: 3, prefer: ["salmon", "beef", "egg", "sausage", "milk"], quote: "Đơn app đang chờ, đóng nhanh giúp em." },
+  { name: "Team party", avatar: "🎉", mood: "Mua tiệc", patience: 23, size: 5, prefer: ["beef", "salmon", "cherry", "grape", "shrimp", "cheese"], quote: "Tối nay party, lấy nhiều đồ ngon nhé." },
+  { name: "Khách Nhật", avatar: "🍣", mood: "Mê cá hồi", patience: 26, size: 3, prefer: ["salmon", "wholeSalmon", "squid", "cod"], quote: "Cá hồi ngon là được." },
+  { name: "Nhà hàng", avatar: "🏮", mood: "Lấy sỉ", patience: 20, size: 4, prefer: ["wholeSalmon", "salmon", "beef", "shrimp", "oyster"], quote: "Cho cá nguyên con đẹp nhé." },
+  { name: "Khách nấu lẩu", avatar: "🍲", mood: "Mua xương", patience: 32, size: 2, prefer: ["headBone", "beef", "salmon", "mushroom"], quote: "Có đầu xương nấu lẩu không?" },
+];
+
+export const SHOP_EVENTS: ShopEvent[] = [
+  { id: "staff-off", type: "bad", title: "Nhân viên nghỉ đột xuất", description: "Khách hôm nay dễ sốt ruột hơn. Mood đầu ngày giảm 10 điểm.", moodDelta: -10 },
+  { id: "thief", type: "bad", title: "Bị trộm vặt", description: "Mất 150k tiền mặt.", cashDelta: -150 },
+  { id: "freezer-issue", type: "bad", title: "Tủ đông trục trặc", description: "Hao hụt nhẹ bò Mỹ và cá hồi.", stockDelta: { salmon: -0.5, beef: -0.5 } },
+  { id: "viral-post", type: "good", title: "Bài TikTok viral", description: "Được cộng 100k tiền mặt và mood đầu ngày +8.", cashDelta: 100, moodDelta: 8 },
+  { id: "supplier-bonus", type: "good", title: "Nhà cung cấp tặng hàng", description: "Được tặng thêm trứng và xúc xích.", stockDelta: { egg: 3, sausage: 3 } },
+  { id: "rainy-day", type: "neutral", title: "Trời mưa", description: "Đơn app nhiều hơn, khách hơi vội hơn. Mood đầu ngày -4.", moodDelta: -4 },
+];
+
+export const MASCOT_ASSETS: Record<MascotState, string> = {
+  idle: "/homefarm-shop/mascot/trust-me.webp",
+  happy: "/homefarm-shop/mascot/sieu-vui.webp",
+  combo: "/homefarm-shop/mascot/dab.webp",
+  wrong: "/homefarm-shop/mascot/ngac-nhien.webp",
+  hurry: "/homefarm-shop/mascot/thong-bao.webp",
+  fail: "/homefarm-shop/mascot/buon-va-bat-luc.webp",
+  idea: "/homefarm-shop/mascot/y-tuong.webp",
+  thinking: "/homefarm-shop/mascot/suy-ngam.webp",
+  trust: "/homefarm-shop/mascot/tin-tuong.webp",
+};
+
+export const MASCOT_TALK: Record<MascotState, string> = {
+  idle: "Có khách kìa!",
+  happy: "Chuẩn rồi bro!",
+  combo: "Combo cháy quá!",
+  wrong: "Ơ sai món rồi!",
+  hurry: "Nhanh lên nào!",
+  fail: "Toang mất khách rồi...",
+  idea: "Hint: nhìn ORDER nhé!",
+  thinking: "Tính kỹ chút nha.",
+  trust: "Tin tớ, món này bán chạy!",
+};
