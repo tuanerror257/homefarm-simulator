@@ -1,6 +1,0 @@
-{
-  "dependencies_to_check": {
-    "@supabase/supabase-js": "needed for leaderboard",
-    "sharp": "optional, only for optimizing mascot files"
-  }
-}
