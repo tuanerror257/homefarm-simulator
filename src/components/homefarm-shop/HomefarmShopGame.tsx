@@ -23,6 +23,7 @@ import "./homefarm-shop.css";
 type OrderProduct = Product & { wantQty: number };
 
 const PAGE_SIZE = 8;
+const UPGRADE_UNLOCK_DAY = 8;
 const MAX_UPGRADE_LEVEL = 3;
 const INITIAL_UPGRADES: ShopUpgrades = {
   freezer: 0,
@@ -93,6 +94,7 @@ export function HomefarmShopGame() {
   const [toast, setToast] = useState("Tap từng món khách cần mua trên kệ hàng");
   const [showImport, setShowImport] = useState(false);
   const [showUpgrades, setShowUpgrades] = useState(false);
+  const [showUpgradeUnlock, setShowUpgradeUnlock] = useState(false);
   const [importQty, setImportQty] = useState<Record<string, number>>({});
   const [upgrades, setUpgrades] = useState<ShopUpgrades>(INITIAL_UPGRADES);
   const [combo, setCombo] = useState(0);
@@ -129,6 +131,7 @@ export function HomefarmShopGame() {
   const timePercent = customer ? Math.max(0, Math.round((timeLeft / customer.patience) * 100)) : 0;
   const estimatedTip = customer ? bill * calcTipRate(customer, timeLeft, moodScore, combo) : 0;
   const importCost = products.reduce((s, p) => s + (importQty[p.id] || 0) * p.cost, 0);
+  const upgradesUnlocked = day >= UPGRADE_UNLOCK_DAY;
   const upgradeCount = Object.values(upgrades).reduce((sum, level) => sum + level, 0);
 
   const currentScore = calculateScore({
@@ -169,7 +172,7 @@ export function HomefarmShopGame() {
   }, [customerIndex, day, customer, eventMoodPenalty]);
 
   useEffect(() => {
-    if (!customer || showImport || showUpgrades || showLeaderboard || activeEvent) return;
+    if (!customer || showImport || showUpgrades || showUpgradeUnlock || showLeaderboard || activeEvent) return;
 
     const timer = setInterval(() => {
       setMoodScore((m) => Math.max(0, m - (0.8 + day * 0.035)));
@@ -187,7 +190,7 @@ export function HomefarmShopGame() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [customerIndex, customer, showImport, showUpgrades, showLeaderboard, activeEvent, day, skipCustomer]);
+  }, [customerIndex, customer, showImport, showUpgrades, showUpgradeUnlock, showLeaderboard, activeEvent, day, skipCustomer]);
 
   async function loadLeaderboard() {
     try {
@@ -309,6 +312,11 @@ export function HomefarmShopGame() {
   }
 
   function buyUpgrade(id: ShopUpgradeId) {
+    if (!upgradesUnlocked) {
+      setToast(`Nâng cấp cửa hàng sẽ mở từ ngày ${UPGRADE_UNLOCK_DAY}.`);
+      return;
+    }
+
     const definition = UPGRADE_DEFS.find((upgrade) => upgrade.id === id)!;
     const currentLevel = upgrades[id];
     if (currentLevel >= MAX_UPGRADE_LEVEL) {
@@ -409,9 +417,11 @@ export function HomefarmShopGame() {
     setEventMoodPenalty(nextEvent?.moodDelta ?? 0);
     setActiveEvent(nextEvent);
     setDaySummary(null);
+    if (nextDay === UPGRADE_UNLOCK_DAY) setShowUpgradeUnlock(true);
 
     const skippedText = remainingCustomers > 0 ? ` · bỏ qua ${remainingCustomers} khách còn lại` : "";
-    setToast(`Ngày ${nextDay}: mở khóa ${nextProducts.length} mặt hàng · có ${nextCustomers.length} khách${skippedText}. Combo tốt nhất: ${maxCombo}.`);
+    const upgradeText = nextDay === UPGRADE_UNLOCK_DAY ? " · đã mở Nâng cấp cửa hàng" : "";
+    setToast(`Ngày ${nextDay}: mở khóa ${nextProducts.length} mặt hàng · có ${nextCustomers.length} khách${skippedText}${upgradeText}. Combo tốt nhất: ${maxCombo}.`);
   }
 
   async function saveScore() {
@@ -565,9 +575,11 @@ export function HomefarmShopGame() {
                 >
                   🏆 BXH
                 </button>
-                <button className="hfs-board-pill hfs-upgrade-pill" onClick={() => setShowUpgrades(true)}>
-                  ⬆️ Lv {upgradeCount}
-                </button>
+                {upgradesUnlocked && (
+                  <button className="hfs-board-pill hfs-upgrade-pill" onClick={() => setShowUpgrades(true)}>
+                    ⬆️ Lv {upgradeCount}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -682,6 +694,30 @@ export function HomefarmShopGame() {
               <div className="hfs-modal-actions">
                 <button onClick={() => setShowUpgrades(false)} className="hfs-confirm">Xong</button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {showUpgradeUnlock && (
+          <div className="hfs-modal-backdrop hfs-unlock-backdrop">
+            <div className="hfs-unlock-panel">
+              <div className="hfs-unlock-icon">⬆️</div>
+              <div className="hfs-unlock-title">Mở khóa Nâng cấp cửa hàng</div>
+              <div className="hfs-unlock-desc">
+                Từ ngày {UPGRADE_UNLOCK_DAY}, bạn có thể dùng tiền mặt để nâng cấp dao fillet, nhân viên, bảng hiệu VIP và tủ lạnh.
+              </div>
+              <button
+                className="hfs-unlock-btn"
+                onClick={() => {
+                  setShowUpgradeUnlock(false);
+                  setShowUpgrades(true);
+                }}
+              >
+                Xem nâng cấp
+              </button>
+              <button className="hfs-unlock-skip" onClick={() => setShowUpgradeUnlock(false)}>
+                Để sau
+              </button>
             </div>
           </div>
         )}

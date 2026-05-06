@@ -2,6 +2,13 @@
 
 All notable Homefarm Shop Simulator changes are tracked here.
 
+## v2.4.1 - Day 8 upgrade unlock
+
+- Hidden the shop upgrade button before Day 8.
+- Added a feature-unlock modal when the player advances from Day 7 to Day 8.
+- Paused the customer timer while the unlock modal is open.
+- Updated the visible game version badge to `v2.4.1`.
+
 ## v2.4 - Shop upgrades
 
 - Added a shop upgrade modal with four upgrades: fillet knife, staff helper, VIP sign, and freezer.
