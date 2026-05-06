@@ -36,6 +36,14 @@ const PRODUCT_WEIGHTS: Record<string, number> = {
   headBone: 3,
 };
 
+const OVERNIGHT_SPOILAGE_RATES: Record<NonNullable<Product["category"]>, number> = {
+  seafood: 0.05,
+  meat: 0.05,
+  fruit: 0.04,
+  core: 0.02,
+  addon: 0.02,
+};
+
 export function money(value: number) {
   return `${Math.round(value).toLocaleString("vi-VN")}k`;
 }
@@ -307,6 +315,39 @@ export function applyEventToProducts(
     const effectiveDelta = delta < 0 ? Number((delta * (1 - freezerReduction)).toFixed(1)) : delta;
     return { ...p, stock: Math.max(0, Number((p.stock + effectiveDelta).toFixed(1))) };
   });
+}
+
+export function applyOvernightSpoilage(
+  products: Product[],
+  options: {
+    freezerLevel?: number;
+  } = {},
+) {
+  const freezerReduction = Math.min((options.freezerLevel ?? 0) * 0.25, 0.75);
+  let affectedCount = 0;
+  let totalLoss = 0;
+
+  const nextProducts = products.map((product) => {
+    if (product.stock <= 0 || product.unit === "con") return product;
+
+    const baseRate = OVERNIGHT_SPOILAGE_RATES[product.category ?? "addon"] ?? 0.02;
+    const loss = Number((product.stock * baseRate * (1 - freezerReduction)).toFixed(1));
+    if (loss <= 0) return product;
+
+    affectedCount += 1;
+    totalLoss += loss;
+
+    return {
+      ...product,
+      stock: Math.max(0, Number((product.stock - loss).toFixed(1))),
+    };
+  });
+
+  return {
+    products: nextProducts,
+    affectedCount,
+    totalLoss: Number(totalLoss.toFixed(1)),
+  };
 }
 
 export function calculateScore(params: {

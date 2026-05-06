@@ -2,6 +2,15 @@
 
 All notable Homefarm Shop Simulator changes are tracked here.
 
+## v2.5 - Overnight stock spoilage
+
+- Added overnight stock spoilage when advancing to the next day.
+- Applied spoilage before newly unlocked products are added, so new catalog items do not decay immediately.
+- Made seafood and meat decay faster than fruit, core, and addon products.
+- Made freezer upgrades reduce overnight spoilage by 25% per level, capped at 75%.
+- Added a toast note when overnight spoilage affects stocked products.
+- Updated the visible game version badge to `v2.5`.
+
 ## v2.4.4 - Later special events
 
 - Moved special events to start from Day 12 instead of Day 6.

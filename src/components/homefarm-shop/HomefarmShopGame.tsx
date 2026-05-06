@@ -7,6 +7,7 @@ import { MASCOT_ASSETS, MASCOT_TALK, START_PRODUCTS } from "@/lib/homefarm-shop/
 import { GAME_VERSION } from "@/config/version";
 import {
   applyEventToProducts,
+  applyOvernightSpoilage,
   calcTipRate,
   calculateScore,
   generateCustomers,
@@ -393,7 +394,8 @@ export function HomefarmShopGame() {
     const remainingCustomers = Math.max(0, customers.length - customerIndex);
     const nextDay = day + 1;
 
-    const unlockedProducts = getUnlockedProducts(nextDay, products);
+    const overnightSpoilage = applyOvernightSpoilage(products, { freezerLevel: upgrades.freezer });
+    const unlockedProducts = getUnlockedProducts(nextDay, overnightSpoilage.products);
     const nextEvent = maybeCreateEvent(nextDay);
     const nextProducts = applyEventToProducts(unlockedProducts, nextEvent, { freezerLevel: upgrades.freezer });
     const nextCustomers = generateCustomers(nextProducts, nextDay, {
@@ -430,10 +432,11 @@ export function HomefarmShopGame() {
     if (nextDay === EVENT_UNLOCK_DAY) setShowEventUnlock(true);
 
     const skippedText = remainingCustomers > 0 ? ` · bỏ qua ${remainingCustomers} khách còn lại` : "";
+    const spoilageText = overnightSpoilage.affectedCount > 0 ? ` · hao hụt qua đêm ${overnightSpoilage.affectedCount} mặt hàng` : "";
     const catalogText = nextDay === PRODUCT_EXPANSION_DAY ? " · danh mục sản phẩm đã mở rộng" : "";
     const upgradeText = nextDay === UPGRADE_UNLOCK_DAY ? " · đã mở Nâng cấp cửa hàng" : "";
     const eventText = nextDay === EVENT_UNLOCK_DAY ? " · các vấn đề vận hành bắt đầu xuất hiện" : "";
-    setToast(`Ngày ${nextDay}: mở khóa ${nextProducts.length} mặt hàng · có ${nextCustomers.length} khách${skippedText}${catalogText}${upgradeText}${eventText}. Combo tốt nhất: ${maxCombo}.`);
+    setToast(`Ngày ${nextDay}: mở khóa ${nextProducts.length} mặt hàng · có ${nextCustomers.length} khách${skippedText}${spoilageText}${catalogText}${upgradeText}${eventText}. Combo tốt nhất: ${maxCombo}.`);
   }
 
   async function saveScore() {
