@@ -5,7 +5,7 @@ Single source of truth for the project snapshot, feature map, and version histor
 ## Current Snapshot
 
 - Current version: `v3.0`
-- Current commit: TBD
+- Current commit: `b6cc87a`
 - Current rollback tag: `v3.0-start-screen`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
