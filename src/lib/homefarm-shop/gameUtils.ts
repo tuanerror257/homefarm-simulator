@@ -204,29 +204,39 @@ function customersCountByDay(day: number) {
   return Math.min(8 + Math.floor((day - 5) * 0.55), 18);
 }
 
-function patienceByDay(type: CustomerType, day: number) {
+function patienceByDay(type: CustomerType, day: number, staffLevel = 0) {
   const pressure = day <= 5 ? 0 : (day - 5) * 0.8;
   const randomBonus = Math.random() * 5;
-  return Math.max(8, Math.round(type.patience - pressure + randomBonus));
+  return Math.max(8, Math.round(type.patience - pressure + randomBonus + staffLevel * 2.5));
 }
 
-export function generateCustomers(products: Product[], day: number): Customer[] {
+export function generateCustomers(
+  products: Product[],
+  day: number,
+  options: {
+    signLevel?: number;
+    staffLevel?: number;
+  } = {},
+): Customer[] {
   const count = customersCountByDay(day);
+  const signLevel = options.signLevel ?? 0;
+  const staffLevel = options.staffLevel ?? 0;
 
   return Array.from({ length: count }).map((_, index) => {
-    const vipChance = day >= 3 ? Math.min(0.08 + day * 0.012, 0.22) : 0;
+    const vipChance = day >= 3 ? Math.min(0.08 + day * 0.012 + signLevel * 0.035, 0.32) : 0;
     const isVip = Math.random() < vipChance;
     const type = isVip
       ? sample(CUSTOMER_TYPES.filter((customer) => ["Khách VIP", "Nhà hàng", "Team party"].includes(customer.name)))
       : sample(CUSTOMER_TYPES);
     const order = buildOrder(products, type, isVip ? day + 5 : day);
+    const patience = patienceByDay(type, day, staffLevel);
 
     return {
       ...type,
       name: isVip ? `${type.name} VIP` : type.name,
       mood: isVip ? "Đơn lớn" : type.mood,
       orderNo: index + 1,
-      patience: isVip ? Math.max(14, patienceByDay(type, day) - 5) : patienceByDay(type, day),
+      patience: isVip ? Math.max(14, patience - 5) : patience,
       repeat: isVip || Math.random() < Math.min(0.08 + day * 0.025, 0.38),
       vip: isVip,
       quote: isVip ? "Đơn lớn, làm nhanh tôi tip mạnh." : type.quote,
@@ -274,12 +284,20 @@ export function maybeCreateEvent(day: number): ShopEvent | null {
   return sample(SHOP_EVENTS);
 }
 
-export function applyEventToProducts(products: Product[], event: ShopEvent | null) {
+export function applyEventToProducts(
+  products: Product[],
+  event: ShopEvent | null,
+  options: {
+    freezerLevel?: number;
+  } = {},
+) {
   if (!event?.stockDelta) return products;
+  const freezerReduction = Math.min((options.freezerLevel ?? 0) * 0.25, 0.75);
 
   return products.map((p) => {
     const delta = event.stockDelta?.[p.id] || 0;
-    return { ...p, stock: Math.max(0, Number((p.stock + delta).toFixed(1))) };
+    const effectiveDelta = delta < 0 ? Number((delta * (1 - freezerReduction)).toFixed(1)) : delta;
+    return { ...p, stock: Math.max(0, Number((p.stock + effectiveDelta).toFixed(1))) };
   });
 }
 

@@ -2,6 +2,16 @@
 
 All notable Homefarm Shop Simulator changes are tracked here.
 
+## v2.4 - Shop upgrades
+
+- Added a shop upgrade modal with four upgrades: fillet knife, staff helper, VIP sign, and freezer.
+- Added upgrade levels and cash costs with a max level of 3 per upgrade.
+- Made fillet knife upgrades increase salmon and head-bone yield immediately.
+- Made staff helper upgrades increase customer patience from the next day.
+- Made VIP sign upgrades increase VIP customer chance from the next day.
+- Made freezer upgrades reduce negative stock loss from shop events.
+- Updated the visible game version badge to `v2.4`.
+
 ## v2.3.1 - Remove daily goal overlay
 
 - Removed the daily goal bar from the active order panel so `ORDER`, `TIME`, and `MOOD` remain clearly visible.

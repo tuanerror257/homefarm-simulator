@@ -33,6 +33,10 @@ export type Customer = CustomerType & {
   vip?: boolean;
 };
 
+export type ShopUpgradeId = "freezer" | "knife" | "sign" | "staff";
+
+export type ShopUpgrades = Record<ShopUpgradeId, number>;
+
 export type EndDaySummaryData = {
   revenue: number;
   profit: number;

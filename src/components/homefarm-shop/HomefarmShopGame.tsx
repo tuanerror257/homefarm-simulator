@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { EndDaySummaryData, MascotState, Product, ShopEvent } from "@/types/homefarm-shop";
+import type { EndDaySummaryData, MascotState, Product, ShopEvent, ShopUpgradeId, ShopUpgrades } from "@/types/homefarm-shop";
 import { MASCOT_ASSETS, MASCOT_TALK, START_PRODUCTS } from "@/lib/homefarm-shop/data";
 import { GAME_VERSION } from "@/config/version";
 import {
@@ -23,6 +23,55 @@ import "./homefarm-shop.css";
 type OrderProduct = Product & { wantQty: number };
 
 const PAGE_SIZE = 8;
+const MAX_UPGRADE_LEVEL = 3;
+const INITIAL_UPGRADES: ShopUpgrades = {
+  freezer: 0,
+  knife: 0,
+  sign: 0,
+  staff: 0,
+};
+
+const UPGRADE_DEFS: Array<{
+  id: ShopUpgradeId;
+  icon: string;
+  name: string;
+  description: string;
+  effect: string;
+  costs: number[];
+}> = [
+  {
+    id: "knife",
+    icon: "🔪",
+    name: "Dao fillet",
+    description: "Fillet cá nguyên ra nhiều thành phẩm hơn.",
+    effect: "+0,35kg fillet và +0,1kg đầu xương mỗi level",
+    costs: [500, 1100, 2200],
+  },
+  {
+    id: "staff",
+    icon: "🧑‍🍳",
+    name: "Nhân viên phụ",
+    description: "Khách kiên nhẫn hơn từ ngày kế tiếp.",
+    effect: "+2,5s kiên nhẫn mỗi level",
+    costs: [800, 1600, 3200],
+  },
+  {
+    id: "sign",
+    icon: "💎",
+    name: "Bảng hiệu VIP",
+    description: "Tăng xác suất gặp khách VIP từ ngày kế tiếp.",
+    effect: "+3,5% cơ hội VIP mỗi level",
+    costs: [700, 1400, 2800],
+  },
+  {
+    id: "freezer",
+    icon: "❄️",
+    name: "Tủ lạnh xịn",
+    description: "Giảm hao hụt hàng khi gặp sự kiện xấu.",
+    effect: "-25% hao hụt do event mỗi level",
+    costs: [650, 1300, 2600],
+  },
+];
 
 export function HomefarmShopGame() {
   const [products, setProducts] = useState(START_PRODUCTS);
@@ -43,7 +92,9 @@ export function HomefarmShopGame() {
   const [timeLeft, setTimeLeft] = useState(customers[0].patience);
   const [toast, setToast] = useState("Tap từng món khách cần mua trên kệ hàng");
   const [showImport, setShowImport] = useState(false);
+  const [showUpgrades, setShowUpgrades] = useState(false);
   const [importQty, setImportQty] = useState<Record<string, number>>({});
+  const [upgrades, setUpgrades] = useState<ShopUpgrades>(INITIAL_UPGRADES);
   const [combo, setCombo] = useState(0);
   const [moodScore, setMoodScore] = useState(100);
   const [wrongFlash, setWrongFlash] = useState(false);
@@ -78,6 +129,7 @@ export function HomefarmShopGame() {
   const timePercent = customer ? Math.max(0, Math.round((timeLeft / customer.patience) * 100)) : 0;
   const estimatedTip = customer ? bill * calcTipRate(customer, timeLeft, moodScore, combo) : 0;
   const importCost = products.reduce((s, p) => s + (importQty[p.id] || 0) * p.cost, 0);
+  const upgradeCount = Object.values(upgrades).reduce((sum, level) => sum + level, 0);
 
   const currentScore = calculateScore({
     day,
@@ -117,7 +169,7 @@ export function HomefarmShopGame() {
   }, [customerIndex, day, customer, eventMoodPenalty]);
 
   useEffect(() => {
-    if (!customer || showImport || showLeaderboard || activeEvent) return;
+    if (!customer || showImport || showUpgrades || showLeaderboard || activeEvent) return;
 
     const timer = setInterval(() => {
       setMoodScore((m) => Math.max(0, m - (0.8 + day * 0.035)));
@@ -135,7 +187,7 @@ export function HomefarmShopGame() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [customerIndex, customer, showImport, showLeaderboard, activeEvent, day, skipCustomer]);
+  }, [customerIndex, customer, showImport, showUpgrades, showLeaderboard, activeEvent, day, skipCustomer]);
 
   async function loadLeaderboard() {
     try {
@@ -237,20 +289,44 @@ export function HomefarmShopGame() {
       return;
     }
 
+    const salmonYield = 4.8 + upgrades.knife * 0.35;
+    const headBoneYield = 1.2 + upgrades.knife * 0.1;
+
     setProducts((prev) =>
       prev.map((p) =>
         p.id === "wholeSalmon"
           ? { ...p, stock: Number((p.stock - 1).toFixed(1)) }
           : p.id === "salmon"
-            ? { ...p, stock: Number((p.stock + 4.8).toFixed(1)) }
+            ? { ...p, stock: Number((p.stock + salmonYield).toFixed(1)) }
             : p.id === "headBone"
-              ? { ...p, stock: Number((p.stock + 1.2).toFixed(1)) }
+              ? { ...p, stock: Number((p.stock + headBoneYield).toFixed(1)) }
               : p,
       ),
     );
 
     setMascotState("trust");
-    setToast("Fillet 1 con cá nguyên (6kg): +4.8kg fillet, +1.2kg đầu xương.");
+    setToast(`Fillet 1 con cá nguyên: +${qty(salmonYield)}kg fillet, +${qty(headBoneYield)}kg đầu xương.`);
+  }
+
+  function buyUpgrade(id: ShopUpgradeId) {
+    const definition = UPGRADE_DEFS.find((upgrade) => upgrade.id === id)!;
+    const currentLevel = upgrades[id];
+    if (currentLevel >= MAX_UPGRADE_LEVEL) {
+      setToast(`${definition.name} đã đạt level tối đa.`);
+      return;
+    }
+
+    const cost = definition.costs[currentLevel];
+    if (cash < cost) {
+      setMascotState("thinking");
+      setToast(`Chưa đủ tiền nâng cấp ${definition.name}. Cần ${money(cost)}, hiện có ${money(cash)}.`);
+      return;
+    }
+
+    setCash((value) => value - cost);
+    setUpgrades((current) => ({ ...current, [id]: current[id] + 1 }));
+    setMascotState("trust");
+    setToast(`Đã nâng cấp ${definition.name} lên level ${currentLevel + 1}: -${money(cost)}.`);
   }
 
   function setQty(id: string, value: number) {
@@ -304,8 +380,11 @@ export function HomefarmShopGame() {
 
     const unlockedProducts = getUnlockedProducts(nextDay, products);
     const nextEvent = maybeCreateEvent(nextDay);
-    const nextProducts = applyEventToProducts(unlockedProducts, nextEvent);
-    const nextCustomers = generateCustomers(nextProducts, nextDay);
+    const nextProducts = applyEventToProducts(unlockedProducts, nextEvent, { freezerLevel: upgrades.freezer });
+    const nextCustomers = generateCustomers(nextProducts, nextDay, {
+      signLevel: upgrades.sign,
+      staffLevel: upgrades.staff,
+    });
 
     if (nextEvent?.cashDelta) {
       setCash((value) => Math.max(0, value + nextEvent.cashDelta!));
@@ -486,7 +565,9 @@ export function HomefarmShopGame() {
                 >
                   🏆 BXH
                 </button>
-                <div className="hfs-inventory-pill">Inventory</div>
+                <button className="hfs-board-pill hfs-upgrade-pill" onClick={() => setShowUpgrades(true)}>
+                  ⬆️ Lv {upgradeCount}
+                </button>
               </div>
             </div>
 
@@ -557,6 +638,49 @@ export function HomefarmShopGame() {
               <div className="hfs-modal-actions">
                 <button onClick={() => setShowImport(false)} className="hfs-cancel">Huỷ</button>
                 <button onClick={confirmImport} className="hfs-confirm">Nhập {money(importCost)}</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showUpgrades && (
+          <div className="hfs-modal-backdrop">
+            <div className="hfs-modal">
+              <div className="hfs-modal-top">
+                <div>
+                  <div className="hfs-modal-title">Nâng cấp cửa hàng</div>
+                  <div className="hfs-modal-sub">Dùng tiền mặt để mở lợi thế dài hạn. Tổng level: {upgradeCount}/{UPGRADE_DEFS.length * MAX_UPGRADE_LEVEL}</div>
+                </div>
+                <button onClick={() => setShowUpgrades(false)} className="hfs-modal-close">×</button>
+              </div>
+
+              <div className="hfs-upgrade-list">
+                {UPGRADE_DEFS.map((upgrade) => {
+                  const level = upgrades[upgrade.id];
+                  const maxed = level >= MAX_UPGRADE_LEVEL;
+                  const cost = maxed ? 0 : upgrade.costs[level];
+                  return (
+                    <div key={upgrade.id} className={`hfs-upgrade-row ${maxed ? "maxed" : ""}`}>
+                      <div className="hfs-import-icon">{upgrade.icon}</div>
+                      <div className="hfs-import-info">
+                        <div className="hfs-import-name">{upgrade.name} · Lv {level}/{MAX_UPGRADE_LEVEL}</div>
+                        <div className="hfs-import-sub">{upgrade.description}</div>
+                        <div className="hfs-upgrade-effect">{upgrade.effect}</div>
+                      </div>
+                      <button
+                        className="hfs-upgrade-buy"
+                        onClick={() => buyUpgrade(upgrade.id)}
+                        disabled={maxed || cash < cost}
+                      >
+                        {maxed ? "MAX" : money(cost)}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="hfs-modal-actions">
+                <button onClick={() => setShowUpgrades(false)} className="hfs-confirm">Xong</button>
               </div>
             </div>
           </div>
