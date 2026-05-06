@@ -5,7 +5,7 @@ Single source of truth for the project snapshot, feature map, and version histor
 ## Current Snapshot
 
 - Current version: `v2.6`
-- Current commit: TBD
+- Current commit: `2724829`
 - Current rollback tag: `v2.6-supabase-leaderboard`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
