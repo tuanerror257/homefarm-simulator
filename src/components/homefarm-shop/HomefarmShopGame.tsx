@@ -922,46 +922,20 @@ function ProductCard({
 }
 
 function StartScreen({ onStart, dimmed }: { onStart: () => void; dimmed?: boolean }) {
+  const [pressed, setPressed] = useState(false);
+
   return (
     <div className={`hfs-start-screen ${dimmed ? "dimmed" : ""}`}>
-      <div className="hfs-start-logo-wrap">
-        <Image
-          src="/homefarm-shop/homefarm-shop-simulator-logo.png"
-          alt="Homefarm Shop Simulator"
-          width={320}
-          height={180}
-          className="hfs-start-logo-img"
-          priority
+      {!dimmed && (
+        <button
+          className={`hfs-start-btn ${pressed ? "pressing" : ""}`}
+          onPointerDown={() => setPressed(true)}
+          onPointerUp={() => { setPressed(false); onStart(); }}
+          onPointerLeave={() => setPressed(false)}
+          onPointerCancel={() => setPressed(false)}
+          aria-label="Start Game"
         />
-      </div>
-
-      <div className="hfs-start-mascot-area">
-        <Image
-          src={MASCOT_ASSETS.trust}
-          alt="mascot"
-          width={140}
-          height={192}
-          className="hfs-start-mascot-img"
-          priority
-        />
-      </div>
-
-      <div className="hfs-start-tags">
-        <span>🌿 FRESH</span>
-        <span>💚 HEALTHY</span>
-        <span>😋 DELICIOUS</span>
-      </div>
-
-      <div className="hfs-start-footer">
-        <div className="hfs-start-credits">
-          Ý tưởng: Tada · Vibe code với Codex &amp; Claude Code
-        </div>
-        {!dimmed && (
-          <button className="hfs-start-btn" onClick={onStart}>
-            🎮 START GAME
-          </button>
-        )}
-      </div>
+      )}
     </div>
   );
 }
