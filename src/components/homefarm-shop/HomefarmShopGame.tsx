@@ -9,9 +9,7 @@ import {
   applyEventToProducts,
   calcTipRate,
   calculateScore,
-  evaluateDailyGoal,
   generateCustomers,
-  getDailyGoal,
   getStockShortageMessage,
   getUnlockedProducts,
   maybeCreateEvent,
@@ -74,19 +72,12 @@ export function HomefarmShopGame() {
   const isComplete = Boolean(customer && done === customer.order.length);
   const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
   const visibleProducts = products.slice(productPage * PAGE_SIZE, productPage * PAGE_SIZE + PAGE_SIZE);
-  const dailyGoal = useMemo(() => getDailyGoal(day), [day]);
 
   const bill = useMemo(() => orderProducts.reduce((s, p) => s + p.price * p.wantQty, 0), [orderProducts]);
   const orderProfit = useMemo(() => orderProducts.reduce((s, p) => s + (p.price - p.cost) * p.wantQty, 0), [orderProducts]);
   const timePercent = customer ? Math.max(0, Math.round((timeLeft / customer.patience) * 100)) : 0;
   const estimatedTip = customer ? bill * calcTipRate(customer, timeLeft, moodScore, combo) : 0;
   const importCost = products.reduce((s, p) => s + (importQty[p.id] || 0) * p.cost, 0);
-  const dailyGoalProgress = evaluateDailyGoal(dailyGoal, {
-    revenue,
-    profit,
-    served: servedTodayCount,
-    combo: dayMaxCombo,
-  });
 
   const currentScore = calculateScore({
     day,
@@ -291,15 +282,9 @@ export function HomefarmShopGame() {
 
   function endDay() {
     const skippedTotal = skippedTodayCount + Math.max(0, customers.length - customerIndex);
-    const goal = evaluateDailyGoal(dailyGoal, {
-      revenue,
-      profit,
-      served: servedTodayCount,
-      combo: dayMaxCombo,
-    });
     const rating = Math.max(
       1,
-      Math.min(5, Number((5 - skippedTotal * 0.35 + servedTodayCount * 0.08 + (goal.completed ? 0.25 : 0)).toFixed(1))),
+      Math.min(5, Number((5 - skippedTotal * 0.35 + servedTodayCount * 0.08).toFixed(1))),
     );
 
     setDaySummary({
@@ -310,12 +295,10 @@ export function HomefarmShopGame() {
       skipped: skippedTotal,
       combo: dayMaxCombo,
       rating,
-      goal,
     });
   }
 
   function startNextDay() {
-    const goalReward = daySummary?.goal.completed ? daySummary.goal.reward : 0;
     const remainingCustomers = Math.max(0, customers.length - customerIndex);
     const nextDay = day + 1;
 
@@ -325,9 +308,7 @@ export function HomefarmShopGame() {
     const nextCustomers = generateCustomers(nextProducts, nextDay);
 
     if (nextEvent?.cashDelta) {
-      setCash((value) => Math.max(0, value + goalReward + nextEvent.cashDelta!));
-    } else if (goalReward > 0) {
-      setCash((value) => value + goalReward);
+      setCash((value) => Math.max(0, value + nextEvent.cashDelta!));
     }
 
     setDay(nextDay);
@@ -351,8 +332,7 @@ export function HomefarmShopGame() {
     setDaySummary(null);
 
     const skippedText = remainingCustomers > 0 ? ` · bỏ qua ${remainingCustomers} khách còn lại` : "";
-    const rewardText = goalReward > 0 ? ` · thưởng mục tiêu +${money(goalReward)}` : "";
-    setToast(`Ngày ${nextDay}: mở khóa ${nextProducts.length} mặt hàng · có ${nextCustomers.length} khách${skippedText}${rewardText}. Combo tốt nhất: ${maxCombo}.`);
+    setToast(`Ngày ${nextDay}: mở khóa ${nextProducts.length} mặt hàng · có ${nextCustomers.length} khách${skippedText}. Combo tốt nhất: ${maxCombo}.`);
   }
 
   async function saveScore() {
@@ -444,13 +424,6 @@ export function HomefarmShopGame() {
                     <div className="hfs-bill">
                       Bill {money(bill)} · Lãi {money(orderProfit)} · Tip ~{money(estimatedTip)}
                     </div>
-                  </div>
-
-                  <div className={`hfs-daily-goal ${dailyGoalProgress.completed ? "done" : ""}`}>
-                    <span>🎯 {dailyGoal.label}</span>
-                    <strong>
-                      {Math.round(dailyGoalProgress.current).toLocaleString("vi-VN")}/{Math.round(dailyGoal.target).toLocaleString("vi-VN")}
-                    </strong>
                   </div>
 
                   <div className="hfs-order-items">

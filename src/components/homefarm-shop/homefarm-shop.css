@@ -326,37 +326,6 @@
   text-overflow: ellipsis;
 }
 
-.hfs-daily-goal {
-  min-height: 28px;
-  border: 2px solid #2d2118;
-  border-radius: 12px;
-  background: #fff7e4;
-  box-shadow: 0 2px 0 #2d2118;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  padding: 4px 7px;
-  font-size: 9px;
-  font-weight: 900;
-}
-
-.hfs-daily-goal span {
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.hfs-daily-goal strong {
-  flex: 0 0 auto;
-  color: #d71920;
-}
-
-.hfs-daily-goal.done {
-  background: #dcfce7;
-}
-
 .hfs-order-items {
   flex: 1;
   min-height: 0;
@@ -1200,35 +1169,11 @@
   color: #d71920;
 }
 
-.hfs-goal-result {
-  margin-top: 9px;
-  border: 3px solid #2d2118;
-  border-radius: 16px;
-  background: #fff;
-  padding: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.hfs-goal-result.completed {
-  background: #dcfce7;
-}
-
-.hfs-goal-result span,
 .hfs-summary-grid span {
   display: block;
   font-size: 9px;
   opacity: .62;
   font-weight: 900;
-}
-
-.hfs-goal-result strong {
-  display: block;
-  margin-top: 2px;
 }
 
 .hfs-summary-grid {

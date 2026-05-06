@@ -33,19 +33,6 @@ export type Customer = CustomerType & {
   vip?: boolean;
 };
 
-export type DailyGoal = {
-  id: string;
-  label: string;
-  target: number;
-  reward: number;
-  type: "revenue" | "served" | "combo" | "profit";
-};
-
-export type DailyGoalResult = DailyGoal & {
-  current: number;
-  completed: boolean;
-};
-
 export type EndDaySummaryData = {
   revenue: number;
   profit: number;
@@ -54,7 +41,6 @@ export type EndDaySummaryData = {
   skipped: number;
   combo: number;
   rating: number;
-  goal: DailyGoalResult;
 };
 
 export type MascotState =

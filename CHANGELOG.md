@@ -2,6 +2,13 @@
 
 All notable Homefarm Shop Simulator changes are tracked here.
 
+## v2.3.1 - Remove daily goal overlay
+
+- Removed the daily goal bar from the active order panel so `ORDER`, `TIME`, and `MOOD` remain clearly visible.
+- Removed daily goal reward logic from day transitions.
+- Kept the end-day summary and VIP customer behavior from `v2.3`.
+- Updated the visible game version badge to `v2.3.1`.
+
 ## v2.3 - Daily goals, end-day summary, VIP orders
 
 - Added a real end-day summary modal with revenue, profit, served customers, skipped customers, max combo, rating, and goal result.

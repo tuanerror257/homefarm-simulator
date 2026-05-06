@@ -15,13 +15,6 @@ export default function EndDaySummary({ data, onNext, day }: EndDaySummaryProps)
     <div className="hfs-summary-backdrop">
       <div className="hfs-summary-panel">
         <div className="hfs-summary-title">📊 Ngày {day} kết thúc</div>
-        <div className={`hfs-goal-result ${data.goal.completed ? "completed" : ""}`}>
-          <div>
-            <span>Mục tiêu</span>
-            <strong>{data.goal.label}</strong>
-          </div>
-          <div>{data.goal.completed ? `+${money(data.goal.reward)}` : "Chưa đạt"}</div>
-        </div>
 
         <div className="hfs-summary-grid">
           <div><span>Doanh thu</span><strong>{money(data.revenue)}</strong></div>

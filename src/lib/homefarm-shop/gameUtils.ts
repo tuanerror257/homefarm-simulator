@@ -1,4 +1,4 @@
-import type { Customer, CustomerType, DailyGoal, DailyGoalResult, Product, ShopEvent } from "@/types/homefarm-shop";
+import type { Customer, CustomerType, Product, ShopEvent } from "@/types/homefarm-shop";
 import { ALL_PRODUCTS, CUSTOMER_TYPES, SHOP_EVENTS } from "./data";
 
 const PRODUCT_WEIGHTS: Record<string, number> = {
@@ -248,64 +248,6 @@ export function calcTipRate(customer: Customer, timeLeft: number, moodScore: num
   if (customer.vip) rate += 0.06;
 
   return Math.min(rate, customer.vip ? 0.28 : 0.2);
-}
-
-export function getDailyGoal(day: number): DailyGoal {
-  const cycle = day % 3;
-
-  if (cycle === 1) {
-    const target = 1900 + day * 500;
-    return {
-      id: `revenue-${day}`,
-      type: "revenue",
-      label: `Đạt ${money(target)} doanh thu ngày`,
-      target,
-      reward: 220 + day * 35,
-    };
-  }
-
-  if (cycle === 2) {
-    const target = Math.min(customersCountByDay(day), 3 + Math.floor(day * 0.7));
-    return {
-      id: `served-${day}`,
-      type: "served",
-      label: `Phục vụ ít nhất ${target} khách`,
-      target,
-      reward: 180 + day * 30,
-    };
-  }
-
-  return {
-    id: `combo-${day}`,
-    type: "combo",
-    label: `Giữ combo max x${Math.min(3 + Math.floor(day / 2), 10)}`,
-    target: Math.min(3 + Math.floor(day / 2), 10),
-    reward: 260 + day * 40,
-  };
-}
-
-export function evaluateDailyGoal(
-  goal: DailyGoal,
-  stats: {
-    revenue: number;
-    profit: number;
-    served: number;
-    combo: number;
-  },
-): DailyGoalResult {
-  const currentByType = {
-    revenue: stats.revenue,
-    profit: stats.profit,
-    served: stats.served,
-    combo: stats.combo,
-  };
-  const current = currentByType[goal.type];
-
-  return {
-    ...goal,
-    current,
-    completed: current >= goal.target,
-  };
 }
 
 export function getStockShortageMessage(product: Product) {
