@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v2.5`
-- Current commit: `aff32b5`
-- Current rollback tag: `v2.5-overnight-stock-spoilage`
+- Current version: `v2.6`
+- Current commit: TBD
+- Current rollback tag: `v2.6-supabase-leaderboard`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v2.6 - Supabase leaderboard
+
+- Connected leaderboard to Supabase for persistent cloud storage across sessions.
+- Created `homefarm_shop_leaderboard` table with RLS policies (public read, public insert with validation).
+- Fallback to localStorage when Supabase env vars are not set.
+- Updated the visible game version badge to `v2.6`.
+- Tag: `v2.6-supabase-leaderboard`
 
 ### v2.5 - Overnight stock spoilage
 
