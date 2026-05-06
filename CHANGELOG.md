@@ -2,6 +2,13 @@
 
 All notable Homefarm Shop Simulator changes are tracked here.
 
+## v2.4.2 - Day 6 product expansion unlock
+
+- Added a product catalog expansion modal when the player advances from Day 5 to Day 6.
+- Hidden no existing gameplay controls, but pauses the customer timer while the unlock modal is open.
+- Added a toast note when Day 6 starts and the product catalog expands.
+- Updated the visible game version badge to `v2.4.2`.
+
 ## v2.4.1 - Day 8 upgrade unlock
 
 - Hidden the shop upgrade button before Day 8.

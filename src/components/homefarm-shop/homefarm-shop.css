@@ -786,6 +786,11 @@
   box-shadow: 0 4px 0 #2d2118;
 }
 
+.hfs-catalog-unlock-icon {
+  background: #ffcf3f;
+  color: #2d2118;
+}
+
 .hfs-unlock-title {
   color: #d71920;
   font-size: 20px;
