@@ -30,6 +30,31 @@ export type Customer = CustomerType & {
   orderNo: number;
   order: OrderItem[];
   repeat?: boolean;
+  vip?: boolean;
+};
+
+export type DailyGoal = {
+  id: string;
+  label: string;
+  target: number;
+  reward: number;
+  type: "revenue" | "served" | "combo" | "profit";
+};
+
+export type DailyGoalResult = DailyGoal & {
+  current: number;
+  completed: boolean;
+};
+
+export type EndDaySummaryData = {
+  revenue: number;
+  profit: number;
+  served: number;
+  total: number;
+  skipped: number;
+  combo: number;
+  rating: number;
+  goal: DailyGoalResult;
 };
 
 export type MascotState =

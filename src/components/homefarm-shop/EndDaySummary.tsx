@@ -1,33 +1,39 @@
 import React from "react";
+import type { EndDaySummaryData } from "@/types/homefarm-shop";
+import { money } from "@/lib/homefarm-shop/gameUtils";
 
-export default function EndDaySummary({ data, onNext, day }: any) {
+type EndDaySummaryProps = {
+  data: EndDaySummaryData | null;
+  onNext: () => void;
+  day: number;
+};
+
+export default function EndDaySummary({ data, onNext, day }: EndDaySummaryProps) {
   if (!data) return null;
 
   return (
-    <div style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,0.6)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 999
-    }}>
-      <div style={{
-        background: "#fff",
-        padding: 24,
-        borderRadius: 12,
-        width: 320
-      }}>
-        <h2>📊 Ngày {day} kết thúc</h2>
-        <p>💰 Doanh thu: {data.revenue}k</p>
-        <p>📈 Lãi: {data.profit}k</p>
-        <p>👥 Phục vụ: {data.served}/{data.total}</p>
-        <p>🔥 Combo max: x{data.combo}</p>
-        <p>⭐ Rating: {data.rating}/5</p>
+    <div className="hfs-summary-backdrop">
+      <div className="hfs-summary-panel">
+        <div className="hfs-summary-title">📊 Ngày {day} kết thúc</div>
+        <div className={`hfs-goal-result ${data.goal.completed ? "completed" : ""}`}>
+          <div>
+            <span>Mục tiêu</span>
+            <strong>{data.goal.label}</strong>
+          </div>
+          <div>{data.goal.completed ? `+${money(data.goal.reward)}` : "Chưa đạt"}</div>
+        </div>
 
-        <button onClick={onNext} style={{marginTop:12}}>
-          👉 Sang ngày {day + 1}
+        <div className="hfs-summary-grid">
+          <div><span>Doanh thu</span><strong>{money(data.revenue)}</strong></div>
+          <div><span>Lãi</span><strong>{money(data.profit)}</strong></div>
+          <div><span>Phục vụ</span><strong>{data.served}/{data.total}</strong></div>
+          <div><span>Bỏ qua</span><strong>{data.skipped}</strong></div>
+          <div><span>Combo max</span><strong>x{data.combo}</strong></div>
+          <div><span>Rating</span><strong>{data.rating}/5</strong></div>
+        </div>
+
+        <button onClick={onNext} className="hfs-summary-next">
+          Sang ngày {day + 1}
         </button>
       </div>
     </div>

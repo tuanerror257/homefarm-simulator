@@ -1,4 +1,4 @@
-import type { Customer, CustomerType, Product, ShopEvent } from "@/types/homefarm-shop";
+import type { Customer, CustomerType, DailyGoal, DailyGoalResult, Product, ShopEvent } from "@/types/homefarm-shop";
 import { ALL_PRODUCTS, CUSTOMER_TYPES, SHOP_EVENTS } from "./data";
 
 const PRODUCT_WEIGHTS: Record<string, number> = {
@@ -191,6 +191,13 @@ function buildOrder(products: Product[], customerType: CustomerType, day: number
   });
 }
 
+function boostVipOrder(order: Customer["order"]) {
+  return order.map((item) => ({
+    ...item,
+    qty: Number((item.qty * 1.45).toFixed(1)),
+  }));
+}
+
 function customersCountByDay(day: number) {
   // Tăng nhẹ theo ngày để ngày sau đông khách hơn nhưng không quá loạn UI.
   if (day <= 5) return 3 + day; // 4 -> 8 khách
@@ -207,14 +214,23 @@ export function generateCustomers(products: Product[], day: number): Customer[] 
   const count = customersCountByDay(day);
 
   return Array.from({ length: count }).map((_, index) => {
-    const type = sample(CUSTOMER_TYPES);
+    const vipChance = day >= 3 ? Math.min(0.08 + day * 0.012, 0.22) : 0;
+    const isVip = Math.random() < vipChance;
+    const type = isVip
+      ? sample(CUSTOMER_TYPES.filter((customer) => ["Khách VIP", "Nhà hàng", "Team party"].includes(customer.name)))
+      : sample(CUSTOMER_TYPES);
+    const order = buildOrder(products, type, isVip ? day + 5 : day);
 
     return {
       ...type,
+      name: isVip ? `${type.name} VIP` : type.name,
+      mood: isVip ? "Đơn lớn" : type.mood,
       orderNo: index + 1,
-      patience: patienceByDay(type, day),
-      repeat: Math.random() < Math.min(0.08 + day * 0.025, 0.38),
-      order: buildOrder(products, type, day),
+      patience: isVip ? Math.max(14, patienceByDay(type, day) - 5) : patienceByDay(type, day),
+      repeat: isVip || Math.random() < Math.min(0.08 + day * 0.025, 0.38),
+      vip: isVip,
+      quote: isVip ? "Đơn lớn, làm nhanh tôi tip mạnh." : type.quote,
+      order: isVip ? boostVipOrder(order) : order,
     };
   });
 }
@@ -229,8 +245,67 @@ export function calcTipRate(customer: Customer, timeLeft: number, moodScore: num
   if (moodRatio > 0.8) rate += 0.03;
   if (combo >= 2) rate += Math.min(0.05, combo * 0.01);
   if (customer.repeat) rate += 0.02;
+  if (customer.vip) rate += 0.06;
 
-  return Math.min(rate, 0.2);
+  return Math.min(rate, customer.vip ? 0.28 : 0.2);
+}
+
+export function getDailyGoal(day: number): DailyGoal {
+  const cycle = day % 3;
+
+  if (cycle === 1) {
+    const target = 1900 + day * 500;
+    return {
+      id: `revenue-${day}`,
+      type: "revenue",
+      label: `Đạt ${money(target)} doanh thu ngày`,
+      target,
+      reward: 220 + day * 35,
+    };
+  }
+
+  if (cycle === 2) {
+    const target = Math.min(customersCountByDay(day), 3 + Math.floor(day * 0.7));
+    return {
+      id: `served-${day}`,
+      type: "served",
+      label: `Phục vụ ít nhất ${target} khách`,
+      target,
+      reward: 180 + day * 30,
+    };
+  }
+
+  return {
+    id: `combo-${day}`,
+    type: "combo",
+    label: `Giữ combo max x${Math.min(3 + Math.floor(day / 2), 10)}`,
+    target: Math.min(3 + Math.floor(day / 2), 10),
+    reward: 260 + day * 40,
+  };
+}
+
+export function evaluateDailyGoal(
+  goal: DailyGoal,
+  stats: {
+    revenue: number;
+    profit: number;
+    served: number;
+    combo: number;
+  },
+): DailyGoalResult {
+  const currentByType = {
+    revenue: stats.revenue,
+    profit: stats.profit,
+    served: stats.served,
+    combo: stats.combo,
+  };
+  const current = currentByType[goal.type];
+
+  return {
+    ...goal,
+    current,
+    completed: current >= goal.target,
+  };
 }
 
 export function getStockShortageMessage(product: Product) {
