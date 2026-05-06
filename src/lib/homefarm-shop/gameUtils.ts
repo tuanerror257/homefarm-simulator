@@ -216,18 +216,25 @@ export function generateCustomers(
   options: {
     signLevel?: number;
     staffLevel?: number;
+    rainyDay?: boolean;
   } = {},
 ): Customer[] {
   const count = customersCountByDay(day);
   const signLevel = options.signLevel ?? 0;
   const staffLevel = options.staffLevel ?? 0;
+  const rainyDay = options.rainyDay ?? false;
+  const appCustomer = CUSTOMER_TYPES.find((customer) => customer.name === "Shipper app");
 
   return Array.from({ length: count }).map((_, index) => {
     const vipChance = day >= 3 ? Math.min(0.08 + day * 0.012 + signLevel * 0.035, 0.32) : 0;
     const isVip = Math.random() < vipChance;
-    const type = isVip
-      ? sample(CUSTOMER_TYPES.filter((customer) => ["Khách VIP", "Nhà hàng", "Team party"].includes(customer.name)))
-      : sample(CUSTOMER_TYPES);
+    let type = sample(CUSTOMER_TYPES);
+    if (isVip) {
+      type = sample(CUSTOMER_TYPES.filter((customer) => ["Khách VIP", "Nhà hàng", "Team party"].includes(customer.name)));
+    } else if (rainyDay && appCustomer && Math.random() < 0.32) {
+      type = appCustomer;
+    }
+    const appOrder = type.name === "Shipper app" || (!isVip && rainyDay && Math.random() < 0.18);
     const order = buildOrder(products, type, isVip ? day + 5 : day);
     const patience = patienceByDay(type, day, staffLevel);
 
@@ -239,6 +246,7 @@ export function generateCustomers(
       patience: isVip ? Math.max(14, patience - 5) : patience,
       repeat: isVip || Math.random() < Math.min(0.08 + day * 0.025, 0.38),
       vip: isVip,
+      appOrder,
       quote: isVip ? "Đơn lớn, làm nhanh tôi tip mạnh." : type.quote,
       order: isVip ? boostVipOrder(order) : order,
     };

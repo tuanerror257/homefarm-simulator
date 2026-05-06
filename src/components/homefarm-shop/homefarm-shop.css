@@ -221,7 +221,8 @@
   min-width: 0;
 }
 
-.hfs-vip-badge {
+.hfs-vip-badge,
+.hfs-app-badge {
   border-radius: 999px;
   background: #2d2118;
   color: #ffcf3f;
@@ -230,6 +231,11 @@
   font-size: 10px;
   font-weight: 900;
   white-space: nowrap;
+}
+
+.hfs-app-badge {
+  background: #0ea5e9;
+  color: #fff;
 }
 
 .hfs-combo {

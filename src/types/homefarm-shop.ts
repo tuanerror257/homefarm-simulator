@@ -31,6 +31,7 @@ export type Customer = CustomerType & {
   order: OrderItem[];
   repeat?: boolean;
   vip?: boolean;
+  appOrder?: boolean;
 };
 
 export type ShopUpgradeId = "freezer" | "knife" | "sign" | "staff";

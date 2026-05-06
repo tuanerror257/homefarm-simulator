@@ -23,6 +23,7 @@ import "./homefarm-shop.css";
 type OrderProduct = Product & { wantQty: number };
 
 const PAGE_SIZE = 8;
+const APP_ORDER_SHIPPING_FEE = 20;
 const PRODUCT_EXPANSION_DAY = 6;
 const UPGRADE_UNLOCK_DAY = 8;
 const MAX_UPGRADE_LEVEL = 3;
@@ -253,7 +254,8 @@ export function HomefarmShopGame() {
     const nextMultiplier = nextCombo >= 10 ? 2 : nextCombo >= 5 ? 1.5 : nextCombo >= 3 ? 1.2 : 1;
     const comboBonus = nextCombo >= 3 ? Math.round(bill * (nextMultiplier - 1) * 0.12) : 0;
     const tip = Math.round(baseTip * nextMultiplier);
-    const thisOrderProfit = orderProfit + tip + comboBonus;
+    const shippingFee = customer.appOrder ? APP_ORDER_SHIPPING_FEE : 0;
+    const thisOrderProfit = orderProfit + tip + comboBonus - shippingFee;
 
     setProducts((prev) =>
       prev.map((p) => {
@@ -262,7 +264,7 @@ export function HomefarmShopGame() {
       }),
     );
 
-    setCash((v) => v + bill + tip + comboBonus);
+    setCash((v) => v + bill + tip + comboBonus - shippingFee);
     setRevenue((v) => v + bill);
     setProfit((v) => v + thisOrderProfit);
     setTotalRevenue((v) => v + bill);
@@ -278,6 +280,7 @@ export function HomefarmShopGame() {
     let msg = `Chuẩn! Bill +${money(bill)} · Lãi ${money(thisOrderProfit)}`;
     if (tip > 0) msg += ` · Tip +${money(tip)}`;
     if (comboBonus > 0) msg += ` · Bonus +${money(comboBonus)}`;
+    if (shippingFee > 0) msg += ` · Phí ship -${money(shippingFee)}`;
     if (nextCombo >= 3) msg += ` · Combo ${nextCombo} (${nextMultiplier}x) 🔥`;
     else if (nextCombo > 0) msg += ` · Combo ${nextCombo}`;
     if (customer.vip) msg += " · VIP tip mạnh 💎";
@@ -394,6 +397,7 @@ export function HomefarmShopGame() {
     const nextCustomers = generateCustomers(nextProducts, nextDay, {
       signLevel: upgrades.sign,
       staffLevel: upgrades.staff,
+      rainyDay: nextEvent?.id === "rainy-day",
     });
 
     if (nextEvent?.cashDelta) {
@@ -494,6 +498,7 @@ export function HomefarmShopGame() {
                       </div>
                       <div className="hfs-order-badges">
                         {customer.vip && <div className="hfs-vip-badge">VIP</div>}
+                        {customer.appOrder && <div className="hfs-app-badge">APP</div>}
                         <div className={`hfs-combo ${combo >= 3 ? "hot" : ""}`}>🔥 {combo} · {comboLabel}</div>
                       </div>
                     </div>
@@ -515,7 +520,7 @@ export function HomefarmShopGame() {
                     </div>
 
                     <div className="hfs-bill">
-                      Bill {money(bill)} · Lãi {money(orderProfit)} · Tip ~{money(estimatedTip)}
+                      Bill {money(bill)} · Lãi {money(orderProfit - (customer.appOrder ? APP_ORDER_SHIPPING_FEE : 0))} · Tip ~{money(estimatedTip)}
                     </div>
                   </div>
 

@@ -2,6 +2,13 @@
 
 All notable Homefarm Shop Simulator changes are tracked here.
 
+## v2.4.3 - Rainy day app orders
+
+- Added app-order tracking with an `APP` badge in the active order card.
+- Added a 20k shipping fee deduction from cash and profit for every delivered app order.
+- Made rainy-day events actually increase app-order frequency by favoring `Shipper app` customers and converting some normal orders to app orders.
+- Updated the visible game version badge to `v2.4.3`.
+
 ## v2.4.2 - Day 6 product expansion unlock
 
 - Added a product catalog expansion modal when the player advances from Day 5 to Day 6.
