@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v2.6`
-- Current commit: `2724829`
-- Current rollback tag: `v2.6-supabase-leaderboard`
+- Current version: `v3.0`
+- Current commit: TBD
+- Current rollback tag: `v3.0-start-screen`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,16 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.0 - Start screen & tutorial
+
+- Added a start screen filling the phone frame with farm-themed green background, game logo, mascot, and tag labels.
+- Added a START GAME button that leads to a tutorial popup before entering gameplay.
+- Added a tutorial popup with 4 feature bullets: order management, customer service, revenue optimization, and shop upgrades.
+- Credits on start screen: ý tưởng Tada, vibe code với Codex và Claude Code.
+- Game timers no longer run during start/tutorial phase.
+- Updated the visible game version badge to `v3.0`.
+- Tag: `v3.0-start-screen`
 
 ### v2.6 - Supabase leaderboard
 

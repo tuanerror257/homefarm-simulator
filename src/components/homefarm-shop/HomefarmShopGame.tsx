@@ -79,6 +79,7 @@ const UPGRADE_DEFS: Array<{
 ];
 
 export function HomefarmShopGame() {
+  const [gamePhase, setGamePhase] = useState<"start" | "tutorial" | "playing">("start");
   const [products, setProducts] = useState(START_PRODUCTS);
   const [day, setDay] = useState(1);
   const [cash, setCash] = useState(1000);
@@ -178,7 +179,7 @@ export function HomefarmShopGame() {
   }, [customerIndex, day, customer, eventMoodPenalty]);
 
   useEffect(() => {
-    if (!customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showLeaderboard || activeEvent) return;
+    if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showLeaderboard || activeEvent) return;
 
     const timer = setInterval(() => {
       setMoodScore((m) => Math.max(0, m - (0.8 + day * 0.035)));
@@ -196,7 +197,7 @@ export function HomefarmShopGame() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showLeaderboard, activeEvent, day, skipCustomer]);
+  }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showLeaderboard, activeEvent, day, skipCustomer]);
 
   async function loadLeaderboard() {
     try {
@@ -457,6 +458,31 @@ export function HomefarmShopGame() {
     } catch {
       setToast("Lưu điểm lỗi. Kiểm tra Supabase table/env nhé.");
     }
+  }
+
+  if (gamePhase === "start") {
+    return (
+      <div className="hfs-page">
+        <div className="hfs-phone">
+          <div className="hfs-bg" />
+          <div className="hfs-version-badge">v{GAME_VERSION}</div>
+          <StartScreen onStart={() => setGamePhase("tutorial")} />
+        </div>
+      </div>
+    );
+  }
+
+  if (gamePhase === "tutorial") {
+    return (
+      <div className="hfs-page">
+        <div className="hfs-phone">
+          <div className="hfs-bg" />
+          <div className="hfs-version-badge">v{GAME_VERSION}</div>
+          <StartScreen onStart={() => {}} dimmed />
+          <TutorialModal onConfirm={() => setGamePhase("playing")} />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -892,6 +918,94 @@ function ProductCard({
         </div>
       </div>
     </button>
+  );
+}
+
+function StartScreen({ onStart, dimmed }: { onStart: () => void; dimmed?: boolean }) {
+  return (
+    <div className={`hfs-start-screen ${dimmed ? "dimmed" : ""}`}>
+      <div className="hfs-start-logo-wrap">
+        <Image
+          src="/homefarm-shop/homefarm-shop-simulator-logo.png"
+          alt="Homefarm Shop Simulator"
+          width={320}
+          height={180}
+          className="hfs-start-logo-img"
+          priority
+        />
+      </div>
+
+      <div className="hfs-start-mascot-area">
+        <Image
+          src={MASCOT_ASSETS.trust}
+          alt="mascot"
+          width={140}
+          height={192}
+          className="hfs-start-mascot-img"
+          priority
+        />
+      </div>
+
+      <div className="hfs-start-tags">
+        <span>🌿 FRESH</span>
+        <span>💚 HEALTHY</span>
+        <span>😋 DELICIOUS</span>
+      </div>
+
+      <div className="hfs-start-footer">
+        <div className="hfs-start-credits">
+          Ý tưởng: Tada · Vibe code với Codex &amp; Claude Code
+        </div>
+        {!dimmed && (
+          <button className="hfs-start-btn" onClick={onStart}>
+            🎮 START GAME
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TutorialModal({ onConfirm }: { onConfirm: () => void }) {
+  const features = [
+    { icon: "🛒", name: "Đặt hàng và quản lý hàng hoá", desc: "Chọn sản phẩm phù hợp, nhập hàng và xử lý hàng hoá." },
+    { icon: "👥", name: "Phục vụ khách hàng", desc: "Đáp ứng nhu cầu đa dạng và giữ cho khách luôn hài lòng." },
+    { icon: "⏱️", name: "Tối ưu doanh thu", desc: "Quản lý thời gian, quyết định thông minh để tăng lợi nhuận." },
+    { icon: "⬆️", name: "Mở rộng và nâng cấp", desc: "Nâng cấp cửa hàng, mở rộng không gian và trở thành shop số 1." },
+  ];
+
+  return (
+    <div className="hfs-tutorial-backdrop">
+      <div className="hfs-tutorial-panel">
+        <div className="hfs-tutorial-top">
+          <div className="hfs-tutorial-store-icon">🏪</div>
+          <div>
+            <div className="hfs-tutorial-title">CHÀO MỪNG ĐẾN VỚI</div>
+            <div className="hfs-tutorial-title2">HOMEFARM SHOP SIMULATOR</div>
+          </div>
+        </div>
+
+        <div className="hfs-tutorial-desc">
+          Bạn sẽ vào vai quản lý cửa hàng Homefarm — nhập hàng, phục vụ khách và phát triển cửa hàng ngày một lớn mạnh!
+        </div>
+
+        <div className="hfs-tutorial-features">
+          {features.map((f) => (
+            <div key={f.name} className="hfs-tutorial-feature">
+              <div className="hfs-tutorial-feature-icon">{f.icon}</div>
+              <div>
+                <div className="hfs-tutorial-feature-name">{f.name}</div>
+                <div className="hfs-tutorial-feature-desc">{f.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button className="hfs-tutorial-btn" onClick={onConfirm}>
+          OK, VÀO CA BÁN! 🚀
+        </button>
+      </div>
+    </div>
   );
 }
 
