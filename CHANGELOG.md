@@ -2,6 +2,14 @@
 
 All notable Homefarm Shop Simulator changes are tracked here.
 
+## v2.4.4 - Later special events
+
+- Moved special events to start from Day 12 instead of Day 6.
+- Added an operations warning modal when the player advances from Day 11 to Day 12.
+- Changed special event chance to start at 18% on Day 12, increase by 2% per day, and cap at 36%.
+- Paused the customer timer while the Day 12 warning modal is open.
+- Updated the visible game version badge to `v2.4.4`.
+
 ## v2.4.3 - Rainy day app orders
 
 - Added app-order tracking with an `APP` badge in the active order card.

@@ -282,11 +282,11 @@ export function getStockShortageMessage(product: Product) {
 }
 
 export function maybeCreateEvent(day: number): ShopEvent | null {
-  // 5 ngày đầu yên bình để người chơi làm quen.
-  if (day <= 5) return null;
+  // Day 1-11 yên bình để người chơi làm quen và mở rộng shop.
+  if (day <= 11) return null;
 
-  // Từ ngày 6 bắt đầu có sự kiện. Chance tăng dần nhưng có trần.
-  const chance = Math.min(0.18 + (day - 6) * 0.02, 0.42);
+  // Từ ngày 12 bắt đầu có sự kiện. Chance tăng dần nhưng có trần.
+  const chance = Math.min(0.18 + (day - 12) * 0.02, 0.36);
   if (Math.random() > chance) return null;
 
   return sample(SHOP_EVENTS);

@@ -797,6 +797,11 @@
   color: #2d2118;
 }
 
+.hfs-event-unlock-icon {
+  background: #d71920;
+  color: #fff;
+}
+
 .hfs-unlock-title {
   color: #d71920;
   font-size: 20px;
