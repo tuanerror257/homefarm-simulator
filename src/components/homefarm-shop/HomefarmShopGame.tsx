@@ -825,7 +825,7 @@ export function HomefarmShopGame() {
               <div className="hfs-rank-list">
                 {(() => {
                   const MEDALS = ["🥇", "🥈", "🥉"];
-                  const TOP_N = 6;
+                  const TOP_N = 5;
                   const n = leaderboard.length;
                   const myRank = n === 0 ? 1 : leaderboard.filter(r => r.score > currentScore).length + 1;
                   const myInTop = myRank <= TOP_N;
