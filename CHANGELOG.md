@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v5.1`
+- Current version: `v5.2`
 - Current commit: TBD
-- Current rollback tag: `v5.1-fix-button-overflow-mobile`
+- Current rollback tag: `v5.2-product-swap-sashimi-bocanada-pizza`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,16 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v5.2 - Thay sản phẩm Day 8 & Day 16
+
+- Day 8: Gà sạch → Set sashimi (🍣, 299k/set, cost 195k, stock 5 set, category seafood)
+- Day 16: Cừu → Bò Canada (🥩, 589k/kg, cost 385k, stock 4kg, category meat)
+- Day 16: Vịt → Pizza (🍕, 249k/cái, cost 160k, stock 5 cái, category addon)
+- Cập nhật prefer arrays trong CUSTOMER_TYPES: Mẹ đảm/Gym Bro: chicken→sashimi; Gia đình: chicken→pizza
+- Cập nhật gameUtils.ts: bỏ chicken/duck khỏi fractional qty list, thêm boCanada
+- Layout 4 trang: kiểm tra OK trên 430px (349px tổng < 412px usable), không cần chỉnh CSS
+- Tag: `v5.2-product-swap-sashimi-bocanada-pizza`
 
 ### v5.1 - Fix text tràn ra ngoài nút trên iPhone
 

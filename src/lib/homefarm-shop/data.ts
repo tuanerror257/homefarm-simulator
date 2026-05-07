@@ -16,7 +16,7 @@ export const ALL_PRODUCTS: Product[] = [
   { id: "squid", name: "Mực", icon: "🦑", stock: 4.2, unit: "kg", price: 259, cost: 175, unlockDay: 6, category: "seafood" },
 
   { id: "pork", name: "Heo Iberico", icon: "🥓", stock: 5.5, unit: "kg", price: 359, cost: 230, unlockDay: 8, category: "meat" },
-  { id: "chicken", name: "Gà sạch", icon: "🍗", stock: 7, unit: "kg", price: 149, cost: 95, unlockDay: 8, category: "meat" },
+  { id: "sashimi", name: "Set sashimi", icon: "🍣", stock: 5, unit: "set", price: 299, cost: 195, unlockDay: 8, category: "seafood" },
 
   { id: "avocado", name: "Bơ", icon: "🥑", stock: 5, unit: "kg", price: 169, cost: 105, unlockDay: 10, category: "fruit" },
   { id: "blueberry", name: "Việt quất", icon: "🫐", stock: 3.5, unit: "hộp", price: 139, cost: 88, unlockDay: 10, category: "fruit" },
@@ -27,8 +27,8 @@ export const ALL_PRODUCTS: Product[] = [
   { id: "oyster", name: "Hàu", icon: "🦪", stock: 4, unit: "kg", price: 219, cost: 145, unlockDay: 14, category: "seafood" },
   { id: "crab", name: "Cua", icon: "🦀", stock: 3.5, unit: "kg", price: 499, cost: 340, unlockDay: 14, category: "seafood" },
 
-  { id: "lamb", name: "Cừu", icon: "🍖", stock: 4.8, unit: "kg", price: 389, cost: 255, unlockDay: 16, category: "meat" },
-  { id: "duck", name: "Vịt", icon: "🦆", stock: 5, unit: "kg", price: 189, cost: 120, unlockDay: 16, category: "meat" },
+  { id: "boCanada", name: "Bò Canada", icon: "🥩", stock: 4, unit: "kg", price: 589, cost: 385, unlockDay: 16, category: "meat" },
+  { id: "pizza", name: "Pizza", icon: "🍕", stock: 5, unit: "cái", price: 249, cost: 160, unlockDay: 16, category: "addon" },
 
   { id: "strawberry", name: "Dâu tây", icon: "🍓", stock: 4.2, unit: "kg", price: 299, cost: 195, unlockDay: 18, category: "fruit" },
   { id: "kiwi", name: "Kiwi", icon: "🥝", stock: 5, unit: "kg", price: 169, cost: 108, unlockDay: 18, category: "fruit" },
@@ -52,13 +52,13 @@ export const ALL_PRODUCTS: Product[] = [
 export const START_PRODUCTS = ALL_PRODUCTS.filter((p) => (p.unlockDay || 1) <= 1);
 
 export const CUSTOMER_TYPES: CustomerType[] = [
-  { name: "Mẹ đảm", avatar: "👩‍🍳", mood: "Soi kỹ", patience: 24, size: 4, prefer: ["salmon", "beef", "egg", "chicken"], quote: "Cá phải tươi, thịt phải đẹp." },
-  { name: "Gym Bro", avatar: "💪", mood: "Protein", patience: 26, size: 3, prefer: ["beef", "egg", "salmon", "chicken", "wagyu"], quote: "Full protein cho anh." },
+  { name: "Mẹ đảm", avatar: "👩‍🍳", mood: "Soi kỹ", patience: 24, size: 4, prefer: ["salmon", "beef", "egg", "sashimi"], quote: "Cá phải tươi, thịt phải đẹp." },
+  { name: "Gym Bro", avatar: "💪", mood: "Protein", patience: 26, size: 3, prefer: ["beef", "egg", "salmon", "sashimi", "wagyu"], quote: "Full protein cho anh." },
   { name: "Gen Z", avatar: "🧋", mood: "Ăn clean", patience: 36, size: 3, prefer: ["salmon", "grape", "cherry", "avocado", "blueberry", "yogurt"], quote: "Set healthy xinh xinh nha!" },
   { name: "Khách VIP", avatar: "😎", mood: "Chi mạnh", patience: 22, size: 5, prefer: ["salmon", "beef", "cherry", "shrimp", "wagyu", "crab"], quote: "Lấy đồ ngon nhất." },
   { name: "Khó tính", avatar: "😤", mood: "Gắt", patience: 16, size: 4, prefer: ["salmon", "beef", "wagyu"], quote: "Nhanh lên." },
   { name: "Dễ tính", avatar: "😊", mood: "Chill", patience: 42, size: 2, prefer: ["egg", "sausage", "grape", "milk", "bread"], quote: "Từ từ cũng được." },
-  { name: "Gia đình", avatar: "👨‍👩‍👧", mood: "Mua nhiều", patience: 30, size: 5, prefer: ["salmon", "beef", "egg", "sausage", "chicken", "orange"], quote: "Mỗi thứ một ít." },
+  { name: "Gia đình", avatar: "👨‍👩‍👧", mood: "Mua nhiều", patience: 30, size: 5, prefer: ["salmon", "beef", "egg", "sausage", "pizza", "orange"], quote: "Mỗi thứ một ít." },
   { name: "Dân văn phòng", avatar: "💼", mood: "Ăn trưa", patience: 28, size: 3, prefer: ["sausage", "egg", "beef", "milk", "bread"], quote: "Nhanh gọn nhé." },
   { name: "Foodie", avatar: "🤤", mood: "Sành ăn", patience: 25, size: 4, prefer: ["salmon", "beef", "cherry", "cheese", "oyster", "scallop"], quote: "Phải ngon nhé." },
   { name: "Sinh viên", avatar: "🎓", mood: "Tiết kiệm", patience: 35, size: 2, prefer: ["egg", "sausage", "milk", "bread"], quote: "Món rẻ thôi." },
