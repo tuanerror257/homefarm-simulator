@@ -1732,6 +1732,11 @@
   opacity: .75;
 }
 
+.hfs-cost-line.hfs-cost-hike {
+  color: #d71920;
+  opacity: 1;
+}
+
 .hfs-cost-total-line {
   display: flex;
   justify-content: space-between;

@@ -9,10 +9,13 @@ type EndDaySummaryProps = {
   day: number;
 };
 
+const COST_HIKE_DAYS = [6, 12, 18];
+
 export default function EndDaySummary({ data, onNext, day }: EndDaySummaryProps) {
   if (!data) return null;
 
   const { operatingCost: op, cashAfterCost } = data;
+  const costHike = COST_HIKE_DAYS.includes(day);
 
   return (
     <div className="hfs-summary-backdrop">
@@ -31,8 +34,14 @@ export default function EndDaySummary({ data, onNext, day }: EndDaySummaryProps)
         <div className="hfs-cost-section">
           <div className="hfs-cost-label">Chi phí vận hành</div>
           <div className="hfs-cost-line"><span>Thuê nhà</span><span>{money(op.rent)}</span></div>
-          <div className="hfs-cost-line"><span>Nhân viên</span><span>{money(op.staff)}</span></div>
-          <div className="hfs-cost-line"><span>Điện nước</span><span>{money(op.utilities)}</span></div>
+          <div className={`hfs-cost-line${costHike ? " hfs-cost-hike" : ""}`}>
+            <span>Nhân viên{costHike ? " ↑" : ""}</span>
+            <span>{money(op.staff)}</span>
+          </div>
+          <div className={`hfs-cost-line${costHike ? " hfs-cost-hike" : ""}`}>
+            <span>Điện nước{costHike ? " ↑" : ""}</span>
+            <span>{money(op.utilities)}</span>
+          </div>
           <div className="hfs-cost-line"><span>Khác</span><span>~{money(op.other)}</span></div>
           <div className="hfs-cost-total-line"><span>Tổng chi phí</span><span>-{money(op.total)}</span></div>
         </div>
