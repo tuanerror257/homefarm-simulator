@@ -640,6 +640,7 @@ export function HomefarmShopGame() {
   }
 
   async function saveScore() {
+    if (playerName.toLowerCase() === "tadadev") return;
     try {
       await saveLeaderboardEntry({
         player_name: playerName.trim() || "Ẩn danh",

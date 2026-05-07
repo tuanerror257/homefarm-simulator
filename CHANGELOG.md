@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.19`
+- Current version: `v3.20`
 - Current commit: TBD
-- Current rollback tag: `v3.19-bot`
+- Current rollback tag: `v3.20-bot-no-save`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,11 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.20 - Bot không lưu leaderboard
+
+- Tên Tadadev bị chặn hoàn toàn khỏi `saveScore()` — không ghi điểm vào leaderboard dù thủ công hay auto.
+- Tag: `v3.20-bot-no-save`
 
 ### v3.19 - Bot tự chơi (Tadadev mode)
 
