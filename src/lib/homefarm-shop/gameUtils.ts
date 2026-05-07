@@ -237,6 +237,7 @@ export function generateCustomers(
     rainyDay?: boolean;
     extraCount?: number;
     theme?: "busy" | "slow" | "normal";
+    crisisMultiplier?: number;
   } = {},
 ): Customer[] {
   const theme = options.theme ?? getDayTheme(day);
@@ -246,7 +247,8 @@ export function generateCustomers(
     : theme === "slow"
       ? Math.round(baseCount * 0.75)
       : baseCount;
-  const count = themedCount + (options.extraCount ?? 0);
+  const crisisMultiplier = options.crisisMultiplier ?? 1;
+  const count = Math.max(0, Math.round(themedCount * crisisMultiplier)) + (options.extraCount ?? 0);
   const signLevel = options.signLevel ?? 0;
   const staffLevel = options.staffLevel ?? 0;
   const rainyDay = options.rainyDay ?? false;

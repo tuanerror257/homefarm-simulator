@@ -90,6 +90,18 @@ export type ShopEvent = {
   stockDelta?: Record<string, number>;
 };
 
+export type GodModeCrisisId = "fire" | "food_safety" | "competitor" | "supply_crisis" | "tax_audit" | "epidemic";
+
+export type ActiveCrisis = {
+  id: GodModeCrisisId;
+  title: string;
+  icon: string;
+  remainingDays: number;
+  customerMultiplier?: number;
+  importCostMultiplier?: number;
+  closedToday?: boolean;
+};
+
 export type AchievementId =
   | "first_serve"
   | "combo_5"

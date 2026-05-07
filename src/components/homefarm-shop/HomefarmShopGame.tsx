@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Achievement, AchievementId, EndDaySummaryData, MascotState, OperatingCostBreakdown, Product, ProductStat, ShopEvent, ShopUpgradeId, ShopUpgrades } from "@/types/homefarm-shop";
+import type { Achievement, AchievementId, ActiveCrisis, EndDaySummaryData, GodModeCrisisId, MascotState, OperatingCostBreakdown, Product, ProductStat, ShopEvent, ShopUpgradeId, ShopUpgrades } from "@/types/homefarm-shop";
 import { ACHIEVEMENTS, MASCOT_ASSETS, MASCOT_TALK, START_PRODUCTS } from "@/lib/homefarm-shop/data";
 import { GAME_VERSION } from "@/config/version";
 import {
@@ -33,8 +33,76 @@ const PRODUCT_EXPANSION_DAY = 6;
 const UPGRADE_UNLOCK_DAY = 8;
 const EVENT_UNLOCK_DAY = 12;
 const AD_UNLOCK_DAY = 15;
+const GOD_MODE_START_DAY = 36;
+const GOD_MODE_CHANCE_INCREMENT = 0.03;
+const GOD_MODE_MAX_CHANCE = 0.65;
 // Bot gate: minimum day required to purchase each upgrade level (index = currentLevel)
 const BOT_UPGRADE_DAY_GATE = [8, 14, 20, 24, 27];
+
+const GOD_MODE_CRISIS_DEFS: Array<{
+  id: GodModeCrisisId;
+  icon: string;
+  title: string;
+  popupDesc: string;
+  baseChance: number;
+  duration: number;
+  customerMultiplier?: number;
+  importCostMultiplier?: number;
+  closedToday?: boolean;
+}> = [
+  {
+    id: "fire",
+    icon: "🔥",
+    title: "Cháy kho lạnh",
+    popupDesc: "Toàn bộ hải sản và thịt trong kho bị thiêu rụi ngay đầu ngày.",
+    baseChance: 0.03,
+    duration: 1,
+  },
+  {
+    id: "food_safety",
+    icon: "🚔",
+    title: "Kiểm tra ATTP",
+    popupDesc: "Đoàn kiểm tra vệ sinh an toàn thực phẩm bất ngờ ập vào. Phạt tiền nặng và chỉ 40% khách dám vào.",
+    baseChance: 0.04,
+    duration: 1,
+    customerMultiplier: 0.4,
+  },
+  {
+    id: "competitor",
+    icon: "🏪",
+    title: "Đối thủ khai trương",
+    popupDesc: "Siêu thị mới khai trương ngay cạnh bên, kéo đi 35% khách hàng trong 3 ngày.",
+    baseChance: 0.05,
+    duration: 3,
+    customerMultiplier: 0.65,
+  },
+  {
+    id: "supply_crisis",
+    icon: "📉",
+    title: "Khủng hoảng nguồn hàng",
+    popupDesc: "Chuỗi cung ứng gián đoạn — giá nhập toàn bộ hàng hóa tăng 50% trong 3 ngày.",
+    baseChance: 0.04,
+    duration: 3,
+    importCostMultiplier: 1.5,
+  },
+  {
+    id: "tax_audit",
+    icon: "💸",
+    title: "Hóa đơn thuế hồi tố",
+    popupDesc: "Cơ quan thuế truy thu — mất 25–40% tiền mặt hiện có ngay lập tức.",
+    baseChance: 0.03,
+    duration: 1,
+  },
+  {
+    id: "epidemic",
+    icon: "😷",
+    title: "Dịch cúm khu phố",
+    popupDesc: "Dịch bệnh bùng phát — cơ quan y tế yêu cầu đóng cửa bắt buộc 2 ngày liên tiếp.",
+    baseChance: 0.03,
+    duration: 2,
+    closedToday: true,
+  },
+];
 
 const AD_TYPES = [
   {
@@ -187,6 +255,8 @@ export function HomefarmShopGame() {
   const [gameOverReason, setGameOverReason] = useState<"" | "bankrupt" | "stolen" | "reputation">("");
   const [lowRatingStreak, setLowRatingStreak] = useState(0);
   const [loanDebt, setLoanDebt] = useState(0);
+  const [activeCrises, setActiveCrises] = useState<ActiveCrisis[]>([]);
+  const [showGodModeUnlock, setShowGodModeUnlock] = useState(false);
   const [unlockedAchievements, setUnlockedAchievements] = useState<Set<AchievementId>>(new Set());
   const [newAchievement, setNewAchievement] = useState<Achievement | null>(null);
 
@@ -232,16 +302,17 @@ export function HomefarmShopGame() {
   const estimatedTip = customer ? bill * calcTipRate(customer, timeLeft, moodScore, combo) : 0;
   const BULK_THRESHOLD = 5;
   const BULK_DISCOUNT = 0.06;
+  const crisisImportMultiplier = activeCrises.reduce((m, c) => m * (c.importCostMultiplier ?? 1), 1);
   const importCost = products.reduce((s, p) => {
     const q = importQty[p.id] || 0;
-    const unitCost = getDailyCost(p, day);
+    const unitCost = getDailyCost(p, day) * crisisImportMultiplier;
     const discount = q >= BULK_THRESHOLD ? BULK_DISCOUNT : 0;
     return s + q * unitCost * (1 - discount);
   }, 0);
   const importSaving = products.reduce((s, p) => {
     const q = importQty[p.id] || 0;
     if (q < BULK_THRESHOLD) return s;
-    return s + q * getDailyCost(p, day) * BULK_DISCOUNT;
+    return s + q * getDailyCost(p, day) * crisisImportMultiplier * BULK_DISCOUNT;
   }, 0);
   const upgradesUnlocked = day >= UPGRADE_UNLOCK_DAY;
   const upgradeCount = Object.values(upgrades).reduce((sum, level) => sum + level, 0);
@@ -289,7 +360,7 @@ export function HomefarmShopGame() {
   }, [customerIndex, day, customer, eventMoodPenalty]);
 
   useEffect(() => {
-    if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showAds || showLeaderboard || activeEvent || gameOver) return;
+    if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showGodModeUnlock || showAds || showLeaderboard || activeEvent || gameOver) return;
 
     const timer = setInterval(() => {
       setMoodScore((m) => Math.max(0, m - (0.7 + day * 0.022) * 2.2));
@@ -571,8 +642,8 @@ export function HomefarmShopGame() {
     let delay = 650;
     if (daySummary) {
       delay = 2000;
-    } else if (showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock) {
-      delay = 3500; // pause on unlock notification screens so user can read
+    } else if (showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showGodModeUnlock) {
+      delay = 4000; // pause on unlock notification screens so user can read
     } else if (showUpgrades || showAds) {
       delay = 1500; // pause so user can read modal before bot acts
     } else if (showImport) {
@@ -593,11 +664,12 @@ export function HomefarmShopGame() {
       const curUpgrades = botUpgradesRef.current;
 
       // 1. Dismiss blocking overlays bot never intentionally opens
-      if (showCatalogUnlock) { setShowCatalogUnlock(false); return; }
-      if (showUpgradeUnlock) { setShowUpgradeUnlock(false); return; }
-      if (showEventUnlock)   { setShowEventUnlock(false);   return; }
-      if (showAdUnlock)      { setShowAdUnlock(false);      return; }
-      if (activeEvent)       { setActiveEvent(null);        return; }
+      if (showCatalogUnlock)  { setShowCatalogUnlock(false);  return; }
+      if (showUpgradeUnlock)  { setShowUpgradeUnlock(false);  return; }
+      if (showEventUnlock)    { setShowEventUnlock(false);    return; }
+      if (showAdUnlock)       { setShowAdUnlock(false);       return; }
+      if (showGodModeUnlock)  { setShowGodModeUnlock(false);  return; }
+      if (activeEvent)        { setActiveEvent(null);         return; }
 
       // 2. Game over → restart after 3s
       if (gameOver) { setTimeout(resetGame, 3000); return; }
@@ -790,7 +862,7 @@ export function HomefarmShopGame() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     botActive,
-    showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock,
+    showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeUnlock,
     showImport, showUpgrades, showAds, activeEvent,
     gameOver, daySummary, customer, selected, isComplete,
     upgrades, adRunToday, day, products, productPage, importQty, botImportScrolled, botUpgradedToday,
@@ -821,13 +893,7 @@ export function HomefarmShopGame() {
     const overnightSpoilage = applyOvernightSpoilage(products, { freezerLevel: upgrades.freezer });
     const unlockedProducts = getUnlockedProducts(nextDay, overnightSpoilage.products);
     const nextEvent = maybeCreateEvent(nextDay, unlockedProducts);
-    const nextProducts = applyEventToProducts(unlockedProducts, nextEvent, { freezerLevel: upgrades.freezer });
-    const nextCustomers = generateCustomers(nextProducts, nextDay, {
-      signLevel: upgrades.sign,
-      staffLevel: upgrades.staff,
-      rainyDay: nextEvent?.id === "rainy-day",
-      extraCount: pendingExtraCustomers,
-    });
+    let nextProducts = applyEventToProducts(unlockedProducts, nextEvent, { freezerLevel: upgrades.freezer });
 
     if (cashAfterCost < 0) {
       setCash(cashAfterCost);
@@ -859,8 +925,92 @@ export function HomefarmShopGame() {
     const LOAN_DAILY_INTEREST = 50;
     const loanInterest = loanDebt > 0 ? Math.min(loanDebt, LOAN_DAILY_INTEREST) : 0;
     const newLoanDebt = Math.max(0, loanDebt - loanInterest);
+    let cashFinal = cashWithEvent - loanInterest;
+
+    // ── GOD MODE: roll crises ────────────────────────────────────────────────
+    const survivingCrises: ActiveCrisis[] = activeCrises
+      .map((c) => ({ ...c, remainingDays: c.remainingDays - 1 }))
+      .filter((c) => c.remainingDays > 0);
+
+    const newCrises: ActiveCrisis[] = [];
+    const crisisToastParts: string[] = [];
+
+    if (nextDay >= GOD_MODE_START_DAY) {
+      const daysInGodMode = nextDay - GOD_MODE_START_DAY;
+      for (const def of GOD_MODE_CRISIS_DEFS) {
+        const chance = Math.min(def.baseChance + daysInGodMode * GOD_MODE_CHANCE_INCREMENT, GOD_MODE_MAX_CHANCE);
+        if (Math.random() >= chance) continue;
+
+        // Apply immediate effects
+        if (def.id === "fire") {
+          nextProducts = nextProducts.map((p) =>
+            ["seafood", "meat"].includes(p.category ?? "") ? { ...p, stock: 0 } : p,
+          );
+        }
+        if (def.id === "food_safety") {
+          const fine = Math.round((3000 + Math.random() * 3000) / 100) * 100;
+          cashFinal -= fine;
+          crisisToastParts.push(`bị phạt ${money(fine)}`);
+        }
+        if (def.id === "tax_audit") {
+          const rate = 0.25 + Math.random() * 0.15;
+          const loss = Math.round(cashFinal * rate);
+          cashFinal -= loss;
+          crisisToastParts.push(`thuế hồi tố -${money(loss)}`);
+        }
+
+        // Add or refresh crisis (reset duration if already active)
+        const existingIdx = survivingCrises.findIndex((c) => c.id === def.id);
+        const entry: ActiveCrisis = {
+          id: def.id,
+          title: def.title,
+          icon: def.icon,
+          remainingDays: def.duration,
+          ...(def.customerMultiplier !== undefined && { customerMultiplier: def.customerMultiplier }),
+          ...(def.importCostMultiplier !== undefined && { importCostMultiplier: def.importCostMultiplier }),
+          ...(def.closedToday !== undefined && { closedToday: def.closedToday }),
+        };
+        if (existingIdx >= 0) {
+          survivingCrises[existingIdx] = entry;
+        } else {
+          newCrises.push(entry);
+          crisisToastParts.push(def.title);
+        }
+      }
+    }
+
+    const nextActiveCrises = [...survivingCrises, ...newCrises];
+
+    // Bankrupt check after crisis cash effects
+    if (cashFinal < 0) {
+      setCash(cashFinal);
+      setDaySummary(null);
+      setGameOver(true);
+      setGameOverReason("bankrupt");
+      return;
+    }
+
+    // Compute combined crisis effect on customers
+    const closedByEpidemic = nextActiveCrises.some((c) => c.closedToday);
+    const crisisCustomerMult = closedByEpidemic
+      ? 0
+      : nextActiveCrises.reduce((m, c) => m * (c.customerMultiplier ?? 1), 1);
+
+    const nextCustomers = crisisCustomerMult === 0
+      ? []
+      : generateCustomers(nextProducts, nextDay, {
+          signLevel: upgrades.sign,
+          staffLevel: upgrades.staff,
+          rainyDay: nextEvent?.id === "rainy-day",
+          extraCount: pendingExtraCustomers,
+          theme: getDayTheme(nextDay),
+          crisisMultiplier: crisisCustomerMult,
+        });
+    // ── END GOD MODE ─────────────────────────────────────────────────────────
+
     setLoanDebt(newLoanDebt);
-    setCash(cashWithEvent - loanInterest);
+    setCash(cashFinal);
+    setActiveCrises(nextActiveCrises);
 
     setDay(nextDay);
     setRevenue(0);
@@ -890,6 +1040,7 @@ export function HomefarmShopGame() {
     if (nextDay === UPGRADE_UNLOCK_DAY) setShowUpgradeUnlock(true);
     if (nextDay === EVENT_UNLOCK_DAY) setShowEventUnlock(true);
     if (nextDay === AD_UNLOCK_DAY) setShowAdUnlock(true);
+    if (nextDay === GOD_MODE_START_DAY) setShowGodModeUnlock(true);
 
     const skippedText = remainingCustomers > 0 ? ` · bỏ qua ${remainingCustomers} khách còn lại` : "";
     const spoilageText = overnightSpoilage.affectedCount > 0 ? ` · hao hụt qua đêm ${overnightSpoilage.affectedCount} mặt hàng` : "";
@@ -897,7 +1048,10 @@ export function HomefarmShopGame() {
     const upgradeText = nextDay === UPGRADE_UNLOCK_DAY ? " · đã mở Nâng cấp cửa hàng" : "";
     const eventText = nextDay === EVENT_UNLOCK_DAY ? " · các vấn đề vận hành bắt đầu xuất hiện" : "";
     const adText = nextDay === AD_UNLOCK_DAY ? " · đã mở Quảng Cáo" : pendingExtraCustomers > 0 ? ` · +${pendingExtraCustomers} khách từ quảng cáo` : "";
-    setToast(`Ngày ${nextDay}: mở khóa ${nextProducts.length} mặt hàng · có ${nextCustomers.length} khách${skippedText}${spoilageText}${catalogText}${upgradeText}${eventText}${adText}. Combo tốt nhất: ${maxCombo}.`);
+    const godModeText = nextDay === GOD_MODE_START_DAY ? " · ⚠️ GOD MODE bắt đầu!" : "";
+    const crisisText = crisisToastParts.length > 0 ? ` · 🚨 Crisis: ${crisisToastParts.join(", ")}` : "";
+    const closedText = closedByEpidemic ? " · 😷 Đóng cửa hôm nay!" : "";
+    setToast(`Ngày ${nextDay}: ${nextProducts.length} mặt hàng · ${nextCustomers.length} khách${skippedText}${spoilageText}${catalogText}${upgradeText}${eventText}${adText}${godModeText}${crisisText}${closedText}. Combo: ${maxCombo}.`);
   }
 
   async function saveScore() {
@@ -970,6 +1124,8 @@ export function HomefarmShopGame() {
     setGameOverReason("");
     setLowRatingStreak(0);
     setLoanDebt(0);
+    setActiveCrises([]);
+    setShowGodModeUnlock(false);
     setUnlockedAchievements(new Set());
     setNewAchievement(null);
   }
@@ -1037,7 +1193,22 @@ export function HomefarmShopGame() {
                   {getDayTheme(day) === "busy" ? "🔥 Mùa bận" : "😴 Ế ẩm"}
                 </span>
               )}
+              {day >= GOD_MODE_START_DAY && (
+                <span className="hfs-theme-badge god-mode">☠️ GOD</span>
+              )}
             </div>
+
+            {activeCrises.length > 0 && (
+              <div className="hfs-crisis-strip">
+                {activeCrises.map((c) => (
+                  <div key={c.id} className="hfs-crisis-badge">
+                    <span>{c.icon}</span>
+                    <span>{c.title}</span>
+                    {c.remainingDays > 1 && <span className="hfs-crisis-days">{c.remainingDays}d</span>}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </header>
 
@@ -1370,6 +1541,37 @@ export function HomefarmShopGame() {
               </button>
               <button className="hfs-unlock-skip" onClick={() => setShowAdUnlock(false)}>
                 Để sau
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showGodModeUnlock && (
+          <div className="hfs-modal-backdrop hfs-godmode-backdrop">
+            <div className="hfs-godmode-panel">
+              <div className="hfs-godmode-skull">☠️</div>
+              <div className="hfs-godmode-title">GOD MODE</div>
+              <div className="hfs-godmode-sub">Ngày {GOD_MODE_START_DAY} — Thử thách tột cùng</div>
+              <div className="hfs-godmode-desc">
+                Từ hôm nay, mỗi ngày 6 khủng hoảng sẽ roll độc lập. Xác suất tăng thêm 3% mỗi ngày — không có điểm dừng.
+              </div>
+              <div className="hfs-godmode-crisis-list">
+                {GOD_MODE_CRISIS_DEFS.map((def) => (
+                  <div key={def.id} className="hfs-godmode-crisis-row">
+                    <span className="hfs-godmode-crisis-icon">{def.icon}</span>
+                    <div className="hfs-godmode-crisis-body">
+                      <div className="hfs-godmode-crisis-name">{def.title}</div>
+                      <div className="hfs-godmode-crisis-desc">{def.popupDesc}</div>
+                    </div>
+                    <span className="hfs-godmode-crisis-chance">{Math.round(def.baseChance * 100)}%</span>
+                  </div>
+                ))}
+              </div>
+              <div className="hfs-godmode-warning">
+                ⚠️ Xác suất mỗi crisis tăng +3%/ngày, tối đa 65%. Chuẩn bị tốt hay chấp nhận thua.
+              </div>
+              <button className="hfs-godmode-btn" onClick={() => setShowGodModeUnlock(false)}>
+                Tôi đã sẵn sàng ☠️
               </button>
             </div>
           </div>

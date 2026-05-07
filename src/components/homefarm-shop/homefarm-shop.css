@@ -1137,6 +1137,162 @@
   color: #0984e3;
   border: 1px solid #0984e366;
 }
+.hfs-theme-badge.god-mode {
+  background: #2d0000;
+  color: #ff4444;
+  border: 1px solid #ff444488;
+  animation: hfs-godmode-pulse 1.5s ease-in-out infinite;
+}
+@keyframes hfs-godmode-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* Crisis strip */
+.hfs-crisis-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 0 2px;
+}
+.hfs-crisis-badge {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: #2d0000;
+  color: #ff6b6b;
+  border: 1px solid #ff444855;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 2px 6px;
+  animation: hfs-godmode-pulse 2s ease-in-out infinite;
+}
+.hfs-crisis-days {
+  background: #ff4444;
+  color: #fff;
+  border-radius: 4px;
+  padding: 0 3px;
+  font-size: 8px;
+}
+
+/* God Mode unlock popup */
+.hfs-godmode-backdrop {
+  background: rgba(0,0,0,0.88) !important;
+  z-index: 50;
+}
+.hfs-godmode-panel {
+  background: linear-gradient(160deg, #1a0000 0%, #2d0a0a 60%, #1a0008 100%);
+  border: 2px solid #cc0000;
+  border-radius: 18px;
+  padding: 22px 18px 18px;
+  width: 90%;
+  max-width: 340px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 0 40px rgba(255,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.hfs-godmode-skull {
+  font-size: 48px;
+  animation: hfs-godmode-pulse 1s ease-in-out infinite;
+}
+.hfs-godmode-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: #ff3333;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px rgba(255,0,0,0.6);
+}
+.hfs-godmode-sub {
+  font-size: 11px;
+  font-weight: 800;
+  color: #ff9999;
+  opacity: 0.8;
+}
+.hfs-godmode-desc {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffcccc;
+  text-align: center;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+.hfs-godmode-crisis-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+.hfs-godmode-crisis-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,68,68,0.2);
+  border-radius: 10px;
+  padding: 7px 10px;
+}
+.hfs-godmode-crisis-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.hfs-godmode-crisis-body {
+  flex: 1;
+}
+.hfs-godmode-crisis-name {
+  font-size: 11px;
+  font-weight: 900;
+  color: #ffdddd;
+}
+.hfs-godmode-crisis-desc {
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffbbbb;
+  opacity: 0.75;
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.hfs-godmode-crisis-chance {
+  font-size: 11px;
+  font-weight: 900;
+  color: #ff6666;
+  flex-shrink: 0;
+  align-self: center;
+}
+.hfs-godmode-warning {
+  font-size: 10px;
+  font-weight: 800;
+  color: #ffaa00;
+  text-align: center;
+  line-height: 1.4;
+  padding: 6px 10px;
+  background: rgba(255,170,0,0.08);
+  border: 1px solid rgba(255,170,0,0.25);
+  border-radius: 8px;
+  width: 100%;
+}
+.hfs-godmode-btn {
+  background: #cc0000;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 900;
+  padding: 10px 24px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 4px;
+  letter-spacing: 1px;
+}
+.hfs-godmode-btn:active {
+  background: #990000;
+}
 
 .hfs-customer-zone {
   height: 218px;
