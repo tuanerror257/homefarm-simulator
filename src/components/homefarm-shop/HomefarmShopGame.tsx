@@ -1185,6 +1185,7 @@ function TutorialModal({ onConfirm }: { onConfirm: (name: string) => void }) {
             <div className="hfs-tutorial-title">CHÀO MỪNG ĐẾN VỚI</div>
             <div className="hfs-tutorial-title2">HOMEFARM SHOP SIMULATOR</div>
           </div>
+          <div className="hfs-tutorial-store-icon">🏬</div>
         </div>
 
         <div className="hfs-tutorial-desc">
