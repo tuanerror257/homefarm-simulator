@@ -672,7 +672,7 @@ export function HomefarmShopGame() {
       if (activeEvent)        { setActiveEvent(null);         return; }
 
       // 2. Game over → restart after 3s
-      if (gameOver) { setTimeout(resetGame, 3000); return; }
+      if (gameOver) return;
 
       // 3. End-day summary → advance
       if (daySummary) { startNextDay(); return; }
