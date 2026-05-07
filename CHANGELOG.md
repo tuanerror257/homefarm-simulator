@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.5`
-- Current commit: `24785c2`
-- Current rollback tag: `v3.5-toast-fix`
+- Current version: `v3.7`
+- Current commit: `87066a6`
+- Current rollback tag: `v3.7-operating-costs`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,25 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.7 - Operating costs and game over
+
+- Added tiered daily operating costs (chi phí vận hành): 400k on Day 1-5, 650k on Day 6-11, 950k on Day 12+.
+- Deducted automatically when the player advances to the next day.
+- End-day summary now shows operating cost and cash remaining after deduction.
+- Added a red warning in the summary if the deduction would result in negative cash.
+- Added a game over screen (💸 Cửa hàng phá sản!) when cash goes negative after cost deduction.
+- Game over screen shows final score and a button to open the leaderboard.
+- Updated the visible game version badge to `v3.7`.
+- Tag: `v3.7-operating-costs`
+
+### v3.6 - Background music
+
+- Added looping background music via HTML5 Audio API (`/homefarm-shop/bgm.mp3`).
+- BGM starts when the player taps START GAME and loops throughout the session.
+- Added a mute/unmute button (🔊/🔇) in the top-right corner of the game UI.
+- Updated the visible game version badge to `v3.6`.
+- Tag: `v3.6-bgm`
 
 ### v3.5 - Layout overhaul
 
