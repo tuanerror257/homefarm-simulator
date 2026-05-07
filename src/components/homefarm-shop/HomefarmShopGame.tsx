@@ -201,7 +201,7 @@ export function HomefarmShopGame() {
   }, [customerIndex, customers.length]);
 
   useEffect(() => {
-    if (gameOver) loadLeaderboard();
+    if (gameOver) saveScore();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameOver]);
 
