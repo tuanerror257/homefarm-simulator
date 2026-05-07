@@ -344,10 +344,12 @@ export function HomefarmShopGame() {
   function fillet() {
     const whole = products.find((p) => p.id === "wholeSalmon");
     if (!whole || whole.stock < 1) {
+      sfx.wrong();
       setMascotState("thinking");
       setToast("Không đủ cá nguyên con để fillet. Cần nhập thêm cá nguyên.");
       return;
     }
+    sfx.knife();
 
     const salmonYield = 4.8 + upgrades.knife * 0.35;
     const headBoneYield = 1.2 + upgrades.knife * 0.1;
@@ -772,8 +774,8 @@ export function HomefarmShopGame() {
         <footer className="hfs-footer">
           <button onClick={fillet} className="hfs-action hfs-fillet">🔪 Fillet</button>
           <button onClick={deliver} className={`hfs-action hfs-deliver ${isComplete ? "ready" : ""}`}>✅ Giao</button>
-          <button onClick={() => { setMascotState("thinking"); setShowImport(true); }} className="hfs-action hfs-import">🚚 Nhập</button>
-          <button onClick={endDay} className="hfs-action hfs-end">🌙 Qua ngày</button>
+          <button onClick={() => { sfx.button(); setMascotState("thinking"); setShowImport(true); }} className="hfs-action hfs-import">🚚 Nhập</button>
+          <button onClick={() => { sfx.nextDay(); endDay(); }} className="hfs-action hfs-end">🌙 Qua ngày</button>
         </footer>
 
         {activeEvent && (
@@ -808,9 +810,9 @@ export function HomefarmShopGame() {
                         </div>
                       </div>
                       <div className="hfs-stepper">
-                        <button onClick={() => setQty(product.id, q - 1)} className="hfs-step-minus">−</button>
+                        <button onClick={() => { sfx.stepper(); setQty(product.id, q - 1); }} className="hfs-step-minus">−</button>
                         <div className="hfs-step-value">{q}</div>
-                        <button onClick={() => setQty(product.id, q + 1)} className="hfs-step-plus">+</button>
+                        <button onClick={() => { sfx.stepper(); setQty(product.id, q + 1); }} className="hfs-step-plus">+</button>
                       </div>
                     </div>
                   );
