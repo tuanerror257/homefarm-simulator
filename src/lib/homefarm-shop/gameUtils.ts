@@ -293,7 +293,7 @@ export function calcTipRate(customer: Customer, timeLeft: number, moodScore: num
   if (customer.repeat)   rate += 0.01;  // khách quen
   if (customer.vip)      rate += 0.03;  // VIP
 
-  return Math.min(rate, customer.vip ? 0.12 : 0.08);
+  return Math.min(rate, customer.vip ? 0.07 : 0.04);
 }
 
 export function getStockShortageMessage(product: Product) {
