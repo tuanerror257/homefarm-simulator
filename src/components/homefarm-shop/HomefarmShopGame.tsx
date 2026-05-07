@@ -990,13 +990,26 @@ export function HomefarmShopGame() {
               <div className="hfs-unlock-icon">📣</div>
               <div className="hfs-unlock-title">Mở khóa Quảng Cáo</div>
               <div className="hfs-unlock-desc">
-                Từ ngày {AD_UNLOCK_DAY}, bạn có thể chi tiền chạy quảng cáo để tăng lượng khách ngày hôm sau. Phát tờ rơi hoặc Facebook Ads — mỗi ngày chọn một loại.
+                Chạy quảng cáo để tăng lượng khách ngày hôm sau. Mỗi ngày chỉ chạy được một lần.
+              </div>
+              <div className="hfs-ad-unlock-list">
+                <div className="hfs-ad-unlock-row">
+                  <span>📄 Phát tờ rơi</span>
+                  <span>150k–500k · +3–5 khách</span>
+                </div>
+                <div className="hfs-ad-unlock-row">
+                  <span>📘 Facebook Ads</span>
+                  <span>350k–800k · +4–6 khách</span>
+                </div>
+              </div>
+              <div className="hfs-unlock-desc" style={{ marginTop: 8, fontSize: 11 }}>
+                Nhấn nút <strong>📣 Ads</strong> trên kệ hàng để chạy quảng cáo.
               </div>
               <button
                 className="hfs-unlock-btn"
                 onClick={() => { setShowAdUnlock(false); setShowAds(true); }}
               >
-                Xem ngay
+                Chạy ngay thôi!
               </button>
               <button className="hfs-unlock-skip" onClick={() => setShowAdUnlock(false)}>
                 Để sau

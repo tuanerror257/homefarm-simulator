@@ -836,6 +836,31 @@
   background: #24c96b;
 }
 
+.hfs-ad-unlock-list {
+  width: 100%;
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 4px;
+}
+
+.hfs-ad-unlock-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff7e4;
+  border: 2px solid #2d2118;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  gap: 8px;
+}
+
+.hfs-ad-unlock-row span:last-child {
+  color: #d71920;
+  white-space: nowrap;
+}
+
 .hfs-unlock-backdrop {
   align-items: center;
   padding: 16px;
