@@ -224,7 +224,7 @@ export function HomefarmShopGame() {
     if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showLeaderboard || activeEvent || gameOver) return;
 
     const timer = setInterval(() => {
-      setMoodScore((m) => Math.max(0, m - (0.8 + day * 0.035) * 1.69));
+      setMoodScore((m) => Math.max(0, m - (0.8 + day * 0.035) * 2.535));
       setTimeLeft((t) => {
         if (t <= 1) {
           sfx.fail();
