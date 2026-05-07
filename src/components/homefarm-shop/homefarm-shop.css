@@ -172,6 +172,7 @@
   display: flex;
   gap: 8px;
   overflow: hidden;
+  position: relative;
 }
 
 .hfs-mascot-card {
@@ -564,19 +565,31 @@
 }
 
 .hfs-toast {
-  height: 34px;
-  flex: 0 0 34px;
-  border-radius: 16px;
-  background: #2d2118;
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  height: 26px;
+  border-radius: 12px;
+  background: rgba(45,33,24,.9);
   color: #fff;
-  padding: 9px 12px;
-  font-size: 12px;
+  padding: 0 12px;
+  font-size: 11px;
   font-weight: 800;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  position: relative;
-  z-index: 4;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+  animation: hfs-toast-fly 5s ease-in-out forwards;
+}
+
+@keyframes hfs-toast-fly {
+  0%   { transform: translateY(-160%); opacity: 0; }
+  12%  { transform: translateY(0);     opacity: 1; }
+  80%  { transform: translateY(0);     opacity: 1; }
+  100% { transform: translateY(-160%); opacity: 0; }
 }
 
 .hfs-footer {
@@ -969,7 +982,7 @@
   .hfs-hud { max-width: 202px; gap: 4px; }
   .hfs-customer-zone { height: 220px; flex-basis: 220px; }
   .hfs-shelf { height: 314px; flex-basis: 314px; }
-  .hfs-toast { height: 32px; flex-basis: 32px; padding-top: 8px; padding-bottom: 8px; }
+  .hfs-toast { font-size: 10px; }
   .hfs-footer { height: 48px; flex-basis: 48px; }
   .hfs-action { height: 36px; font-size: 13px; }
 }
@@ -1922,12 +1935,7 @@
 }
 
 .hfs-toast {
-  height: 28px;
-  flex: 0 0 28px;
-  border-radius: 12px;
-  padding: 5px 12px;
   font-size: 10px;
-  margin: 4px 5px 3px;
 }
 
 .hfs-leaderboard-btn,
@@ -2058,9 +2066,6 @@
   height: auto;
 }
 
-.hfs-toast {
-  margin-top: 0;
-}
 
 @media (max-height: 740px) {
   .hfs-order-items {
@@ -2279,10 +2284,8 @@
 }
 
 .hfs-toast {
-  height: 28px;
-  flex-basis: 28px;
-  padding: 6px 10px;
   font-size: 10px;
+  padding: 0 9px;
 }
 
 .hfs-footer {

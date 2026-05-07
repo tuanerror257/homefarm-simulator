@@ -155,6 +155,7 @@ export function HomefarmShopGame() {
   const [selected, setSelected] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState(customers[0].patience);
   const [toast, setToast] = useState("Tap từng món khách cần mua trên kệ hàng");
+  const [toastKey, setToastKey] = useState(0);
   const [showImport, setShowImport] = useState(false);
   const [showUpgrades, setShowUpgrades] = useState(false);
   const [showCatalogUnlock, setShowCatalogUnlock] = useState(false);
@@ -255,6 +256,8 @@ export function HomefarmShopGame() {
     if (gameOver) { sfx.gameOver(); saveScore(); }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameOver]);
+
+  useEffect(() => { setToastKey(k => k + 1); }, [toast]);
 
   useEffect(() => {
     if (!customer) {
@@ -1025,6 +1028,7 @@ export function HomefarmShopGame() {
                 </div>
               </div>
             )}
+            <div key={toastKey} className="hfs-toast">💬 {toast}</div>
           </section>
 
           <section className="hfs-shelf">
@@ -1086,8 +1090,6 @@ export function HomefarmShopGame() {
           </section>
 
         </main>
-
-        <div className="hfs-toast">💬 {toast}</div>
 
         <footer className="hfs-footer">
           <button onClick={fillet} className="hfs-action hfs-fillet">🔪 Fillet</button>
