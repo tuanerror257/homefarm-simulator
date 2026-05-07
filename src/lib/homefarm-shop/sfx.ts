@@ -15,7 +15,7 @@ function tone(
   freq: number,
   duration: number,
   type: OscillatorType = "sine",
-  vol = 0.3,
+  vol = 0.5,
   delay = 0,
 ) {
   if (_muted) return;
@@ -34,7 +34,7 @@ function tone(
   osc.stop(c.currentTime + delay + duration + 0.05);
 }
 
-// White noise burst qua highpass filter — dùng cho tiếng dao "xẹt"
+// White noise burst qua highpass filter — tiếng dao "xẹt"
 function swish(duration: number, vol: number, delay: number, filterFreq = 1800) {
   if (_muted) return;
   const c = getCtx();
@@ -65,64 +65,64 @@ export function setSfxMuted(muted: boolean) {
 
 export const sfx = {
   // Tap đúng món
-  tap: () => tone(900, 0.07, "sine", 0.3),
+  tap: () => tone(900, 0.07, "sine", 0.55),
 
   // Tap sai / thiếu hàng
   wrong: () => {
-    tone(180, 0.1, "square", 0.4);
-    tone(140, 0.18, "square", 0.28, 0.09);
+    tone(180, 0.1, "square", 0.65);
+    tone(140, 0.18, "square", 0.5, 0.09);
   },
 
-  // Giao hàng thành công
+  // Giao hàng thành công — sequential nên vol cao được
   deliver: () => {
-    tone(523, 0.09, "sine", 0.4);
-    tone(659, 0.09, "sine", 0.4, 0.09);
-    tone(784, 0.18, "sine", 0.45, 0.18);
+    tone(523, 0.09, "sine", 0.6);
+    tone(659, 0.09, "sine", 0.6, 0.09);
+    tone(784, 0.18, "sine", 0.65, 0.18);
   },
 
-  // Combo 3+ — fanfare tăng dần theo level
+  // Combo 3+ — nhiều nốt overlap nhẹ → giữ vol vừa tránh clip
   combo: (level: number) => {
     const freqs = [523, 659, 784, 1047, 1319];
     const count = level >= 10 ? 5 : level >= 5 ? 4 : 3;
-    freqs.slice(0, count).forEach((f, i) => tone(f, 0.11, "sine", 0.38, i * 0.07));
+    freqs.slice(0, count).forEach((f, i) => tone(f, 0.11, "sine", 0.42, i * 0.07));
   },
 
   // Khách bỏ đi / combo reset
   fail: () => {
-    tone(330, 0.12, "sine", 0.35);
-    tone(247, 0.28, "sine", 0.3, 0.1);
+    tone(330, 0.12, "sine", 0.62);
+    tone(247, 0.28, "sine", 0.55, 0.1);
   },
 
   // Thu tiền — nhập hàng, nâng cấp
   cash: () => {
-    tone(440, 0.07, "triangle", 0.32);
-    tone(554, 0.12, "triangle", 0.32, 0.07);
+    tone(440, 0.07, "triangle", 0.58);
+    tone(554, 0.12, "triangle", 0.58, 0.07);
   },
 
   // Game over
   gameOver: () => {
-    tone(392, 0.16, "sawtooth", 0.38);
-    tone(349, 0.16, "sawtooth", 0.34, 0.22);
-    tone(294, 0.16, "sawtooth", 0.34, 0.44);
-    tone(220, 0.38, "sawtooth", 0.38, 0.66);
+    tone(392, 0.16, "sawtooth", 0.62);
+    tone(349, 0.16, "sawtooth", 0.58, 0.22);
+    tone(294, 0.16, "sawtooth", 0.58, 0.44);
+    tone(220, 0.38, "sawtooth", 0.62, 0.66);
   },
 
   // Fillet dao — "xẹt xẹt"
   knife: () => {
-    swish(0.065, 0.55, 0, 1600);
-    swish(0.065, 0.5, 0.14, 1600);
+    swish(0.065, 0.9, 0, 1600);
+    swish(0.065, 0.82, 0.14, 1600);
   },
 
   // Nút UI chung — mở import, mở upgrade
-  button: () => tone(480, 0.06, "sine", 0.28),
+  button: () => tone(480, 0.06, "sine", 0.52),
 
   // Stepper +/−
-  stepper: () => tone(720, 0.035, "sine", 0.22),
+  stepper: () => tone(720, 0.035, "sine", 0.42),
 
-  // Qua ngày
+  // Qua ngày / sang ngày mới
   nextDay: () => {
-    tone(392, 0.1, "sine", 0.35);
-    tone(523, 0.1, "sine", 0.35, 0.11);
-    tone(659, 0.22, "sine", 0.38, 0.22);
+    tone(392, 0.1, "sine", 0.6);
+    tone(523, 0.1, "sine", 0.6, 0.11);
+    tone(659, 0.22, "sine", 0.65, 0.22);
   },
 };

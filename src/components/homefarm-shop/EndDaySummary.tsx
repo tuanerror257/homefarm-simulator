@@ -1,6 +1,7 @@
 import React from "react";
 import type { EndDaySummaryData } from "@/types/homefarm-shop";
 import { money } from "@/lib/homefarm-shop/gameUtils";
+import { sfx } from "@/lib/homefarm-shop/sfx";
 
 type EndDaySummaryProps = {
   data: EndDaySummaryData | null;
@@ -45,7 +46,7 @@ export default function EndDaySummary({ data, onNext, day }: EndDaySummaryProps)
           <div className="hfs-summary-warning">⚠️ Không đủ tiền — cửa hàng sẽ phá sản!</div>
         )}
 
-        <button onClick={onNext} className="hfs-summary-next">
+        <button onClick={() => { sfx.nextDay(); onNext(); }} className="hfs-summary-next">
           Sang ngày {day + 1}
         </button>
       </div>
