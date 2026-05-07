@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.13`
+- Current version: `v3.14`
 - Current commit: TBD
-- Current rollback tag: `v3.13-mood-pressure2`
+- Current rollback tag: `v3.14-start-btn-center`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,11 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.14 - Fix start button centering
+
+- Đổi căn giữa nút Start Game từ `left:50%+translateX(-50%)` sang `left:0;right:0;margin:auto` cho chắc chắn hơn trên mọi device.
+- Tag: `v3.14-start-btn-center`
 
 ### v3.13 - Mood pressure +50%
 

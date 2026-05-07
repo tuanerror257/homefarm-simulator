@@ -2424,8 +2424,9 @@
   position: absolute;
   z-index: 2;
   bottom: 1%;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
   width: 78%;
   aspect-ratio: 1536 / 1024;
   background: transparent url('/homefarm-shop/start-btn.png') center / contain no-repeat;
@@ -2437,7 +2438,7 @@
 }
 
 .hfs-start-btn.pressing {
-  transform: translateX(-50%) translateY(6px) scale(0.95);
+  transform: translateY(6px) scale(0.95);
   filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)) brightness(0.85);
 }
 
