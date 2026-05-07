@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { EndDaySummaryData, MascotState, Product, ShopEvent, ShopUpgradeId, ShopUpgrades } from "@/types/homefarm-shop";
 import { MASCOT_ASSETS, MASCOT_TALK, START_PRODUCTS } from "@/lib/homefarm-shop/data";
 import { GAME_VERSION } from "@/config/version";
@@ -80,6 +80,25 @@ const UPGRADE_DEFS: Array<{
 
 export function HomefarmShopGame() {
   const [gamePhase, setGamePhase] = useState<"start" | "tutorial" | "playing">("start");
+  const [muted, setMuted] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const audio = new Audio("/homefarm-shop/bgm.mp3");
+    audio.loop = true;
+    audio.volume = 0.45;
+    audioRef.current = audio;
+    return () => { audio.pause(); audio.src = ""; };
+  }, []);
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+    audioRef.current.muted = muted;
+  }, [muted]);
+
+  function startBgm() {
+    audioRef.current?.play().catch(() => {});
+  }
   const [products, setProducts] = useState(START_PRODUCTS);
   const [day, setDay] = useState(1);
   const [cash, setCash] = useState(1000);
@@ -467,7 +486,7 @@ export function HomefarmShopGame() {
         <div className="hfs-phone">
           <div className="hfs-bg" />
           <div className="hfs-version-badge">v{GAME_VERSION}</div>
-          <StartScreen onStart={() => setGamePhase("tutorial")} />
+          <StartScreen onStart={() => { startBgm(); setGamePhase("tutorial"); }} />
         </div>
       </div>
     );
@@ -491,6 +510,9 @@ export function HomefarmShopGame() {
       <div className={`hfs-phone ${wrongFlash ? "wrong" : ""}`}>
         <div className="hfs-bg" />
         <div className="hfs-version-badge">v{GAME_VERSION}</div>
+        <button className="hfs-mute-btn" onClick={() => setMuted(m => !m)} aria-label="Toggle music">
+          {muted ? "🔇" : "🔊"}
+        </button>
 
         <header className="hfs-header">
           <div className="hfs-brand-art">
