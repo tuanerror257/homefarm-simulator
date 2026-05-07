@@ -428,6 +428,7 @@ export function HomefarmShopGame() {
     setEventMoodPenalty(nextEvent?.moodDelta ?? 0);
     setActiveEvent(nextEvent);
     setDaySummary(null);
+    setScoreSaved(false);
     if (nextDay === PRODUCT_EXPANSION_DAY) setShowCatalogUnlock(true);
     if (nextDay === UPGRADE_UNLOCK_DAY) setShowUpgradeUnlock(true);
     if (nextDay === EVENT_UNLOCK_DAY) setShowEventUnlock(true);
@@ -610,7 +611,6 @@ export function HomefarmShopGame() {
                 <button
                   className="hfs-board-pill"
                   onClick={async () => {
-                    setScoreSaved(false);
                     setShowLeaderboard(true);
                     await loadLeaderboard();
                   }}
