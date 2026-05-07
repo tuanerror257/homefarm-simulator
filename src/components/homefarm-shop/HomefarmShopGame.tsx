@@ -187,8 +187,13 @@ export function HomefarmShopGame() {
   const botProductsRef = useRef(products);
   botProductsRef.current = products;
   const botCashRef = useRef(cash);
+  botCashRef.current = cash;
   const botUpgradesRef = useRef(upgrades);
   botUpgradesRef.current = upgrades;
+  // Target quantities bot wants to import (set before opening modal, read tick-by-tick)
+  const botImportTargetRef = useRef<Record<string, number>>({});
+  const botImportQtyRef = useRef(importQty);
+  botImportQtyRef.current = importQty;
   const orderProducts: OrderProduct[] = useMemo(
     () =>
       customer
@@ -525,8 +530,19 @@ export function HomefarmShopGame() {
         // Ads modal open → run leaflet ad
         if (showAds) { runAd(AD_TYPES[0]); return; }
 
-        // Import modal open → confirm the import bot already staged
-        if (showImport) { confirmImport(); return; }
+        // Import modal open → fill qty one product per tick, then confirm
+        if (showImport) {
+          const target = botImportTargetRef.current;
+          const curQty = botImportQtyRef.current;
+          const nextEntry = Object.entries(target).find(([id, need]) => (curQty[id] || 0) < need);
+          if (nextEntry) {
+            const [id, need] = nextEntry;
+            setImportQty((prev) => ({ ...prev, [id]: need }));
+            return;
+          }
+          confirmImport();
+          return;
+        }
 
         // Decide: open upgrade modal if there's something to buy
         if (upgradesUnlocked) {
@@ -545,7 +561,7 @@ export function HomefarmShopGame() {
           return;
         }
 
-        // Broad refill: stage importQty then open import modal
+        // Broad refill: record target then open empty import modal
         const TARGET = 15;
         const refillQty: Record<string, number> = {};
         let refillCost = 0;
@@ -555,16 +571,28 @@ export function HomefarmShopGame() {
           if (need > 0) { refillQty[p.id] = need; refillCost += need * p.cost; }
         }
         if (refillCost > 0 && curCash >= refillCost) {
-          setImportQty(refillQty);
+          botImportTargetRef.current = refillQty;
+          setImportQty({});
           setShowImport(true);
-          return; // next tick: showImport=true → confirmImport()
+          return;
         }
         endDay();
         return;
       }
 
-      // 5. Has customer — import modal open → confirm staged import
-      if (showImport) { confirmImport(); return; }
+      // 5. Has customer — import modal open → fill qty one product per tick, then confirm
+      if (showImport) {
+        const target = botImportTargetRef.current;
+        const curQty = botImportQtyRef.current;
+        const nextEntry = Object.entries(target).find(([id, need]) => (curQty[id] || 0) < need);
+        if (nextEntry) {
+          const [id, need] = nextEntry;
+          setImportQty((prev) => ({ ...prev, [id]: need }));
+          return;
+        }
+        confirmImport();
+        return;
+      }
 
       // 6. Fix stock shortages
       const shortItems = customer.order.filter((item) => {
@@ -580,7 +608,7 @@ export function HomefarmShopGame() {
           if (wholeStock >= 1) { fillet(); return; }
         }
 
-        // Stage import quantities then open modal
+        // Record import targets then open empty modal
         const importItems: Record<string, number> = {};
         let totalImportCost = 0;
         for (const p of curProducts) {
@@ -591,9 +619,10 @@ export function HomefarmShopGame() {
           totalImportCost += need * p.cost;
         }
         if (totalImportCost > 0 && curCash >= totalImportCost) {
-          setImportQty(importItems);
+          botImportTargetRef.current = importItems;
+          setImportQty({});
           setShowImport(true);
-          return; // next tick: showImport=true → confirmImport()
+          return;
         }
         skipCustomer("🤖 Bot bỏ qua — không đủ tiền nhập hàng.");
         return;
@@ -621,7 +650,7 @@ export function HomefarmShopGame() {
     showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock,
     showImport, showUpgrades, showAds, activeEvent,
     gameOver, daySummary, customer, selected, isComplete,
-    upgrades, adRunToday, day, products, productPage,
+    upgrades, adRunToday, day, products, productPage, importQty,
   ]);
   // ── END BOT ─────────────────────────────────────────────────────────────────
 

@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v4.2`
+- Current version: `v4.3`
 - Current commit: TBD
-- Current rollback tag: `v4.2-bot-slow-modal`
+- Current rollback tag: `v4.3-bot-import-stepwise`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v4.3 - Bot điền nhập hàng từng sản phẩm một
+
+- Bot mở modal nhập hàng với qty = 0, rồi mỗi tick điền qty cho 1 sản phẩm (giống người bấm +).
+- `botImportTargetRef` lưu target qty, `botImportQtyRef` đọc importQty mới nhất trong setTimeout.
+- Thêm `importQty` vào dependency array để effect re-fire sau mỗi lần điền qty.
+- Áp dụng cả khi nhập cuối ngày (broad refill) lẫn khi thiếu hàng phục vụ khách.
+- Tag: `v4.3-bot-import-stepwise`
 
 ### v4.2 - Bot giảm tốc khi mở modal
 
