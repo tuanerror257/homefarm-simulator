@@ -70,6 +70,13 @@ export const CUSTOMER_TYPES: CustomerType[] = [
   { name: "Khách Nhật", avatar: "🍣", mood: "Mê cá hồi", patience: 26, size: 3, prefer: ["salmon", "wholeSalmon", "squid", "cod"], quote: "Cá hồi ngon là được." },
   { name: "Nhà hàng", avatar: "🏮", mood: "Lấy sỉ", patience: 20, size: 4, prefer: ["wholeSalmon", "salmon", "beef", "shrimp", "oyster"], quote: "Cho cá nguyên con đẹp nhé." },
   { name: "Khách nấu lẩu", avatar: "🍲", mood: "Mua xương", patience: 32, size: 2, prefer: ["headBone", "beef", "salmon", "pork"], quote: "Có đầu xương nấu lẩu không?" },
+  { name: "Khách Hàn", avatar: "🇰🇷", mood: "K-food", patience: 27, size: 3, prefer: ["beef", "pork", "sashimi", "bacon", "egg"], quote: "삼겹살 있어요? Thịt ba chỉ đi nha." },
+  { name: "Bà nội trợ VIP", avatar: "👒", mood: "Sành điệu", patience: 22, size: 4, prefer: ["wagyu", "cheese", "scallop", "salmon", "crab"], quote: "Tôi chỉ lấy hàng xịn thôi nhé." },
+  { name: "Đầu bếp", avatar: "👨‍🍳", mood: "Chuyên nghiệp", patience: 24, size: 4, prefer: ["wholeSalmon", "oyster", "crab", "cod", "scallop"], quote: "Hàng tươi sống thôi, đừng đông lạnh." },
+  { name: "Nhóm sinh nhật", avatar: "🎂", mood: "Ăn tiệc", patience: 28, size: 5, prefer: ["strawberry", "cherry", "grape", "cheese", "salmon"], quote: "Hôm nay sinh nhật bạn tớ, lấy đẹp đẹp nhé!" },
+  { name: "Gym girl", avatar: "🏋️‍♀️", mood: "Healthy", patience: 33, size: 3, prefer: ["blueberry", "avocado", "yogurt", "egg", "salmon"], quote: "Đồ ăn clean cho chị nhé, không chất béo." },
+  { name: "Ông chủ quán", avatar: "🧔", mood: "Lấy sỉ", patience: 21, size: 4, prefer: ["wholeSalmon", "beef", "pork", "shrimp", "egg"], quote: "Lấy nhiều, tính giá tốt nhé." },
+  { name: "Khách du lịch", avatar: "🧳", mood: "Ghé nhanh", patience: 15, size: 2, prefer: ["sausage", "cheese", "bread", "milk", "grape"], quote: "Mua nhanh thôi, tôi còn bắt xe." },
 ];
 
 export const SHOP_EVENTS: ShopEvent[] = [
