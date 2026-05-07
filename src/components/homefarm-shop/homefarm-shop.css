@@ -2480,6 +2480,7 @@
   font-weight: 900;
   color: rgba(45,33,24,.6);
   letter-spacing: 1px;
+  text-align: center;
 }
 
 .hfs-tutorial-title2 {
@@ -2487,6 +2488,7 @@
   font-weight: 900;
   color: #d71920;
   line-height: 1.15;
+  text-align: center;
 }
 
 .hfs-tutorial-desc {
@@ -2495,6 +2497,7 @@
   color: rgba(45,33,24,.72);
   line-height: 1.4;
   margin-bottom: 10px;
+  text-align: center;
 }
 
 .hfs-tutorial-sound-hint {
