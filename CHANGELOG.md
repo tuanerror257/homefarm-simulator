@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.0`
-- Current commit: `b6cc87a`
-- Current rollback tag: `v3.0-start-screen`
+- Current version: `v3.1`
+- Current commit: `d9e8d42`
+- Current rollback tag: `v3.1-player-name`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.1 - Player name input in tutorial
+
+- Added player name input field to the tutorial modal with label "🧑‍🌾 Hãy nhập tên của bạn".
+- Button disabled until a name is entered.
+- Player name kept in session memory and used when saving to the leaderboard.
+- Updated the visible game version badge to `v3.1`.
+- Tag: `v3.1-player-name`
 
 ### v3.0 - Start screen & tutorial
 
