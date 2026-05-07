@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.17`
+- Current version: `v3.18`
 - Current commit: TBD
-- Current rollback tag: `v3.17-advertising`
+- Current rollback tag: `v3.18-ad-unlock-modal`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.18 - Ad unlock modal chi tiết
+
+- Cải thiện modal thông báo mở khóa quảng cáo ở ngày 15: hiển thị bảng chi phí và số khách tăng cho từng loại.
+- Thêm hướng dẫn "Nhấn nút 📣 Ads trên kệ hàng để chạy".
+- Nút "Chạy ngay thôi!" mở thẳng vào modal quảng cáo.
+- Tag: `v3.18-ad-unlock-modal`
 
 ### v3.17 - Hệ thống quảng cáo
 
