@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.11`
+- Current version: `v3.12`
 - Current commit: TBD
-- Current rollback tag: `v3.11-sfx-polish`
+- Current rollback tag: `v3.12-mood-pressure`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,11 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.12 - Mood pressure +30%
+
+- Tăng tốc độ giảm mood thêm ×1.3 (từ ×1.3 lên ×1.69 so với gốc).
+- Tag: `v3.12-mood-pressure`
 
 ### v3.11 - SFX polish + tutorial UI
 
