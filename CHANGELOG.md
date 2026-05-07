@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v4.1`
+- Current version: `v4.2`
 - Current commit: TBD
-- Current rollback tag: `v4.1-bot-ui-navigation`
+- Current rollback tag: `v4.2-bot-slow-modal`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v4.2 - Bot giảm tốc khi mở modal
+
+- Bot dùng delay 1800ms (thay vì 650ms) khi modal Nâng cấp / Nhập hàng / Quảng cáo đang mở.
+- Người dùng kịp nhìn thấy bot đang làm gì trước khi xác nhận.
+- Tag: `v4.2-bot-slow-modal`
 
 ### v4.1 - Bot chơi như người thật (UI navigation)
 

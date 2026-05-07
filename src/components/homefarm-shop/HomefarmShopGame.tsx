@@ -486,6 +486,9 @@ export function HomefarmShopGame() {
   useEffect(() => {
     if (!botActive) return;
 
+    // Slow down while a UI modal is open so the user can read what bot is doing
+    const delay = (showUpgrades || showImport || showAds) ? 1800 : 650;
+
     const t = setTimeout(() => {
       const curProducts = botProductsRef.current;
       const curCash = botCashRef.current;
@@ -609,7 +612,7 @@ export function HomefarmShopGame() {
       // 8. All items selected → deliver
       if (isComplete) { deliver(); return; }
       skipCustomer("🤖 Bot bỏ qua.");
-    }, 650);
+    }, delay);
 
     return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
