@@ -479,7 +479,7 @@ export function HomefarmShopGame() {
           <div className="hfs-bg" />
           <div className="hfs-version-badge">v{GAME_VERSION}</div>
           <StartScreen onStart={() => {}} dimmed />
-          <TutorialModal onConfirm={(name) => { if (name) setPlayerName(name); setGamePhase("playing"); }} />
+          <TutorialModal onConfirm={() => setGamePhase("playing")} />
         </div>
       </div>
     );
@@ -940,32 +940,45 @@ function StartScreen({ onStart, dimmed }: { onStart: () => void; dimmed?: boolea
   );
 }
 
-function TutorialModal({ onConfirm }: { onConfirm: (name: string) => void }) {
-  const [name, setName] = useState("");
-  const [pressed, setPressed] = useState(false);
-  const canConfirm = name.trim().length > 0;
+function TutorialModal({ onConfirm }: { onConfirm: () => void }) {
+  const features = [
+    { icon: "🛒", name: "Đặt hàng và quản lý hàng hoá", desc: "Chọn sản phẩm phù hợp, nhập hàng và xử lý hàng hoá." },
+    { icon: "👥", name: "Phục vụ khách hàng", desc: "Đáp ứng nhu cầu đa dạng và giữ cho khách luôn hài lòng." },
+    { icon: "⏱️", name: "Tối ưu doanh thu", desc: "Quản lý thời gian, quyết định thông minh để tăng lợi nhuận." },
+    { icon: "⬆️", name: "Mở rộng và nâng cấp", desc: "Nâng cấp cửa hàng, mở rộng không gian và trở thành shop số 1." },
+  ];
 
   return (
-    <div className="hfs-tutorial-screen">
-      <input
-        className="hfs-tutorial-name-input"
-        type="text"
-        placeholder="Tên của bạn..."
-        maxLength={24}
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <div className={`hfs-tutorial-btn-layer ${pressed && canConfirm ? "pressing" : ""} ${!canConfirm ? "dimmed" : ""}`} />
-      {canConfirm && (
-        <button
-          className="hfs-tutorial-confirm-btn"
-          onPointerDown={() => setPressed(true)}
-          onPointerUp={() => { setPressed(false); onConfirm(name.trim()); }}
-          onPointerLeave={() => setPressed(false)}
-          onPointerCancel={() => setPressed(false)}
-          aria-label="OK, Vào ca bán"
-        />
-      )}
+    <div className="hfs-tutorial-backdrop">
+      <div className="hfs-tutorial-panel">
+        <div className="hfs-tutorial-top">
+          <div className="hfs-tutorial-store-icon">🏪</div>
+          <div>
+            <div className="hfs-tutorial-title">CHÀO MỪNG ĐẾN VỚI</div>
+            <div className="hfs-tutorial-title2">HOMEFARM SHOP SIMULATOR</div>
+          </div>
+        </div>
+
+        <div className="hfs-tutorial-desc">
+          Bạn sẽ vào vai quản lý cửa hàng Homefarm — nhập hàng, phục vụ khách và phát triển cửa hàng ngày một lớn mạnh!
+        </div>
+
+        <div className="hfs-tutorial-features">
+          {features.map((f) => (
+            <div key={f.name} className="hfs-tutorial-feature">
+              <div className="hfs-tutorial-feature-icon">{f.icon}</div>
+              <div>
+                <div className="hfs-tutorial-feature-name">{f.name}</div>
+                <div className="hfs-tutorial-feature-desc">{f.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button className="hfs-tutorial-btn" onClick={onConfirm}>
+          OK, VÀO CA BÁN! 🚀
+        </button>
+      </div>
     </div>
   );
 }

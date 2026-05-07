@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.1`
-- Current commit: TBD
-- Current rollback tag: `v3.1-tutorial-redesign`
+- Current version: `v3.0`
+- Current commit: `b6cc87a`
+- Current rollback tag: `v3.0-start-screen`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,15 +79,6 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
-
-### v3.1 - Tutorial redesign with player name
-
-- Replaced tutorial modal with full-screen image-based design (tutorial-bg.jpg + tutorial-btn.png).
-- Added player name input field overlaid on the design at the correct position.
-- Button is greyed out until a name is entered; confirms and starts the game.
-- Player name is kept in session memory only, used when saving to the leaderboard.
-- Updated the visible game version badge to `v3.1`.
-- Tag: `v3.1-tutorial-redesign`
 
 ### v3.0 - Start screen & tutorial
 
