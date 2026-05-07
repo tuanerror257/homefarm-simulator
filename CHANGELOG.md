@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v4.7`
+- Current version: `v4.8`
 - Current commit: TBD
-- Current rollback tag: `v4.7-bot-slow-summary`
+- Current rollback tag: `v4.8-bot-pause-unlocks`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v4.8 - Bot pause đúng chỗ để đọc thông báo
+
+- Màn hình tổng kết cuối ngày: giảm từ 4s → 2s.
+- Màn hình unlock notification (catalog, upgrade, event, ad): dừng 3.5s để đọc nội dung.
+- Tag: `v4.8-bot-pause-unlocks`
 
 ### v4.7 - Bot dừng 4 giây ở màn hình tổng kết cuối ngày
 
