@@ -2751,23 +2751,27 @@
 
 .hfs-brand-art {
   position: absolute !important;
-  left: 9px !important;
-  top: 7px !important;
-  width: 242px !important;
-  height: 76px !important;
+  left: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  right: 226px !important;      /* dashboard width(214) + right-offset(8) + gap(4) */
+  width: auto !important;
+  height: auto !important;
   z-index: 5 !important;
   display: flex !important;
   align-items: center !important;
+  justify-content: center !important;
+  padding-left: 8px !important;
   pointer-events: none !important;
 }
 
 .hfs-brand-img {
   display: block !important;
-  width: 242px !important;
-  height: auto !important;
-  max-height: 76px !important;
+  width: auto !important;
+  height: 72px !important;
+  max-height: 72px !important;
+  max-width: 100% !important;
   object-fit: contain !important;
-  object-position: left center !important;
   filter:
     drop-shadow(0 3px 0 rgba(45,33,24,.20))
     drop-shadow(0 0 10px rgba(255,255,255,.12)) !important;
@@ -2828,15 +2832,13 @@
   }
 
   .hfs-brand-art {
-    left: 8px !important;
-    top: 7px !important;
-    width: 212px !important;
-    height: 70px !important;
+    right: 215px !important;    /* dashboard width(204) + right-offset(7) + gap(4) */
+    padding-left: 7px !important;
   }
 
   .hfs-brand-img {
-    width: 212px !important;
-    max-height: 70px !important;
+    height: 64px !important;
+    max-height: 64px !important;
   }
 
   .hfs-dashboard {
@@ -2857,12 +2859,12 @@
 
 @media (max-width: 390px) {
   .hfs-brand-art {
-    left: 7px !important;
-    width: 184px !important;
+    right: 210px !important;    /* dashboard width(198) + right-offset(8) + gap(4) */
   }
 
   .hfs-brand-img {
-    width: 184px !important;
+    height: 64px !important;
+    max-height: 64px !important;
   }
 
   .hfs-dashboard {
