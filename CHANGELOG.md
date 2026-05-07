@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v4.3`
+- Current version: `v4.4`
 - Current commit: TBD
-- Current rollback tag: `v4.3-bot-import-stepwise`
+- Current rollback tag: `v4.4-bot-import-plus1`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v4.4 - Bot nhấn +1 từng lần như người thật khi nhập hàng
+
+- Bot mở modal nhập hàng (qty = 0), pause 1.5s để xem form trống.
+- Mỗi tick tăng qty +1 cho sản phẩm đang điền (delay 150ms/lần — nhìn thấy số đếm lên).
+- Khi xong tất cả: pause 1s để thấy kết quả rồi mới confirmImport().
+- Delay thông minh theo trạng thái: chưa fill=1500ms, đang fill=150ms, xong=1000ms.
+- Tag: `v4.4-bot-import-plus1`
 
 ### v4.3 - Bot điền nhập hàng từng sản phẩm một
 

@@ -491,8 +491,20 @@ export function HomefarmShopGame() {
   useEffect(() => {
     if (!botActive) return;
 
-    // Slow down while a UI modal is open so the user can read what bot is doing
-    const delay = (showUpgrades || showImport || showAds) ? 1800 : 650;
+    // Compute delay based on current UI state
+    let delay = 650;
+    if (showUpgrades || showAds) {
+      delay = 1500; // pause so user can read modal before bot acts
+    } else if (showImport) {
+      const targetEntries = Object.entries(botImportTargetRef.current);
+      if (targetEntries.length > 0) {
+        const anyFilled = targetEntries.some(([id]) => (importQty[id] || 0) > 0);
+        const allFilled = targetEntries.every(([id, need]) => (importQty[id] || 0) >= need);
+        delay = allFilled ? 1000  // pause before confirm so user sees final state
+              : anyFilled ? 150   // fast +1 clicks while filling
+              : 1500;             // first pause after modal opens (shows empty form)
+      }
+    }
 
     const t = setTimeout(() => {
       const curProducts = botProductsRef.current;
@@ -530,14 +542,14 @@ export function HomefarmShopGame() {
         // Ads modal open → run leaflet ad
         if (showAds) { runAd(AD_TYPES[0]); return; }
 
-        // Import modal open → fill qty one product per tick, then confirm
+        // Import modal open → increment qty by +1 per tick per product, then confirm
         if (showImport) {
           const target = botImportTargetRef.current;
           const curQty = botImportQtyRef.current;
           const nextEntry = Object.entries(target).find(([id, need]) => (curQty[id] || 0) < need);
           if (nextEntry) {
-            const [id, need] = nextEntry;
-            setImportQty((prev) => ({ ...prev, [id]: need }));
+            const [id] = nextEntry;
+            setImportQty((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
             return;
           }
           confirmImport();
@@ -580,14 +592,14 @@ export function HomefarmShopGame() {
         return;
       }
 
-      // 5. Has customer — import modal open → fill qty one product per tick, then confirm
+      // 5. Has customer — import modal open → increment +1 per tick per product, then confirm
       if (showImport) {
         const target = botImportTargetRef.current;
         const curQty = botImportQtyRef.current;
         const nextEntry = Object.entries(target).find(([id, need]) => (curQty[id] || 0) < need);
         if (nextEntry) {
-          const [id, need] = nextEntry;
-          setImportQty((prev) => ({ ...prev, [id]: need }));
+          const [id] = nextEntry;
+          setImportQty((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
           return;
         }
         confirmImport();
