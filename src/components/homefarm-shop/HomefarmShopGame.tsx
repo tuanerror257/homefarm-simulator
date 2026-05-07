@@ -34,7 +34,7 @@ const UPGRADE_UNLOCK_DAY = 8;
 const EVENT_UNLOCK_DAY = 12;
 const AD_UNLOCK_DAY = 15;
 // Bot gate: minimum day required to purchase each upgrade level (index = currentLevel)
-const BOT_UPGRADE_DAY_GATE = [8, 14, 22];
+const BOT_UPGRADE_DAY_GATE = [8, 14, 20, 24, 27];
 
 const AD_TYPES = [
   {
@@ -56,7 +56,7 @@ const AD_TYPES = [
 ] as const;
 
 type AdId = typeof AD_TYPES[number]["id"];
-const MAX_UPGRADE_LEVEL = 3;
+const MAX_UPGRADE_LEVEL = 5;
 const OPERATING_COST_TIERS = [
   { untilDay: 5,        rent: 200, staff: 150, utilities: 30,  otherMin: 10, otherMax: 50  },
   { untilDay: 11,       rent: 280, staff: 250, utilities: 70,  otherMin: 30, otherMax: 80  },
@@ -91,7 +91,7 @@ const UPGRADE_DEFS: Array<{
     name: "Dao fillet",
     description: "Fillet cá nguyên ra nhiều thành phẩm hơn.",
     effect: "+0,35kg fillet và +0,1kg đầu xương mỗi level",
-    costs: [500, 1100, 2200],
+    costs: [500, 1100, 2200, 4000, 7000],
   },
   {
     id: "staff",
@@ -99,7 +99,7 @@ const UPGRADE_DEFS: Array<{
     name: "Nhân viên phụ",
     description: "Khách kiên nhẫn hơn từ ngày kế tiếp.",
     effect: "+2,5s kiên nhẫn mỗi level",
-    costs: [800, 1600, 3200],
+    costs: [800, 1600, 3200, 5500, 9000],
   },
   {
     id: "sign",
@@ -107,7 +107,7 @@ const UPGRADE_DEFS: Array<{
     name: "Bảng hiệu VIP",
     description: "Tăng xác suất gặp khách VIP từ ngày kế tiếp.",
     effect: "+3,5% cơ hội VIP mỗi level",
-    costs: [700, 1400, 2800],
+    costs: [700, 1400, 2800, 4800, 8000],
   },
   {
     id: "freezer",
@@ -115,7 +115,7 @@ const UPGRADE_DEFS: Array<{
     name: "Tủ lạnh xịn",
     description: "Giảm hao hụt hàng khi gặp sự kiện xấu.",
     effect: "-25% hao hụt do event mỗi level",
-    costs: [650, 1300, 2600],
+    costs: [650, 1300, 2600, 4200, 7000],
   },
 ];
 
