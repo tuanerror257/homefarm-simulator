@@ -794,6 +794,8 @@ export function HomefarmShopGame() {
               <div className="hfs-unlock-title">Danh mục sản phẩm mở rộng</div>
               <div className="hfs-unlock-desc">
                 Cửa hàng đã được biết đến rộng rãi hơn. Từ ngày {PRODUCT_EXPANSION_DAY}, danh mục sản phẩm được mở rộng để đáp ứng nhu cầu đa dạng của khách hàng.
+                <br /><br />
+                Để đáp ứng nhu cầu vận hành tăng cao, bạn sẽ cần thuê thêm nhân viên — chi phí hàng ngày sẽ tăng theo.
               </div>
               <button className="hfs-unlock-btn" onClick={() => setShowCatalogUnlock(false)}>
                 Bắt đầu bán hàng
