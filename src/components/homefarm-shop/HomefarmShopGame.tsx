@@ -176,6 +176,7 @@ export function HomefarmShopGame() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [playerName, setPlayerName] = useState("Tada");
+  const [botMode, setBotMode] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
   const [daySummary, setDaySummary] = useState<EndDaySummaryData | null>(null);
   const [gameOver, setGameOver] = useState(false);
@@ -183,7 +184,7 @@ export function HomefarmShopGame() {
   const [lowRatingStreak, setLowRatingStreak] = useState(0);
 
   const customer = customers[customerIndex] || null;
-  const botActive = playerName.toLowerCase() === "tadadev" && gamePhase === "playing";
+  const botActive = botMode && gamePhase === "playing";
 
   // Refs so bot setTimeout always reads latest state
   const botProductsRef = useRef(products);
@@ -888,6 +889,7 @@ export function HomefarmShopGame() {
     setEventMoodPenalty(0);
     setShowLeaderboard(false);
     setScoreSaved(false);
+    setBotMode(false);
     setDaySummary(null);
     setGameOver(false);
     setGameOverReason("");
@@ -913,7 +915,7 @@ export function HomefarmShopGame() {
           <div className="hfs-bg" />
           <div className="hfs-version-badge">v{GAME_VERSION}</div>
           <StartScreen onStart={() => {}} dimmed />
-          <TutorialModal onConfirm={(name) => { if (name) setPlayerName(name); setGamePhase("playing"); }} />
+          <TutorialModal onConfirm={(name) => { if (name) { setPlayerName(name); setBotMode(name.toLowerCase() === "tadadev"); } setGamePhase("playing"); }} />
         </div>
       </div>
     );
