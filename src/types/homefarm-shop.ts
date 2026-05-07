@@ -115,7 +115,17 @@ export type AchievementId =
   | "bulk_save_500"
   | "bulk_save_1000"
   | "bulk_save_1500"
-  | "bulk_save_2000";
+  | "bulk_save_2000"
+  | "sold_salmon_100"
+  | "sold_beef_100"
+  | "sold_pork_100"
+  | "sold_egg_50"
+  | "sold_shrimp_50"
+  | "sold_sashimi_30"
+  | "sold_fruit_100"
+  | "sold_seafood_200"
+  | "sold_meat_200"
+  | "sold_dairy_100";
 
 export type Achievement = {
   id: AchievementId;

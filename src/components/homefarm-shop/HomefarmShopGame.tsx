@@ -261,6 +261,7 @@ export function HomefarmShopGame() {
   const [unlockedAchievements, setUnlockedAchievements] = useState<Set<AchievementId>>(new Set());
   const [newAchievement, setNewAchievement] = useState<Achievement | null>(null);
   const [totalBulkSavings, setTotalBulkSavings] = useState(0);
+  const [productSoldTotal, setProductSoldTotal] = useState<Record<string, number>>({});
 
   const customer = customers[customerIndex] || null;
   const botActive = botMode && gamePhase === "playing";
@@ -468,6 +469,29 @@ export function HomefarmShopGame() {
         const itemRevenue = item.qty * (products.find((p) => p.id === item.id)?.price ?? 0);
         next[item.id] = { qty: (next[item.id]?.qty ?? 0) + item.qty, revenue: (next[item.id]?.revenue ?? 0) + itemRevenue };
       }
+      return next;
+    });
+
+    setProductSoldTotal((prev) => {
+      const next = { ...prev };
+      for (const item of customer.order) {
+        next[item.id] = (next[item.id] ?? 0) + item.qty;
+      }
+      const check = (ids: string[], threshold: number, id: AchievementId) => {
+        const prevSum = ids.reduce((s, pid) => s + (prev[pid] ?? 0), 0);
+        const nextSum = ids.reduce((s, pid) => s + (next[pid] ?? 0), 0);
+        if (prevSum < threshold && nextSum >= threshold) unlockAchievement(id);
+      };
+      check(["salmon"], 100, "sold_salmon_100");
+      check(["beef", "boCanada", "wagyu"], 100, "sold_beef_100");
+      check(["pork", "bacon", "ham"], 100, "sold_pork_100");
+      check(["egg"], 50, "sold_egg_50");
+      check(["shrimp"], 50, "sold_shrimp_50");
+      check(["sashimi"], 30, "sold_sashimi_30");
+      check(["grape", "cherry", "avocado", "blueberry", "strawberry", "kiwi", "mango", "orange"], 100, "sold_fruit_100");
+      check(["salmon", "shrimp", "squid", "oyster", "crab", "sashimi", "scallop", "cod"], 200, "sold_seafood_200");
+      check(["beef", "boCanada", "wagyu", "pork", "bacon", "ham"], 200, "sold_meat_200");
+      check(["milk", "yogurt", "cheese", "butter"], 100, "sold_dairy_100");
       return next;
     });
 
@@ -1147,6 +1171,7 @@ export function HomefarmShopGame() {
     setUnlockedAchievements(new Set());
     setNewAchievement(null);
     setTotalBulkSavings(0);
+    setProductSoldTotal({});
   }
 
   if (gamePhase === "start") {
