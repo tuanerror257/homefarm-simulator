@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.11`
+- Current version: `v3.12`
 - Current commit: TBD
-- Current rollback tag: `v3.11-sfx-polish`
+- Current rollback tag: `v3.12-dashboard`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.12 - Dashboard redesign
+
+- Restructured top-right HUD into a 3-tier layout for better visual hierarchy.
+- TIỀN MẶT card is now a full-width hero row with a larger value font (15px).
+- DT LŨY KẾ and LÃI LŨY KẾ sit in a 2-column grid below the hero.
+- DAY / DT NGÀY / LÃI NGÀY mini pills remain as the bottom row (unchanged).
+- Tag: `v3.12-dashboard`
 
 ### v3.11 - SFX polish + tutorial UI
 
