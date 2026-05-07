@@ -409,11 +409,11 @@ export function calculateScore(params: {
     0,
     Math.round(
       params.cash +
-        params.totalRevenue * 0.25 +
-        params.totalProfit * 1.8 +
-        params.servedCount * 120 +
-        params.day * 250 +
-        params.maxCombo * 180,
+        params.totalRevenue * 0.15 +
+        params.totalProfit * 2.2 +
+        params.servedCount * 90 +
+        params.day * 120 +
+        params.maxCombo * 220,
     ),
   );
 }
