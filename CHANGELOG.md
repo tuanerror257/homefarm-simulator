@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v5.0`
+- Current version: `v5.1`
 - Current commit: TBD
-- Current rollback tag: `v5.0-bot-upgrade-pacing`
+- Current rollback tag: `v5.1-fix-button-overflow-mobile`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v5.1 - Fix text tràn ra ngoài nút trên iPhone
+
+- Root cause: `white-space: nowrap` bị thiếu → text wrap sang dòng 2 → tràn ra ngoài button height cố định.
+- Thêm `white-space: nowrap; overflow: hidden` vào `.hfs-action` và `.hfs-board-pill`.
+- Phone context: giảm `.hfs-action` font từ 12px → 11px, gap footer từ 6→5px, padding 8→6px.
+- Phone context: giảm `.hfs-board-pill` từ 26px/11px/10px → 24px/10px/7px padding.
+- Tag: `v5.1-fix-button-overflow-mobile`
 
 ### v5.0 - Bot nâng cấp từ từ theo mốc ngày
 
