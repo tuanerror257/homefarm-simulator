@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.7`
-- Current commit: `87066a6`
-- Current rollback tag: `v3.7-operating-costs`
+- Current version: `v3.8`
+- Current commit: `f98dbaf`
+- Current rollback tag: `v3.8-cost-breakdown`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,15 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.8 - Operating cost breakdown
+
+- Split the daily operating cost into four named line items: Thuê nhà, Nhân viên, Điện nước, and Khác.
+- "Khác" is randomised each day within a per-tier range (rounded to 10k): 10-50k for Day 1-5, 30-80k for Day 6-11, 50-150k for Day 12+.
+- End-day summary shows each line item, a dashed-line total, and a cash-remaining row.
+- Cash-remaining row turns red when negative (bankruptcy warning).
+- Updated the visible game version badge to `v3.8`.
+- Tag: `v3.8-cost-breakdown`
 
 ### v3.7 - Operating costs and game over
 
