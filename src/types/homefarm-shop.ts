@@ -110,7 +110,12 @@ export type AchievementId =
   | "big_revenue"
   | "total_100"
   | "millionaire"
-  | "salmon_master";
+  | "salmon_master"
+  | "bulk_save_200"
+  | "bulk_save_500"
+  | "bulk_save_1000"
+  | "bulk_save_1500"
+  | "bulk_save_2000";
 
 export type Achievement = {
   id: AchievementId;

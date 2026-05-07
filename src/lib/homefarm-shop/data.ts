@@ -121,5 +121,10 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: "big_revenue", title: "Ngày thắng lớn", desc: "Doanh thu 1 ngày đạt 10.000k", icon: "💰" },
   { id: "total_100", title: "Chủ shop chăm chỉ", desc: "Phục vụ tổng 100 khách", icon: "🤝" },
   { id: "millionaire", title: "Tỷ phú mini", desc: "Tích lũy 50.000k tiền mặt", icon: "🏆" },
-  { id: "salmon_master", title: "Vua cá hồi", desc: "Bán 50kg cá hồi trong 1 ngày", icon: "🐟" },
+  { id: "salmon_master",   title: "Vua cá hồi",       desc: "Bán 50kg cá hồi trong 1 ngày",                      icon: "🐟" },
+  { id: "bulk_save_200",  title: "Biết tính toán",   desc: "Tiết kiệm tích lũy 200k nhờ nhập số lượng lớn",    icon: "🧮" },
+  { id: "bulk_save_500",  title: "Mua hàng khôn",    desc: "Tiết kiệm tích lũy 500k nhờ nhập số lượng lớn",    icon: "💡" },
+  { id: "bulk_save_1000", title: "Thánh nhập hàng",  desc: "Tiết kiệm tích lũy 1.000k nhờ nhập số lượng lớn", icon: "📦" },
+  { id: "bulk_save_1500", title: "Vua mua sỉ",       desc: "Tiết kiệm tích lũy 1.500k nhờ nhập số lượng lớn", icon: "👑" },
+  { id: "bulk_save_2000", title: "Thánh tiết kiệm",  desc: "Tiết kiệm tích lũy 2.000k nhờ nhập số lượng lớn", icon: "🪙" },
 ];

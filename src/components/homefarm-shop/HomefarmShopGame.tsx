@@ -260,6 +260,7 @@ export function HomefarmShopGame() {
   const [showGodModeUnlock, setShowGodModeUnlock] = useState(false);
   const [unlockedAchievements, setUnlockedAchievements] = useState<Set<AchievementId>>(new Set());
   const [newAchievement, setNewAchievement] = useState<Achievement | null>(null);
+  const [totalBulkSavings, setTotalBulkSavings] = useState(0);
 
   const customer = customers[customerIndex] || null;
   const botActive = botMode && gamePhase === "playing";
@@ -576,6 +577,22 @@ export function HomefarmShopGame() {
     setProducts((prev) =>
       prev.map((p) => ({ ...p, stock: Number((p.stock + (importQty[p.id] || 0)).toFixed(1)) })),
     );
+    if (importSaving > 0) {
+      setTotalBulkSavings((prev) => {
+        const next = prev + importSaving;
+        const milestones: { threshold: number; id: AchievementId }[] = [
+          { threshold: 200,  id: "bulk_save_200"  },
+          { threshold: 500,  id: "bulk_save_500"  },
+          { threshold: 1000, id: "bulk_save_1000" },
+          { threshold: 1500, id: "bulk_save_1500" },
+          { threshold: 2000, id: "bulk_save_2000" },
+        ];
+        for (const m of milestones) {
+          if (prev < m.threshold && next >= m.threshold) unlockAchievement(m.id);
+        }
+        return next;
+      });
+    }
     setImportQty({});
     setShowImport(false);
     setMascotState("trust");
@@ -1129,6 +1146,7 @@ export function HomefarmShopGame() {
     setShowGodModeUnlock(false);
     setUnlockedAchievements(new Set());
     setNewAchievement(null);
+    setTotalBulkSavings(0);
   }
 
   if (gamePhase === "start") {
