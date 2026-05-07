@@ -589,21 +589,47 @@ export function HomefarmShopGame() {
           return;
         }
 
-        // Broad refill: record target then open empty import modal (qty reset so bot fills from 0)
-        const TARGET = 15;
-        const refillQty: Record<string, number> = {};
-        let refillCost = 0;
-        for (const p of curProducts) {
-          if (p.cost <= 0) continue;
-          const need = Math.max(0, TARGET - p.stock);
-          if (need > 0) { refillQty[p.id] = need; refillCost += need * p.cost; }
-        }
-        if (refillCost > 0 && curCash >= refillCost) {
-          botImportTargetRef.current = refillQty;
-          setBotImportScrolled(false);
-          setImportQty({});
-          setShowImport(true);
-          return;
+        // Demand-based broad refill: estimate next day's consumption per product
+        {
+          const nextDay = day + 1;
+          // Mirror customersCountByDay formula from gameUtils
+          const nextCustomers = nextDay <= 5
+            ? 3 + nextDay
+            : Math.min(8 + Math.floor((nextDay - 5) * 0.55), 18);
+          // Average items per order, increasing with day
+          const avgItems = nextDay <= 8 ? 2 : nextDay <= 16 ? 3.5 : 4.5;
+          // Importable products excluding wholeSalmon (handled by fillet + spot import)
+          const importable = curProducts.filter((p) => p.cost > 0 && p.id !== "wholeSalmon");
+          const orderProb = Math.min(0.9, avgItems / Math.max(1, importable.length));
+
+          const refillQty: Record<string, number> = {};
+          let refillCost = 0;
+          for (const p of importable) {
+            // Avg qty ordered per visit, by product category
+            const avgQty =
+              ["egg","sausage","cheese","milk","butter","yogurt","bacon","ham","bread"].includes(p.id) ? 2
+              : ["cherry","strawberry"].includes(p.id) ? 0.7
+              : ["grape","avocado","kiwi","mango","orange"].includes(p.id) ? 1.2
+              : p.id === "blueberry" ? 1.5
+              : 0.9; // seafood, meat (kg)
+
+            const expectedDemand = nextCustomers * orderProb * avgQty;
+            const target = Math.max(2, Math.ceil(expectedDemand * 1.3)); // 30% safety buffer
+            const need = Math.max(0, target - p.stock);
+            if (need > 0) {
+              refillQty[p.id] = need;
+              refillCost += need * p.cost;
+            }
+          }
+
+          const CASH_RESERVE = 2000; // always keep 2000k after restocking
+          if (refillCost > 0 && curCash - refillCost >= CASH_RESERVE) {
+            botImportTargetRef.current = refillQty;
+            setBotImportScrolled(false);
+            setImportQty({});
+            setShowImport(true);
+            return;
+          }
         }
         endDay();
         return;

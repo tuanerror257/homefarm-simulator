@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v4.8`
+- Current version: `v4.9`
 - Current commit: TBD
-- Current rollback tag: `v4.8-bot-pause-unlocks`
+- Current rollback tag: `v4.9-bot-demand-based-import`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,16 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v4.9 - Bot nhập hàng dựa theo demand thực tế
+
+- Bỏ flat TARGET=15, thay bằng công thức: `ceil(số_khách_ngày_mai × xác_suất_order × avg_qty × 1.3)`
+- `xác_suất_order` = avgItemsPerOrder / số_sản_phẩm (điều chỉnh theo số catalog đã mở)
+- `avg_qty` theo category: hải sản/thịt 0.9kg, đồ đóng gói 2, trái cây 1.0–1.5
+- Skip `wholeSalmon` trong broad refill (xử lý riêng bằng fillet + spot import)
+- Giữ buffer 2,000k tiền mặt, không nhập nếu sau khi nhập sẽ < 2,000k
+- Ví dụ ngày 20: Wagyu target=5kg (cũ: 15kg), tiết kiệm 9,200k chỉ riêng 1 sản phẩm
+- Tag: `v4.9-bot-demand-based-import`
 
 ### v4.8 - Bot pause đúng chỗ để đọc thông báo
 
