@@ -1190,6 +1190,9 @@ function TutorialModal({ onConfirm }: { onConfirm: (name: string) => void }) {
         <div className="hfs-tutorial-desc">
           Bạn sẽ vào vai quản lý cửa hàng Homefarm — nhập hàng, phục vụ khách và phát triển cửa hàng ngày một lớn mạnh!
         </div>
+        <div className="hfs-tutorial-sound-hint">
+          🔊 Game có âm thanh, hãy bật tiếng hoặc đeo tai nghe để có trải nghiệm tốt nhất.
+        </div>
 
         <div className="hfs-tutorial-name-wrap">
           <label className="hfs-tutorial-name-label">🧑‍🌾 Hãy nhập tên của bạn</label>

@@ -2497,6 +2497,19 @@
   margin-bottom: 10px;
 }
 
+.hfs-tutorial-sound-hint {
+  font-size: 11px;
+  font-weight: 900;
+  color: #b45309;
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  text-align: center;
+  line-height: 1.4;
+}
+
 .hfs-tutorial-name-wrap {
   margin-bottom: 10px;
   display: flex;
