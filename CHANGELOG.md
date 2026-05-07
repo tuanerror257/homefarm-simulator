@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.10`
-- Current commit: `5c386b6`
-- Current rollback tag: `v3.10-sfx`
+- Current version: `v3.11`
+- Current commit: TBD
+- Current rollback tag: `v3.11-sfx-polish`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,16 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.11 - SFX polish + tutorial UI
+
+- Thêm âm thanh cho nút "Sang ngày X" trong màn tổng kết.
+- Thêm âm thanh cho nút Fillet (knife "xẹt xẹt"), mở Nhập hàng, Qua ngày, stepper +/−.
+- Tăng volume toàn bộ SFX lên ~2x so với v3.10.
+- Tutorial: thêm dòng gợi ý âm thanh (khung amber).
+- Tutorial: căn giữa toàn bộ header (title, desc).
+- Tutorial: thêm icon 🏪 bên phải để cân layout.
+- Tag: `v3.11-sfx-polish`
 
 ### v3.10 - Sound effects (Web Audio API)
 
