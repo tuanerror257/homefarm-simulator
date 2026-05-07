@@ -198,10 +198,12 @@ function buildOrder(products: Product[], customerType: CustomerType, day: number
 }
 
 function boostVipOrder(order: Customer["order"]) {
-  return order.map((item) => ({
-    ...item,
-    qty: Number((item.qty * 1.45).toFixed(1)),
-  }));
+  return order.map((item) => {
+    const boosted = item.qty * 1.45;
+    // Preserve integer qty for unit-sold items (con, set, cái, hộp, gói…)
+    const qty = Number.isInteger(item.qty) ? Math.max(1, Math.round(boosted)) : Number(boosted.toFixed(1));
+    return { ...item, qty };
+  });
 }
 
 function customersCountByDay(day: number) {

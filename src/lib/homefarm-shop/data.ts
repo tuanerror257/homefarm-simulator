@@ -69,7 +69,7 @@ export const CUSTOMER_TYPES: CustomerType[] = [
   { name: "Team party", avatar: "🎉", mood: "Mua tiệc", patience: 23, size: 5, prefer: ["beef", "salmon", "cherry", "grape", "shrimp", "cheese"], quote: "Tối nay party, lấy nhiều đồ ngon nhé." },
   { name: "Khách Nhật", avatar: "🍣", mood: "Mê cá hồi", patience: 26, size: 3, prefer: ["salmon", "wholeSalmon", "squid", "cod"], quote: "Cá hồi ngon là được." },
   { name: "Nhà hàng", avatar: "🏮", mood: "Lấy sỉ", patience: 20, size: 4, prefer: ["wholeSalmon", "salmon", "beef", "shrimp", "oyster"], quote: "Cho cá nguyên con đẹp nhé." },
-  { name: "Khách nấu lẩu", avatar: "🍲", mood: "Mua xương", patience: 32, size: 2, prefer: ["headBone", "beef", "salmon", "mushroom"], quote: "Có đầu xương nấu lẩu không?" },
+  { name: "Khách nấu lẩu", avatar: "🍲", mood: "Mua xương", patience: 32, size: 2, prefer: ["headBone", "beef", "salmon", "pork"], quote: "Có đầu xương nấu lẩu không?" },
 ];
 
 export const SHOP_EVENTS: ShopEvent[] = [
