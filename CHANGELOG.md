@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v4.9`
+- Current version: `v5.0`
 - Current commit: TBD
-- Current rollback tag: `v4.9-bot-demand-based-import`
+- Current rollback tag: `v5.0-bot-upgrade-pacing`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v5.0 - Bot nâng cấp từ từ theo mốc ngày
+
+- Day gate per level: Lv1 từ day 8, Lv2 từ day 14, Lv3 từ day 22 (`BOT_UPGRADE_DAY_GATE`).
+- Max 1 upgrade mỗi ngày: `botUpgradedToday` state, reset mỗi khi sang ngày mới.
+- Sau khi mua: đóng modal ngay, không vòng lại mua thêm trong cùng tick cycle.
+- Cash buffer thực tế hơn: chỉ mua khi cash ≥ cost × 2 (thay vì cost + 1,500k).
+- Tag: `v5.0-bot-upgrade-pacing`
 
 ### v4.9 - Bot nhập hàng dựa theo demand thực tế
 

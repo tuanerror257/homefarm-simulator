@@ -30,6 +30,8 @@ const PRODUCT_EXPANSION_DAY = 6;
 const UPGRADE_UNLOCK_DAY = 8;
 const EVENT_UNLOCK_DAY = 12;
 const AD_UNLOCK_DAY = 15;
+// Bot gate: minimum day required to purchase each upgrade level (index = currentLevel)
+const BOT_UPGRADE_DAY_GATE = [8, 14, 22];
 
 const AD_TYPES = [
   {
@@ -197,6 +199,8 @@ export function HomefarmShopGame() {
   // Tracks whether bot has scrolled to confirm button — must be state to trigger re-render
   const [botImportScrolled, setBotImportScrolled] = useState(false);
   const botImportConfirmRef = useRef<HTMLButtonElement>(null);
+  // Limits bot to 1 upgrade purchase per day
+  const [botUpgradedToday, setBotUpgradedToday] = useState(false);
   const orderProducts: OrderProduct[] = useMemo(
     () =>
       customer
@@ -534,14 +538,15 @@ export function HomefarmShopGame() {
 
       // 4. No customer → upgrade / ads / refill / end day
       if (!customer) {
-        // Upgrade modal open → buy highest-priority affordable upgrade then close
+        // Upgrade modal open → buy the one upgrade bot decided on, then close immediately
         if (showUpgrades) {
           const upgradeOrder: ShopUpgradeId[] = ["staff", "freezer", "sign", "knife"];
           for (const upId of upgradeOrder) {
             const level = curUpgrades[upId];
             if (level >= MAX_UPGRADE_LEVEL) continue;
+            if (day < BOT_UPGRADE_DAY_GATE[level]) continue;
             const cost = UPGRADE_DEFS.find((u) => u.id === upId)!.costs[level];
-            if (curCash >= cost + 1500) { buyUpgrade(upId); return; }
+            if (curCash >= cost * 2) { buyUpgrade(upId); setShowUpgrades(false); return; }
           }
           setShowUpgrades(false);
           return;
@@ -572,14 +577,19 @@ export function HomefarmShopGame() {
           return;
         }
 
-        // Decide: open upgrade modal if there's something to buy
-        if (upgradesUnlocked) {
+        // Decide: open upgrade modal — max 1 upgrade per day, gated by day milestone per level
+        if (upgradesUnlocked && !botUpgradedToday) {
           const upgradeOrder: ShopUpgradeId[] = ["staff", "freezer", "sign", "knife"];
           for (const upId of upgradeOrder) {
             const level = curUpgrades[upId];
             if (level >= MAX_UPGRADE_LEVEL) continue;
+            if (day < BOT_UPGRADE_DAY_GATE[level]) continue; // not yet time for this level
             const cost = UPGRADE_DEFS.find((u) => u.id === upId)!.costs[level];
-            if (curCash >= cost + 1500) { setShowUpgrades(true); return; }
+            if (curCash >= cost * 2) { // keep at least 1× cost as buffer after purchase
+              setBotUpgradedToday(true);
+              setShowUpgrades(true);
+              return;
+            }
           }
         }
 
@@ -713,7 +723,7 @@ export function HomefarmShopGame() {
     showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock,
     showImport, showUpgrades, showAds, activeEvent,
     gameOver, daySummary, customer, selected, isComplete,
-    upgrades, adRunToday, day, products, productPage, importQty, botImportScrolled,
+    upgrades, adRunToday, day, products, productPage, importQty, botImportScrolled, botUpgradedToday,
   ]);
   // ── END BOT ─────────────────────────────────────────────────────────────────
 
@@ -800,6 +810,7 @@ export function HomefarmShopGame() {
     setScoreSaved(false);
     setPendingExtraCustomers(0);
     setAdRunToday(null);
+    setBotUpgradedToday(false);
     if (nextDay === PRODUCT_EXPANSION_DAY) setShowCatalogUnlock(true);
     if (nextDay === UPGRADE_UNLOCK_DAY) setShowUpgradeUnlock(true);
     if (nextDay === EVENT_UNLOCK_DAY) setShowEventUnlock(true);
