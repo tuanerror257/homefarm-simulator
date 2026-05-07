@@ -78,6 +78,7 @@ export const SHOP_EVENTS: ShopEvent[] = [
   { id: "freezer-issue", type: "bad", title: "Tủ đông trục trặc", description: "🌡️ Tủ đông mất điện một lúc. Bò Mỹ và cá hồi bị hao hụt nhẹ.", stockDelta: { salmon: -0.5, beef: -0.5 } },
   { id: "viral-post", type: "good", title: "Bài TikTok viral", description: "📱✨ Video check-in cửa hàng lan truyền mạng xã hội! +100k tiền mặt và mood đầu ngày +8.", cashDelta: 100, moodDelta: 8 },
   { id: "supplier-bonus", type: "good", title: "Nhà cung cấp tặng hàng", description: "📦🎁 Nhà cung cấp gửi quà tri ân, kho thêm một ít hàng.", stockDelta: { egg: 3, sausage: 3 } },
+  { id: "loyal-customer", type: "good", title: "Khách quen ghé sớm", description: "🤝 Một nhóm khách quen tới sớm, vui vẻ và chi thoải mái. Mood đầu ngày +12.", moodDelta: 12 },
   { id: "rainy-day", type: "neutral", title: "Trời mưa", description: "🌧️ Trời đổ mưa to, khách ngại ra đường — đơn app tăng vọt nhưng khách vội hơn. Mood đầu ngày -4.", moodDelta: -4 },
 ];
 

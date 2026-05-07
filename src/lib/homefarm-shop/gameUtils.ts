@@ -213,7 +213,7 @@ function customersCountByDay(day: number) {
 }
 
 function patienceByDay(type: CustomerType, day: number, staffLevel = 0) {
-  const pressure = day <= 5 ? 0 : (day - 5) * 0.8;
+  const pressure = day <= 5 ? 0 : (day - 5) * 0.55;
   const randomBonus = Math.random() * 5;
   return Math.max(8, Math.round(type.patience - pressure + randomBonus + staffLevel * 2.5));
 }
