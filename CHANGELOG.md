@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.15`
+- Current version: `v3.16`
 - Current commit: TBD
-- Current rollback tag: `v3.15-start-btn-flex`
+- Current rollback tag: `v3.16-start-btn-nudge`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,11 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.16 - Start button nudge right +5%
+
+- Thêm `translateX(5%)` để bù trừ padding trong suốt không đều trong file start-btn.png.
+- Tag: `v3.16-start-btn-nudge`
 
 ### v3.15 - Fix start button centering (flex approach)
 
