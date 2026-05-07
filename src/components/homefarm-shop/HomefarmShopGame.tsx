@@ -924,10 +924,10 @@ export function HomefarmShopGame() {
                 {gameOverReason === "reputation" ? "Mất uy tín!" : "Cửa hàng phá sản!"}
               </div>
               <div className="hfs-gameover-desc">
-                {gameOverReason === "bankrupt" && `Không đủ tiền chi trả vận hành ngày ${day}. Trò chơi kết thúc.`}
-                {gameOverReason === "stolen" && `Bị trộm sạch tiền mặt sau khi trả chi phí vận hành ngày ${day}.`}
+                {gameOverReason === "bankrupt" && <>Không đủ tiền chi trả vận hành ngày {day}.<br />Trò chơi kết thúc.</>}
+                {gameOverReason === "stolen" && <>Bị trộm sạch tiền mặt sau khi trả chi phí vận hành ngày {day}.<br />Trò chơi kết thúc.</>}
                 {gameOverReason === "reputation" && "Rating dưới ⭐2.0 ba ngày liên tiếp — khách hàng đã mất niềm tin vào cửa hàng."}
-                {gameOverReason === "" && `Không đủ tiền chi trả vận hành ngày ${day}. Trò chơi kết thúc.`}
+                {gameOverReason === "" && <>Không đủ tiền chi trả vận hành ngày {day}.<br />Trò chơi kết thúc.</>}
               </div>
               <div className="hfs-gameover-rank">
                 {leaderboard.length > 0
