@@ -225,7 +225,7 @@ export function HomefarmShopGame() {
   const [customers, setCustomers] = useState(() => generateCustomers(START_PRODUCTS, 1));
   const [customerIndex, setCustomerIndex] = useState(0);
   const [selected, setSelected] = useState<string[]>([]);
-  const [timeLeft, setTimeLeft] = useState(customers[0].patience);
+  const [timeLeft, setTimeLeft] = useState(customers[0]?.patience ?? 30);
   const [toast, setToast] = useState("Tap từng món khách cần mua trên kệ hàng");
   const [showImport, setShowImport] = useState(false);
   const [showUpgrades, setShowUpgrades] = useState(false);
