@@ -496,7 +496,9 @@ export function HomefarmShopGame() {
 
     // Compute delay based on current UI state
     let delay = 650;
-    if (showUpgrades || showAds) {
+    if (daySummary) {
+      delay = 4000; // pause on end-of-day summary so user can read
+    } else if (showUpgrades || showAds) {
       delay = 1500; // pause so user can read modal before bot acts
     } else if (showImport) {
       const targetEntries = Object.entries(botImportTargetRef.current);

@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v4.6`
+- Current version: `v4.7`
 - Current commit: TBD
-- Current rollback tag: `v4.6-tips-rebalance-bot-scroll-fix`
+- Current rollback tag: `v4.7-bot-slow-summary`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,11 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v4.7 - Bot dừng 4 giây ở màn hình tổng kết cuối ngày
+
+- Bot delay 4000ms khi `daySummary` đang hiển thị, đủ thời gian đọc toàn bộ nội dung.
+- Tag: `v4.7-bot-slow-summary`
 
 ### v4.6 - Rebalance tips + fix bot freeze sau scroll
 
