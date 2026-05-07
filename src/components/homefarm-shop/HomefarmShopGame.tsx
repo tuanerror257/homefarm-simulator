@@ -225,7 +225,19 @@ export function HomefarmShopGame() {
   const orderProfit = useMemo(() => orderProducts.reduce((s, p) => s + (p.price - p.cost) * p.wantQty, 0), [orderProducts]);
   const timePercent = customer ? Math.max(0, Math.round((timeLeft / customer.patience) * 100)) : 0;
   const estimatedTip = customer ? bill * calcTipRate(customer, timeLeft, moodScore, combo) : 0;
-  const importCost = products.reduce((s, p) => s + (importQty[p.id] || 0) * getDailyCost(p, day), 0);
+  const BULK_THRESHOLD = 5;
+  const BULK_DISCOUNT = 0.06;
+  const importCost = products.reduce((s, p) => {
+    const q = importQty[p.id] || 0;
+    const unitCost = getDailyCost(p, day);
+    const discount = q >= BULK_THRESHOLD ? BULK_DISCOUNT : 0;
+    return s + q * unitCost * (1 - discount);
+  }, 0);
+  const importSaving = products.reduce((s, p) => {
+    const q = importQty[p.id] || 0;
+    if (q < BULK_THRESHOLD) return s;
+    return s + q * getDailyCost(p, day) * BULK_DISCOUNT;
+  }, 0);
   const upgradesUnlocked = day >= UPGRADE_UNLOCK_DAY;
   const upgradeCount = Object.values(upgrades).reduce((sum, level) => sum + level, 0);
 
@@ -1115,7 +1127,10 @@ export function HomefarmShopGame() {
               <div className="hfs-modal-top">
                 <div>
                   <div className="hfs-modal-title">Nhập hàng</div>
-                  <div className="hfs-modal-sub">Chọn số lượng cần nhập. Tổng vốn: {money(importCost)}</div>
+                  <div className="hfs-modal-sub">
+                    Tổng vốn: {money(importCost)}
+                    {importSaving > 0 && <span className="hfs-bulk-saving"> · Tiết kiệm {money(importSaving)} 🎉</span>}
+                  </div>
                 </div>
                 <button onClick={() => setShowImport(false)} className="hfs-modal-close">×</button>
               </div>
@@ -1125,6 +1140,7 @@ export function HomefarmShopGame() {
                   const q = importQty[product.id] || 0;
                   const dailyCost = getDailyCost(product, day);
                   const delta = getDailyCostDelta(product, day);
+                  const hasBulk = q >= BULK_THRESHOLD;
                   return (
                     <div key={product.id} className="hfs-import-row" data-import-id={product.id}>
                       <div className="hfs-import-icon">{product.icon}</div>
@@ -1136,9 +1152,10 @@ export function HomefarmShopGame() {
                               {delta > 0 ? `+${delta}%` : `${delta}%`}
                             </span>
                           )}
+                          {hasBulk && <span className="hfs-bulk-badge">Giá sỉ -6%</span>}
                         </div>
                         <div className="hfs-import-sub">
-                          Tồn {qty(product.stock)} {product.unit} · {product.id === "wholeSalmon" ? "1 con = 6kg · Vốn 2.580k/con" : `Vốn ${money(dailyCost)}/${product.unit}`}
+                          Tồn {qty(product.stock)} {product.unit} · {product.id === "wholeSalmon" ? "1 con = 6kg · Vốn 2.580k/con" : `Vốn ${money(hasBulk ? Math.round(dailyCost * (1 - BULK_DISCOUNT)) : dailyCost)}/${product.unit}`}
                         </div>
                       </div>
                       <div className="hfs-stepper">
