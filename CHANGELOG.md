@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v5.2`
+- Current version: `v6.0`
 - Current commit: TBD
-- Current rollback tag: `v5.2-product-swap-sashimi-bocanada-pizza`
+- Current rollback tag: `v6.0-toast-above-mascot`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,15 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v6.0 - Toast chuyển lên phía trên mascot với animation roll
+
+- Toast không còn nằm cố định giữa khu vực chơi và footer (giải phóng 34px chiều cao).
+- Vị trí mới: `position: absolute; top: 6px` bên trong `hfs-customer-zone` (phía trên mascot).
+- Animation `hfs-toast-fly` (5s): slide xuống từ trên → hold 3s → roll ngược lên biến mất.
+- `overflow: hidden` trên customer-zone tự clip animation vào/ra — không cần extra container.
+- `toastKey` state tăng mỗi khi `toast` thay đổi (dùng useEffect), remount element để retrigger.
+- Tag: `v6.0-toast-above-mascot`
 
 ### v5.2 - Thay sản phẩm Day 8 & Day 16
 
