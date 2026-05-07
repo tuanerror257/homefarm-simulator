@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.1`
-- Current commit: `d9e8d42`
-- Current rollback tag: `v3.1-player-name`
+- Current version: `v3.5`
+- Current commit: `24785c2`
+- Current rollback tag: `v3.5-toast-fix`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,37 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.5 - Layout overhaul
+
+- Moved toast bar outside of `<main>` so it sits pinned directly above the footer.
+- Made shelf use `flex: 1` to fill all remaining space automatically instead of fixed height.
+- Restored toast `border-radius: 12px` and added proper margin for breathing room.
+- Updated the visible game version badge to `v3.5`.
+- Tag: `v3.5-toast-fix`
+
+### v3.4 - Bigger shelf controls
+
+- Increased page tabs (1/2/3) height from 19px to 26px and font from 9px to 11px for easier tap on mobile.
+- Increased BXH and upgrade pills height from 21px to 26px and font from 9px to 11px.
+- Increased shelf-head row height to accommodate larger controls.
+- Updated the visible game version badge to `v3.4`.
+- Tag: `v3.4-ui-layout`
+
+### v3.3 - Leaderboard spam fix
+
+- Removed `setScoreSaved(false)` from the leaderboard open handler — button stays disabled after saving.
+- Reset `scoreSaved` only when advancing to a new day, allowing one save per day with a new score.
+- Updated the visible game version badge to `v3.3`.
+- Tag: `v3.3-leaderboard-spam-fix`
+
+### v3.2 - Leaderboard improvements
+
+- Added medal icons 🥇🥈🥉 for top 1-2-3 in the leaderboard.
+- Capped display to top 5 entries, then `· · ·` and the last entry.
+- Inserted current player's row at their rank position (highlighted in yellow), even before saving.
+- Updated the visible game version badge to `v3.2`.
+- Tag: `v3.2-leaderboard`
 
 ### v3.1 - Player name input in tutorial
 
