@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.9`
-- Current commit: `e6db21e`
-- Current rollback tag: `v3.9-gameover`
+- Current version: `v3.10`
+- Current commit: TBD
+- Current rollback tag: `v3.10-sfx`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,19 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.10 - Sound effects (Web Audio API)
+
+- Added synthesized SFX via Web Audio API — zero new asset files.
+- `sfx.tap()`: pop ngắn khi chọn đúng món.
+- `sfx.wrong()`: buzz thấp khi tap sai, thiếu hàng.
+- `sfx.deliver()`: ka-ching 3 nốt khi giao hàng thành công.
+- `sfx.combo(level)`: fanfare tăng dần (3→5 nốt) khi combo 3+.
+- `sfx.fail()`: tone buồn đi xuống khi khách bỏ đi.
+- `sfx.cash()`: 2 nốt triangle khi nhập hàng / nâng cấp thành công.
+- `sfx.gameOver()`: 4 nốt sawtooth đi xuống khi game over.
+- SFX tự động tắt theo nút mute 🔇.
+- Tag: `v3.10-sfx`
 
 ### v3.9 - Game over overhaul + mood pressure
 

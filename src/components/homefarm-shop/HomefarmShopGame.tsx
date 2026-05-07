@@ -18,6 +18,7 @@ import {
   qty,
 } from "@/lib/homefarm-shop/gameUtils";
 import { fetchLeaderboard, getLeaderboardMode, saveLeaderboardEntry, type LeaderboardEntry } from "@/lib/homefarm-shop/leaderboard";
+import { sfx, setSfxMuted } from "@/lib/homefarm-shop/sfx";
 import EndDaySummary from "./EndDaySummary";
 import "./homefarm-shop.css";
 
@@ -107,6 +108,7 @@ export function HomefarmShopGame() {
   useEffect(() => {
     if (!audioRef.current) return;
     audioRef.current.muted = muted;
+    setSfxMuted(muted);
   }, [muted]);
 
   function startBgm() {
@@ -201,7 +203,7 @@ export function HomefarmShopGame() {
   }, [customerIndex, customers.length]);
 
   useEffect(() => {
-    if (gameOver) saveScore();
+    if (gameOver) { sfx.gameOver(); saveScore(); }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameOver]);
 
@@ -225,6 +227,7 @@ export function HomefarmShopGame() {
       setMoodScore((m) => Math.max(0, m - (0.8 + day * 0.035) * 1.3));
       setTimeLeft((t) => {
         if (t <= 1) {
+          sfx.fail();
           setCombo(0);
           setMascotState("fail");
           skipCustomer("Khách chờ lâu quá nên bỏ đi 😭 Combo reset.");
@@ -252,6 +255,7 @@ export function HomefarmShopGame() {
     if (!customer) return;
 
     if (!customer.order.some((o) => o.id === id)) {
+      sfx.wrong();
       setCash((v) => Math.max(0, v - 50));
       setMoodScore((m) => Math.max(0, m - 15));
       setCombo(0);
@@ -262,6 +266,7 @@ export function HomefarmShopGame() {
       return;
     }
 
+    if (!selected.includes(id)) sfx.tap();
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
     setMoodScore((m) => Math.min(100, m + 4));
     setMascotState(combo >= 2 ? "combo" : "happy");
@@ -283,6 +288,7 @@ export function HomefarmShopGame() {
 
     const notEnough = orderProducts.find((p) => p.stock < p.wantQty);
     if (notEnough) {
+      sfx.wrong();
       setCombo(0);
       setMoodScore((m) => Math.max(0, m - 12));
       setMascotState("thinking");
@@ -320,6 +326,8 @@ export function HomefarmShopGame() {
     setDayMaxCombo((v) => Math.max(v, nextCombo));
     setMoodScore((m) => Math.min(100, m + (nextCombo >= 3 ? 7 : 4)));
     setMascotState(nextCombo >= 3 ? "combo" : "happy");
+    sfx.deliver();
+    if (nextCombo >= 3) sfx.combo(nextCombo);
 
     let msg = `Chuẩn! Bill +${money(bill)} · Lãi ${money(thisOrderProfit)}`;
     if (tip > 0) msg += ` · Tip +${money(tip)}`;
@@ -380,6 +388,7 @@ export function HomefarmShopGame() {
       return;
     }
 
+    sfx.cash();
     setCash((value) => value - cost);
     setUpgrades((current) => ({ ...current, [id]: current[id] + 1 }));
     setMascotState("trust");
@@ -403,6 +412,7 @@ export function HomefarmShopGame() {
       return;
     }
 
+    sfx.cash();
     setCash((v) => v - importCost);
     setProducts((prev) =>
       prev.map((p) => ({ ...p, stock: Number((p.stock + (importQty[p.id] || 0)).toFixed(1)) })),
