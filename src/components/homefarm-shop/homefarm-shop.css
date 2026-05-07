@@ -1656,6 +1656,65 @@
   border-radius: 8px;
 }
 
+.hfs-achievement-popup {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  background: linear-gradient(135deg, #2d2118, #5a3a1a);
+  color: #fff;
+  border: 2px solid #f59f00;
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+  max-width: 280px;
+  animation: hfs-slide-down 0.3s ease, hfs-fade-out 0.5s ease 3s forwards;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+@keyframes hfs-slide-down {
+  from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes hfs-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.hfs-achievement-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.hfs-achievement-body {
+  flex: 1;
+}
+
+.hfs-achievement-label {
+  font-size: 9px;
+  font-weight: 900;
+  opacity: 0.7;
+  text-transform: uppercase;
+  color: #f59f00;
+}
+
+.hfs-achievement-title {
+  font-size: 13px;
+  font-weight: 900;
+  margin: 1px 0;
+}
+
+.hfs-achievement-desc {
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
 .hfs-gameover-backdrop {
   position: absolute;
   inset: 0;

@@ -1,4 +1,4 @@
-import type { CustomerType, MascotState, Product, ShopEvent } from "@/types/homefarm-shop";
+import type { Achievement, CustomerType, MascotState, Product, ShopEvent } from "@/types/homefarm-shop";
 
 export const ALL_PRODUCTS: Product[] = [
   // Day 1-5: core calm mode, 8 items only
@@ -112,3 +112,14 @@ export const MASCOT_TALK: Record<MascotState, string> = {
   thinking: "Tính kỹ chút nha.",
   trust: "Tin tớ, món này bán chạy!",
 };
+
+export const ACHIEVEMENTS: Achievement[] = [
+  { id: "first_serve", title: "Khởi nghiệp!", desc: "Phục vụ khách hàng đầu tiên", icon: "🎉" },
+  { id: "combo_5", title: "Tốc độ ánh sáng", desc: "Đạt combo x5", icon: "⚡" },
+  { id: "combo_10", title: "Combo Cháy", desc: "Đạt combo x10", icon: "🔥" },
+  { id: "perfect_day", title: "Ngày hoàn hảo", desc: "0 khách bỏ qua trong 1 ngày (≥5 khách)", icon: "⭐" },
+  { id: "big_revenue", title: "Ngày thắng lớn", desc: "Doanh thu 1 ngày đạt 10.000k", icon: "💰" },
+  { id: "total_100", title: "Chủ shop chăm chỉ", desc: "Phục vụ tổng 100 khách", icon: "🤝" },
+  { id: "millionaire", title: "Tỷ phú mini", desc: "Tích lũy 50.000k tiền mặt", icon: "🏆" },
+  { id: "salmon_master", title: "Vua cá hồi", desc: "Bán 50kg cá hồi trong 1 ngày", icon: "🐟" },
+];

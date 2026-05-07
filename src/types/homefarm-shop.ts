@@ -89,3 +89,20 @@ export type ShopEvent = {
   moodDelta?: number;
   stockDelta?: Record<string, number>;
 };
+
+export type AchievementId =
+  | "first_serve"
+  | "combo_5"
+  | "combo_10"
+  | "perfect_day"
+  | "big_revenue"
+  | "total_100"
+  | "millionaire"
+  | "salmon_master";
+
+export type Achievement = {
+  id: AchievementId;
+  title: string;
+  desc: string;
+  icon: string;
+};

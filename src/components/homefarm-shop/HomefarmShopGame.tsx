@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { EndDaySummaryData, MascotState, OperatingCostBreakdown, Product, ProductStat, ShopEvent, ShopUpgradeId, ShopUpgrades } from "@/types/homefarm-shop";
-import { MASCOT_ASSETS, MASCOT_TALK, START_PRODUCTS } from "@/lib/homefarm-shop/data";
+import type { Achievement, AchievementId, EndDaySummaryData, MascotState, OperatingCostBreakdown, Product, ProductStat, ShopEvent, ShopUpgradeId, ShopUpgrades } from "@/types/homefarm-shop";
+import { ACHIEVEMENTS, MASCOT_ASSETS, MASCOT_TALK, START_PRODUCTS } from "@/lib/homefarm-shop/data";
 import { GAME_VERSION } from "@/config/version";
 import {
   applyEventToProducts,
@@ -186,6 +186,8 @@ export function HomefarmShopGame() {
   const [gameOverReason, setGameOverReason] = useState<"" | "bankrupt" | "stolen" | "reputation">("");
   const [lowRatingStreak, setLowRatingStreak] = useState(0);
   const [loanDebt, setLoanDebt] = useState(0);
+  const [unlockedAchievements, setUnlockedAchievements] = useState<Set<AchievementId>>(new Set());
+  const [newAchievement, setNewAchievement] = useState<Achievement | null>(null);
 
   const customer = customers[customerIndex] || null;
   const botActive = botMode && gamePhase === "playing";
@@ -394,6 +396,15 @@ export function HomefarmShopGame() {
       }
       return next;
     });
+
+    // Achievement checks
+    const newServedCount = servedCount + 1;
+    if (newServedCount === 1) unlockAchievement("first_serve");
+    if (newServedCount >= 100) unlockAchievement("total_100");
+    if (nextCombo >= 5) unlockAchievement("combo_5");
+    if (nextCombo >= 10) unlockAchievement("combo_10");
+    const newCash = cash + bill + tip + comboBonus - shippingFee;
+    if (newCash >= 50000) unlockAchievement("millionaire");
     setCombo(nextCombo);
     setMaxCombo((v) => Math.max(v, nextCombo));
     setDayMaxCombo((v) => Math.max(v, nextCombo));
@@ -498,6 +509,15 @@ export function HomefarmShopGame() {
     setToast(`Đã nhập hàng: -${money(importCost)} tiền vốn. Lưu ý: lãi lũy kế chỉ tính từ đơn đã bán.`);
   }
 
+  function unlockAchievement(id: AchievementId) {
+    if (unlockedAchievements.has(id)) return;
+    const achievement = ACHIEVEMENTS.find((a) => a.id === id);
+    if (!achievement) return;
+    setUnlockedAchievements((prev) => new Set([...prev, id]));
+    setNewAchievement(achievement);
+    setTimeout(() => setNewAchievement(null), 3500);
+  }
+
   function endDay() {
     const remaining = Math.max(0, customers.length - customerIndex);
     const skippedTotal = skippedTodayCount + remaining;
@@ -534,6 +554,12 @@ export function HomefarmShopGame() {
       topSellers,
       excessStock,
     });
+
+    // Day-end achievement checks
+    if (skippedTodayCount === 0 && servedTodayCount >= 5) unlockAchievement("perfect_day");
+    if (revenue >= 10000) unlockAchievement("big_revenue");
+    const salmonSold = soldByProduct["salmon"]?.qty ?? 0;
+    if (salmonSold >= 50) unlockAchievement("salmon_master");
   }
 
   // ── BOT (Tadadev mode) ──────────────────────────────────────────────────────
@@ -943,6 +969,8 @@ export function HomefarmShopGame() {
     setGameOverReason("");
     setLowRatingStreak(0);
     setLoanDebt(0);
+    setUnlockedAchievements(new Set());
+    setNewAchievement(null);
   }
 
   if (gamePhase === "start") {
@@ -1442,6 +1470,17 @@ export function HomefarmShopGame() {
 
         {loanDebt > 0 && (
           <div className="hfs-loan-hud">💳 Nợ: {money(loanDebt)} · Lãi 50k/ngày</div>
+        )}
+
+        {newAchievement && (
+          <div className="hfs-achievement-popup">
+            <div className="hfs-achievement-icon">{newAchievement.icon}</div>
+            <div className="hfs-achievement-body">
+              <div className="hfs-achievement-label">Achievement mở khóa!</div>
+              <div className="hfs-achievement-title">{newAchievement.title}</div>
+              <div className="hfs-achievement-desc">{newAchievement.desc}</div>
+            </div>
+          </div>
         )}
 
         {showLeaderboard && (
