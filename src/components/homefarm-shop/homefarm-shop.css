@@ -2601,6 +2601,76 @@
   box-shadow: 0 2px 0 #2d2118;
 }
 
+/* v3.9 — game over redesign */
+.hfs-gameover-stats {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.hfs-gameover-stats > div {
+  background: #fff;
+  border: 2px solid #2d2118;
+  border-radius: 12px;
+  padding: 7px 8px;
+  text-align: center;
+}
+
+.hfs-gameover-score-cell {
+  grid-column: span 2;
+  background: #fff8e1 !important;
+  border-color: #d71920 !important;
+}
+
+.hfs-gameover-stats span {
+  display: block;
+  font-size: 9px;
+  font-weight: 900;
+  opacity: .6;
+}
+
+.hfs-gameover-stats strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.hfs-gameover-score-cell strong {
+  font-size: 22px;
+  color: #d71920;
+}
+
+.hfs-gameover-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.hfs-gameover-btn-board,
+.hfs-gameover-btn-restart {
+  height: 40px;
+  border: 3px solid #2d2118;
+  border-radius: 14px;
+  box-shadow: 0 3px 0 #2d2118;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.hfs-gameover-btn-board {
+  background: #24c96b;
+  color: #fff;
+}
+
+.hfs-gameover-btn-restart {
+  background: #ffcf3f;
+  color: #2d2118;
+}
+
+
 /* v0.4 gameplay feel */
 .hfs-combo.hot {
   background: linear-gradient(180deg, #ffda62, #ff8a1f);

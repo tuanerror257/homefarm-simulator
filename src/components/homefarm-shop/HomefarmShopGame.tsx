@@ -149,6 +149,8 @@ export function HomefarmShopGame() {
   const [scoreSaved, setScoreSaved] = useState(false);
   const [daySummary, setDaySummary] = useState<EndDaySummaryData | null>(null);
   const [gameOver, setGameOver] = useState(false);
+  const [gameOverReason, setGameOverReason] = useState<"" | "bankrupt" | "stolen" | "reputation">("");
+  const [lowRatingStreak, setLowRatingStreak] = useState(0);
 
   const customer = customers[customerIndex] || null;
   const orderProducts: OrderProduct[] = useMemo(
@@ -215,7 +217,7 @@ export function HomefarmShopGame() {
     if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showLeaderboard || activeEvent || gameOver) return;
 
     const timer = setInterval(() => {
-      setMoodScore((m) => Math.max(0, m - (0.8 + day * 0.035)));
+      setMoodScore((m) => Math.max(0, m - (0.8 + day * 0.035) * 1.3));
       setTimeLeft((t) => {
         if (t <= 1) {
           setCombo(0);
@@ -447,10 +449,30 @@ export function HomefarmShopGame() {
       setCash(cashAfterCost);
       setDaySummary(null);
       setGameOver(true);
+      setGameOverReason("bankrupt");
       return;
     }
 
-    setCash(Math.max(0, cashAfterCost + (nextEvent?.cashDelta ?? 0)));
+    const todayRating = daySummary?.rating ?? 5;
+    const nextLowRatingStreak = todayRating < 2.0 ? lowRatingStreak + 1 : 0;
+    setLowRatingStreak(nextLowRatingStreak);
+    if (nextLowRatingStreak >= 3) {
+      setDaySummary(null);
+      setGameOver(true);
+      setGameOverReason("reputation");
+      return;
+    }
+
+    const cashWithEvent = cashAfterCost + (nextEvent?.cashDelta ?? 0);
+    if (cashWithEvent < 0) {
+      setCash(cashWithEvent);
+      setDaySummary(null);
+      setGameOver(true);
+      setGameOverReason("stolen");
+      return;
+    }
+
+    setCash(cashWithEvent);
 
     setDay(nextDay);
     setRevenue(0);
@@ -502,6 +524,50 @@ export function HomefarmShopGame() {
     } catch {
       setToast("Lưu điểm lỗi. Kiểm tra Supabase table/env nhé.");
     }
+  }
+
+  function resetGame() {
+    audioRef.current?.pause();
+    if (audioRef.current) audioRef.current.currentTime = 0;
+    const initCustomers = generateCustomers(START_PRODUCTS, 1);
+    setGamePhase("start");
+    setProducts(START_PRODUCTS);
+    setDay(1);
+    setCash(1000);
+    setRevenue(0);
+    setProfit(0);
+    setTotalRevenue(0);
+    setTotalProfit(0);
+    setServedCount(0);
+    setServedTodayCount(0);
+    setSkippedTodayCount(0);
+    setMaxCombo(0);
+    setDayMaxCombo(0);
+    setCustomers(initCustomers);
+    setCustomerIndex(0);
+    setSelected([]);
+    setTimeLeft(initCustomers[0].patience);
+    setToast("Tap từng món khách cần mua trên kệ hàng");
+    setShowImport(false);
+    setShowUpgrades(false);
+    setShowCatalogUnlock(false);
+    setShowUpgradeUnlock(false);
+    setShowEventUnlock(false);
+    setImportQty({});
+    setUpgrades(INITIAL_UPGRADES);
+    setCombo(0);
+    setMoodScore(100);
+    setWrongFlash(false);
+    setMascotState("idle");
+    setProductPage(0);
+    setActiveEvent(null);
+    setEventMoodPenalty(0);
+    setShowLeaderboard(false);
+    setScoreSaved(false);
+    setDaySummary(null);
+    setGameOver(false);
+    setGameOverReason("");
+    setLowRatingStreak(0);
   }
 
   if (gamePhase === "start") {
@@ -846,16 +912,37 @@ export function HomefarmShopGame() {
         {gameOver && (
           <div className="hfs-gameover-backdrop">
             <div className="hfs-gameover-panel">
-              <div className="hfs-gameover-icon">💸</div>
-              <div className="hfs-gameover-title">Cửa hàng phá sản!</div>
-              <div className="hfs-gameover-desc">Không đủ tiền chi trả vận hành ngày {day}. Trò chơi kết thúc.</div>
-              <div className="hfs-gameover-score">{currentScore.toLocaleString("vi-VN")} điểm</div>
-              <button
-                className="hfs-summary-next"
-                onClick={async () => { setShowLeaderboard(true); await loadLeaderboard(); }}
-              >
-                🏆 Xem Leaderboard
-              </button>
+              <div className="hfs-gameover-icon">
+                {gameOverReason === "reputation" ? "📉" : "💸"}
+              </div>
+              <div className="hfs-gameover-title">
+                {gameOverReason === "reputation" ? "Mất uy tín!" : "Cửa hàng phá sản!"}
+              </div>
+              <div className="hfs-gameover-desc">
+                {gameOverReason === "bankrupt" && `Không đủ tiền chi trả vận hành ngày ${day}. Trò chơi kết thúc.`}
+                {gameOverReason === "stolen" && `Bị trộm sạch tiền mặt sau khi trả chi phí vận hành ngày ${day}.`}
+                {gameOverReason === "reputation" && "Rating dưới ⭐2.0 ba ngày liên tiếp — khách hàng đã mất niềm tin vào cửa hàng."}
+                {gameOverReason === "" && `Không đủ tiền chi trả vận hành ngày ${day}. Trò chơi kết thúc.`}
+              </div>
+              <div className="hfs-gameover-stats">
+                <div><span>Ngày đạt được</span><strong>{day}</strong></div>
+                <div><span>Doanh thu</span><strong>{money(totalRevenue)}</strong></div>
+                <div><span>Lợi nhuận</span><strong>{money(totalProfit)}</strong></div>
+                <div><span>Khách phục vụ</span><strong>{servedCount}</strong></div>
+                <div><span>Combo tốt nhất</span><strong>x{maxCombo}</strong></div>
+                <div className="hfs-gameover-score-cell"><span>Điểm số</span><strong>{currentScore.toLocaleString("vi-VN")}</strong></div>
+              </div>
+              <div className="hfs-gameover-actions">
+                <button
+                  className="hfs-gameover-btn-board"
+                  onClick={async () => { setShowLeaderboard(true); await loadLeaderboard(); }}
+                >
+                  🏆 Leaderboard
+                </button>
+                <button className="hfs-gameover-btn-restart" onClick={resetGame}>
+                  🔄 Chơi lại
+                </button>
+              </div>
             </div>
           </div>
         )}

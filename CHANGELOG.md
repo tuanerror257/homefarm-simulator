@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.8`
-- Current commit: `f98dbaf`
-- Current rollback tag: `v3.8-cost-breakdown`
+- Current version: `v3.9`
+- Current commit: TBD
+- Current rollback tag: `v3.9-gameover`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,16 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.9 - Game over overhaul + mood pressure
+
+- Added 2 new game over conditions:
+  - **Bị trộm phá sản**: nếu sau khi trả vận hành, event thief đẩy tiền mặt xuống âm → phá sản ngay.
+  - **Mất uy tín**: rating dưới 2.0 sao 3 ngày liên tiếp → cửa hàng mất khách, game over với màn riêng (icon 📉).
+- Game over panel redesigned: icon, tiêu đề, mô tả lý do cụ thể, stats grid (ngày, DT, lãi, phục vụ, combo, điểm), hai nút 🏆 Leaderboard + 🔄 Chơi lại.
+- Nút "Chơi lại" reset toàn bộ trạng thái về start screen (bao gồm BGM).
+- Tăng tốc độ giảm mood ×1.3 để tạo áp lực cao hơn.
+- Tag: `v3.9-gameover`
 
 ### v3.8 - Operating cost breakdown
 
