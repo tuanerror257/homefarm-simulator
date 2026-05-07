@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.20`
+- Current version: `v3.21`
 - Current commit: TBD
-- Current rollback tag: `v3.20-bot-no-save`
+- Current rollback tag: `v3.21-bot-smarter`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,16 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.21 - Bot thông minh hơn
+
+- Bot tự nhập hàng ngay khi khách cần món mà thiếu stock (thay vì bỏ qua).
+- Bot tự fillet cá nguyên nếu thiếu salmon/headBone.
+- Bot auto-upgrade cuối ngày (ưu tiên staff > freezer > sign > knife) khi đủ tiền.
+- Bot auto-chạy ads tờ rơi mỗi ngày từ Day 15.
+- Cuối ngày: broad refill tất cả sản phẩm lên 15 units trước khi qua ngày.
+- Sử dụng ref để đọc state mới nhất trong setTimeout, tránh stale closure.
+- Tag: `v3.21-bot-smarter`
 
 ### v3.20 - Bot không lưu leaderboard
 

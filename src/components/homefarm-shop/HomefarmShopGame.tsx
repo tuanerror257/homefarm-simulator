@@ -187,6 +187,8 @@ export function HomefarmShopGame() {
   const botProductsRef = useRef(products);
   botProductsRef.current = products;
   const botCashRef = useRef(cash);
+  const botUpgradesRef = useRef(upgrades);
+  botUpgradesRef.current = upgrades;
   const orderProducts: OrderProduct[] = useMemo(
     () =>
       customer
@@ -485,6 +487,10 @@ export function HomefarmShopGame() {
     if (!botActive) return;
 
     const t = setTimeout(() => {
+      const curProducts = botProductsRef.current;
+      const curCash = botCashRef.current;
+      const curUpgrades = botUpgradesRef.current;
+
       // 1. Dismiss any blocking overlay
       if (showCatalogUnlock) { setShowCatalogUnlock(false); return; }
       if (showUpgradeUnlock) { setShowUpgradeUnlock(false); return; }
@@ -498,38 +504,85 @@ export function HomefarmShopGame() {
       // 2. Game over → restart after 3s
       if (gameOver) { setTimeout(resetGame, 3000); return; }
 
-      // 3. End-day summary → advance day
+      // 3. End-day summary → advance
       if (daySummary) { startNextDay(); return; }
 
-      // 4. No customer left → refill stock then end day
+      // 4. No customer → upgrade / ads / refill / end day
       if (!customer) {
-        const TARGET = 20;
-        let cost = 0;
-        const refilled = botProductsRef.current.map((p) => {
+        // Auto-upgrade: one per tick, priority staff > freezer > sign > knife
+        if (upgradesUnlocked) {
+          const upgradeOrder: ShopUpgradeId[] = ["staff", "freezer", "sign", "knife"];
+          for (const upId of upgradeOrder) {
+            const level = curUpgrades[upId];
+            if (level >= MAX_UPGRADE_LEVEL) continue;
+            const cost = UPGRADE_DEFS.find((u) => u.id === upId)!.costs[level];
+            if (curCash >= cost + 1500) { buyUpgrade(upId); return; }
+          }
+        }
+
+        // Auto-run leaflet ad once per day if affordable
+        if (day >= AD_UNLOCK_DAY && !adRunToday && curCash > 1000) {
+          runAd(AD_TYPES[0]);
+          return;
+        }
+
+        // Broad refill: top up all importable products to TARGET units
+        const TARGET = 15;
+        let refillCost = 0;
+        const refilled = curProducts.map((p) => {
           if (p.cost <= 0) return p;
           const need = Math.max(0, TARGET - p.stock);
-          cost += need * p.cost;
+          refillCost += need * p.cost;
           return need > 0 ? { ...p, stock: p.stock + need } : p;
         });
-        if (cost > 0 && botCashRef.current >= cost) {
+        if (refillCost > 0 && curCash >= refillCost) {
           setProducts(refilled);
-          setCash((c) => c - cost);
+          setCash((c) => c - refillCost);
         }
         endDay();
         return;
       }
 
-      // 5. Select next needed item that has enough stock
-      const nextItem = customer.order.find((item) => {
-        if (selected.includes(item.id)) return false;
-        const p = botProductsRef.current.find((pr) => pr.id === item.id);
-        return (p?.stock ?? 0) >= item.qty;
+      // 5. Has customer — fix stock shortages before selecting
+      const shortItems = customer.order.filter((item) => {
+        const p = curProducts.find((pr) => pr.id === item.id);
+        return (p?.stock ?? 0) < item.qty;
       });
+
+      if (shortItems.length > 0) {
+        // Try filleting wholeSalmon first if salmon/headBone is short
+        const needsFillet = shortItems.some((s) => s.id === "salmon" || s.id === "headBone");
+        if (needsFillet) {
+          const wholeStock = curProducts.find((p) => p.id === "wholeSalmon")?.stock ?? 0;
+          if (wholeStock >= 1) { fillet(); return; }
+        }
+
+        // Direct import for everything else that's short
+        let importCost = 0;
+        const withImport = curProducts.map((p) => {
+          const short = shortItems.find((s) => s.id === p.id);
+          if (!short || p.cost <= 0) return p;
+          const need = Math.ceil(short.qty - p.stock) + 3;
+          importCost += need * p.cost;
+          return { ...p, stock: p.stock + need };
+        });
+        if (importCost > 0 && curCash >= importCost) {
+          setProducts(withImport);
+          setCash((c) => c - importCost);
+          return; // re-check next tick
+        }
+        // Still can't fulfill → skip
+        skipCustomer("🤖 Bot bỏ qua — không đủ tiền nhập hàng.");
+        return;
+      }
+
+      // 6. Select next unselected item
+      const nextItem = customer.order.find((item) => !selected.includes(item.id));
       if (nextItem) { tapProduct(nextItem.id); return; }
 
-      // 6. All selectable items picked — deliver if complete, else skip
+      // 7. All items selected → deliver
       if (isComplete) { deliver(); return; }
-      skipCustomer("🤖 Bot bỏ qua — thiếu hàng.");
+      skipCustomer("🤖 Bot bỏ qua.");
     }, 650);
 
     return () => clearTimeout(t);
@@ -539,6 +592,7 @@ export function HomefarmShopGame() {
     showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock,
     showImport, showUpgrades, showAds, activeEvent,
     gameOver, daySummary, customer, selected, isComplete,
+    upgrades, adRunToday, day,
   ]);
   // ── END BOT ─────────────────────────────────────────────────────────────────
 
