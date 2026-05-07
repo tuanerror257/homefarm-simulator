@@ -46,6 +46,8 @@ export type EndDaySummaryData = {
   skipped: number;
   combo: number;
   rating: number;
+  operatingCost: number;
+  cashAfterCost: number;
 };
 
 export type MascotState =

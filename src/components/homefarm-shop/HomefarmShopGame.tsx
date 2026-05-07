@@ -29,6 +29,16 @@ const PRODUCT_EXPANSION_DAY = 6;
 const UPGRADE_UNLOCK_DAY = 8;
 const EVENT_UNLOCK_DAY = 12;
 const MAX_UPGRADE_LEVEL = 3;
+const OPERATING_COSTS = [
+  { untilDay: 5, amount: 400 },
+  { untilDay: 11, amount: 650 },
+  { untilDay: Infinity, amount: 950 },
+] as const;
+
+function getOperatingCost(day: number): number {
+  return (OPERATING_COSTS.find((t) => day <= t.untilDay) ?? OPERATING_COSTS[OPERATING_COSTS.length - 1]).amount;
+}
+
 const INITIAL_UPGRADES: ShopUpgrades = {
   freezer: 0,
   knife: 0,
@@ -135,6 +145,7 @@ export function HomefarmShopGame() {
   const [playerName, setPlayerName] = useState("Tada");
   const [scoreSaved, setScoreSaved] = useState(false);
   const [daySummary, setDaySummary] = useState<EndDaySummaryData | null>(null);
+  const [gameOver, setGameOver] = useState(false);
 
   const customer = customers[customerIndex] || null;
   const orderProducts: OrderProduct[] = useMemo(
@@ -198,7 +209,7 @@ export function HomefarmShopGame() {
   }, [customerIndex, day, customer, eventMoodPenalty]);
 
   useEffect(() => {
-    if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showLeaderboard || activeEvent) return;
+    if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showLeaderboard || activeEvent || gameOver) return;
 
     const timer = setInterval(() => {
       setMoodScore((m) => Math.max(0, m - (0.8 + day * 0.035)));
@@ -398,6 +409,7 @@ export function HomefarmShopGame() {
       1,
       Math.min(5, Number((5 - skippedTotal * 0.35 + servedTodayCount * 0.08).toFixed(1))),
     );
+    const opCost = getOperatingCost(day);
 
     setDaySummary({
       revenue,
@@ -407,12 +419,16 @@ export function HomefarmShopGame() {
       skipped: skippedTotal,
       combo: dayMaxCombo,
       rating,
+      operatingCost: opCost,
+      cashAfterCost: cash - opCost,
     });
   }
 
   function startNextDay() {
     const remainingCustomers = Math.max(0, customers.length - customerIndex);
     const nextDay = day + 1;
+    const opCost = getOperatingCost(day);
+    const cashAfterCost = cash - opCost;
 
     const overnightSpoilage = applyOvernightSpoilage(products, { freezerLevel: upgrades.freezer });
     const unlockedProducts = getUnlockedProducts(nextDay, overnightSpoilage.products);
@@ -424,9 +440,14 @@ export function HomefarmShopGame() {
       rainyDay: nextEvent?.id === "rainy-day",
     });
 
-    if (nextEvent?.cashDelta) {
-      setCash((value) => Math.max(0, value + nextEvent.cashDelta!));
+    if (cashAfterCost < 0) {
+      setCash(cashAfterCost);
+      setDaySummary(null);
+      setGameOver(true);
+      return;
     }
+
+    setCash(Math.max(0, cashAfterCost + (nextEvent?.cashDelta ?? 0)));
 
     setDay(nextDay);
     setRevenue(0);
@@ -812,6 +833,23 @@ export function HomefarmShopGame() {
               </div>
               <button className="hfs-unlock-btn" onClick={() => setShowEventUnlock(false)}>
                 Đã hiểu
+              </button>
+            </div>
+          </div>
+        )}
+
+        {gameOver && (
+          <div className="hfs-gameover-backdrop">
+            <div className="hfs-gameover-panel">
+              <div className="hfs-gameover-icon">💸</div>
+              <div className="hfs-gameover-title">Cửa hàng phá sản!</div>
+              <div className="hfs-gameover-desc">Không đủ tiền chi trả vận hành ngày {day}. Trò chơi kết thúc.</div>
+              <div className="hfs-gameover-score">{currentScore.toLocaleString("vi-VN")} điểm</div>
+              <button
+                className="hfs-summary-next"
+                onClick={async () => { setShowLeaderboard(true); await loadLeaderboard(); }}
+              >
+                🏆 Xem Leaderboard
               </button>
             </div>
           </div>

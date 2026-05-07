@@ -23,7 +23,19 @@ export default function EndDaySummary({ data, onNext, day }: EndDaySummaryProps)
           <div><span>Bỏ qua</span><strong>{data.skipped}</strong></div>
           <div><span>Combo max</span><strong>x{data.combo}</strong></div>
           <div><span>Rating</span><strong>{data.rating}/5</strong></div>
+          <div className="hfs-summary-cost-row">
+            <span>Chi phí VH</span>
+            <strong className="hfs-summary-cost">-{money(data.operatingCost)}</strong>
+          </div>
+          <div className="hfs-summary-cost-row">
+            <span>Tiền còn lại</span>
+            <strong className={data.cashAfterCost < 0 ? "hfs-summary-cost" : ""}>{money(data.cashAfterCost)}</strong>
+          </div>
         </div>
+
+        {data.cashAfterCost < 0 && (
+          <div className="hfs-summary-warning">⚠️ Không đủ tiền — cửa hàng sẽ phá sản!</div>
+        )}
 
         <button onClick={onNext} className="hfs-summary-next">
           Sang ngày {day + 1}
