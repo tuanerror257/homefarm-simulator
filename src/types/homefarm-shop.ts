@@ -46,6 +46,15 @@ export type OperatingCostBreakdown = {
   total: number;
 };
 
+export type ProductStat = {
+  id: string;
+  name: string;
+  icon: string;
+  unit: string;
+  soldQty: number;
+  revenue: number;
+};
+
 export type EndDaySummaryData = {
   revenue: number;
   profit: number;
@@ -56,6 +65,8 @@ export type EndDaySummaryData = {
   rating: number;
   operatingCost: OperatingCostBreakdown;
   cashAfterCost: number;
+  topSellers: ProductStat[];
+  excessStock: { name: string; icon: string; stock: number; unit: string }[];
 };
 
 export type MascotState =

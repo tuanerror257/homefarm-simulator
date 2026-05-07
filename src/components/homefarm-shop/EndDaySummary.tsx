@@ -42,6 +42,30 @@ export default function EndDaySummary({ data, onNext, day }: EndDaySummaryProps)
           <strong>{money(cashAfterCost)}</strong>
         </div>
 
+        {data.topSellers.length > 0 && (
+          <div className="hfs-stat-section">
+            <div className="hfs-stat-label">🔥 Bán chạy hôm nay</div>
+            {data.topSellers.map((s) => (
+              <div key={s.id} className="hfs-stat-row">
+                <span>{s.icon} {s.name}</span>
+                <span>{s.soldQty % 1 === 0 ? s.soldQty : s.soldQty.toFixed(1)} {s.unit} · {money(s.revenue)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {data.excessStock.length > 0 && (
+          <div className="hfs-stat-section warning">
+            <div className="hfs-stat-label">📦 Tồn kho nhiều, chưa bán</div>
+            {data.excessStock.map((s) => (
+              <div key={s.name} className="hfs-stat-row">
+                <span>{s.icon} {s.name}</span>
+                <span>{s.stock % 1 === 0 ? s.stock : s.stock.toFixed(1)} {s.unit} tồn</span>
+              </div>
+            ))}
+          </div>
+        )}
+
         {cashAfterCost < 0 && (
           <div className="hfs-summary-warning">⚠️ Không đủ tiền — cửa hàng sẽ phá sản!</div>
         )}

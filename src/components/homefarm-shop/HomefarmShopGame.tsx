@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { EndDaySummaryData, MascotState, OperatingCostBreakdown, Product, ShopEvent, ShopUpgradeId, ShopUpgrades } from "@/types/homefarm-shop";
+import type { EndDaySummaryData, MascotState, OperatingCostBreakdown, Product, ProductStat, ShopEvent, ShopUpgradeId, ShopUpgrades } from "@/types/homefarm-shop";
 import { MASCOT_ASSETS, MASCOT_TALK, START_PRODUCTS } from "@/lib/homefarm-shop/data";
 import { GAME_VERSION } from "@/config/version";
 import {
@@ -150,6 +150,7 @@ export function HomefarmShopGame() {
   const [servedCount, setServedCount] = useState(0);
   const [servedTodayCount, setServedTodayCount] = useState(0);
   const [skippedTodayCount, setSkippedTodayCount] = useState(0);
+  const [soldByProduct, setSoldByProduct] = useState<Record<string, { qty: number; revenue: number }>>({});
   const [maxCombo, setMaxCombo] = useState(0);
   const [dayMaxCombo, setDayMaxCombo] = useState(0);
   const [customers, setCustomers] = useState(() => generateCustomers(START_PRODUCTS, 1));
@@ -385,6 +386,14 @@ export function HomefarmShopGame() {
     setTotalProfit((v) => v + thisOrderProfit);
     setServedCount((v) => v + 1);
     setServedTodayCount((v) => v + 1);
+    setSoldByProduct((prev) => {
+      const next = { ...prev };
+      for (const item of customer.order) {
+        const itemRevenue = item.qty * (products.find((p) => p.id === item.id)?.price ?? 0);
+        next[item.id] = { qty: (next[item.id]?.qty ?? 0) + item.qty, revenue: (next[item.id]?.revenue ?? 0) + itemRevenue };
+      }
+      return next;
+    });
     setCombo(nextCombo);
     setMaxCombo((v) => Math.max(v, nextCombo));
     setDayMaxCombo((v) => Math.max(v, nextCombo));
@@ -499,6 +508,19 @@ export function HomefarmShopGame() {
     );
     const opCost = getOperatingCost(day);
 
+    const topSellers: ProductStat[] = Object.entries(soldByProduct)
+      .map(([id, stat]) => {
+        const p = products.find((pr) => pr.id === id);
+        return { id, name: p?.name ?? id, icon: p?.icon ?? "📦", unit: p?.unit ?? "", soldQty: stat.qty, revenue: stat.revenue };
+      })
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 3);
+
+    const excessStock = products
+      .filter((p) => p.cost > 0 && p.stock > 5 && !soldByProduct[p.id])
+      .map((p) => ({ name: p.name, icon: p.icon, stock: p.stock, unit: p.unit }))
+      .slice(0, 3);
+
     setDaySummary({
       revenue,
       profit,
@@ -509,6 +531,8 @@ export function HomefarmShopGame() {
       rating,
       operatingCost: opCost,
       cashAfterCost: cash - opCost.total,
+      topSellers,
+      excessStock,
     });
   }
 
@@ -816,6 +840,7 @@ export function HomefarmShopGame() {
     setProfit(0);
     setServedTodayCount(0);
     setSkippedTodayCount(0);
+    setSoldByProduct({});
     setProducts(nextProducts);
     setCustomers(nextCustomers);
     setCustomerIndex(0);
@@ -884,6 +909,7 @@ export function HomefarmShopGame() {
     setServedCount(0);
     setServedTodayCount(0);
     setSkippedTodayCount(0);
+    setSoldByProduct({});
     setMaxCombo(0);
     setDayMaxCombo(0);
     setCustomers(initCustomers);
