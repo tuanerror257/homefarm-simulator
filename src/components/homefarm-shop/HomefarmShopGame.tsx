@@ -13,6 +13,7 @@ import {
   generateCustomers,
   getDailyCost,
   getDailyCostDelta,
+  getDayTheme,
   getStockShortageMessage,
   getUnlockedProducts,
   maybeCreateEvent,
@@ -1031,6 +1032,11 @@ export function HomefarmShopGame() {
               <MiniHud label="DAY" value={day} />
               <MiniHud label="DT NGÀY" value={money(revenue)} />
               <MiniHud label="LÃI NGÀY" value={money(profit)} />
+              {getDayTheme(day) !== "normal" && (
+                <span className={`hfs-theme-badge ${getDayTheme(day)}`}>
+                  {getDayTheme(day) === "busy" ? "🔥 Mùa bận" : "😴 Ế ẩm"}
+                </span>
+              )}
             </div>
           </div>
         </header>

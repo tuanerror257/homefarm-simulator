@@ -1119,6 +1119,25 @@
   font-size: 8px;
 }
 
+.hfs-theme-badge {
+  font-size: 9px;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 8px;
+  white-space: nowrap;
+  align-self: center;
+}
+.hfs-theme-badge.busy {
+  background: #ff4d4d22;
+  color: #d63031;
+  border: 1px solid #d6303166;
+}
+.hfs-theme-badge.slow {
+  background: #74b9ff22;
+  color: #0984e3;
+  border: 1px solid #0984e366;
+}
+
 .hfs-customer-zone {
   height: 218px;
   flex-basis: 218px;

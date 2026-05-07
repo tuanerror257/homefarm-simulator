@@ -206,16 +206,26 @@ function boostVipOrder(order: Customer["order"]) {
   });
 }
 
+// Tuần bận: day 6-8, 13-15, 20-22, 27-28. Tuần chậm: day 9-10, 16-17, 23-24.
+export function getDayTheme(day: number): "busy" | "slow" | "normal" {
+  const BUSY_DAYS = [6,7,8,13,14,15,20,21,22,27,28];
+  const SLOW_DAYS = [9,10,16,17,23,24];
+  if (BUSY_DAYS.includes(day)) return "busy";
+  if (SLOW_DAYS.includes(day)) return "slow";
+  return "normal";
+}
+
 function customersCountByDay(day: number) {
   // Tăng nhẹ theo ngày để ngày sau đông khách hơn nhưng không quá loạn UI.
   if (day <= 5) return 3 + day; // 4 -> 8 khách
   return Math.min(8 + Math.floor((day - 5) * 0.55), 18);
 }
 
-function patienceByDay(type: CustomerType, day: number, staffLevel = 0) {
+function patienceByDay(type: CustomerType, day: number, staffLevel = 0, theme: "busy" | "slow" | "normal" = "normal") {
   const pressure = day <= 5 ? 0 : (day - 5) * 0.55;
   const randomBonus = Math.random() * 5;
-  return Math.max(8, Math.round(type.patience - pressure + randomBonus + staffLevel * 2.5));
+  const themeMod = theme === "busy" ? -4 : theme === "slow" ? 3 : 0;
+  return Math.max(8, Math.round(type.patience - pressure + randomBonus + staffLevel * 2.5 + themeMod));
 }
 
 export function generateCustomers(
@@ -226,9 +236,17 @@ export function generateCustomers(
     staffLevel?: number;
     rainyDay?: boolean;
     extraCount?: number;
+    theme?: "busy" | "slow" | "normal";
   } = {},
 ): Customer[] {
-  const count = customersCountByDay(day) + (options.extraCount ?? 0);
+  const theme = options.theme ?? getDayTheme(day);
+  const baseCount = customersCountByDay(day);
+  const themedCount = theme === "busy"
+    ? Math.round(baseCount * 1.2)
+    : theme === "slow"
+      ? Math.round(baseCount * 0.75)
+      : baseCount;
+  const count = themedCount + (options.extraCount ?? 0);
   const signLevel = options.signLevel ?? 0;
   const staffLevel = options.staffLevel ?? 0;
   const rainyDay = options.rainyDay ?? false;
@@ -245,7 +263,7 @@ export function generateCustomers(
     }
     const appOrder = type.name === "Shipper app" || (!isVip && rainyDay && Math.random() < 0.18);
     const order = buildOrder(products, type, isVip ? day + 5 : day);
-    const patience = patienceByDay(type, day, staffLevel);
+    const patience = patienceByDay(type, day, staffLevel, theme);
 
     return {
       ...type,
