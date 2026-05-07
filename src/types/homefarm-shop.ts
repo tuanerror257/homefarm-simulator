@@ -38,6 +38,14 @@ export type ShopUpgradeId = "freezer" | "knife" | "sign" | "staff";
 
 export type ShopUpgrades = Record<ShopUpgradeId, number>;
 
+export type OperatingCostBreakdown = {
+  rent: number;
+  staff: number;
+  utilities: number;
+  other: number;
+  total: number;
+};
+
 export type EndDaySummaryData = {
   revenue: number;
   profit: number;
@@ -46,7 +54,7 @@ export type EndDaySummaryData = {
   skipped: number;
   combo: number;
   rating: number;
-  operatingCost: number;
+  operatingCost: OperatingCostBreakdown;
   cashAfterCost: number;
 };
 

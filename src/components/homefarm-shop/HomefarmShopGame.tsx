@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { EndDaySummaryData, MascotState, Product, ShopEvent, ShopUpgradeId, ShopUpgrades } from "@/types/homefarm-shop";
+import type { EndDaySummaryData, MascotState, OperatingCostBreakdown, Product, ShopEvent, ShopUpgradeId, ShopUpgrades } from "@/types/homefarm-shop";
 import { MASCOT_ASSETS, MASCOT_TALK, START_PRODUCTS } from "@/lib/homefarm-shop/data";
 import { GAME_VERSION } from "@/config/version";
 import {
@@ -29,14 +29,17 @@ const PRODUCT_EXPANSION_DAY = 6;
 const UPGRADE_UNLOCK_DAY = 8;
 const EVENT_UNLOCK_DAY = 12;
 const MAX_UPGRADE_LEVEL = 3;
-const OPERATING_COSTS = [
-  { untilDay: 5, amount: 400 },
-  { untilDay: 11, amount: 650 },
-  { untilDay: Infinity, amount: 950 },
+const OPERATING_COST_TIERS = [
+  { untilDay: 5,        rent: 200, staff: 150, utilities: 30,  otherMin: 10, otherMax: 50  },
+  { untilDay: 11,       rent: 280, staff: 250, utilities: 70,  otherMin: 30, otherMax: 80  },
+  { untilDay: Infinity, rent: 350, staff: 400, utilities: 100, otherMin: 50, otherMax: 150 },
 ] as const;
 
-function getOperatingCost(day: number): number {
-  return (OPERATING_COSTS.find((t) => day <= t.untilDay) ?? OPERATING_COSTS[OPERATING_COSTS.length - 1]).amount;
+function getOperatingCost(day: number): OperatingCostBreakdown {
+  const tier = OPERATING_COST_TIERS.find((t) => day <= t.untilDay) ?? OPERATING_COST_TIERS[OPERATING_COST_TIERS.length - 1];
+  const other = Math.round((Math.random() * (tier.otherMax - tier.otherMin) + tier.otherMin) / 10) * 10;
+  const total = tier.rent + tier.staff + tier.utilities + other;
+  return { rent: tier.rent, staff: tier.staff, utilities: tier.utilities, other, total };
 }
 
 const INITIAL_UPGRADES: ShopUpgrades = {
@@ -420,15 +423,15 @@ export function HomefarmShopGame() {
       combo: dayMaxCombo,
       rating,
       operatingCost: opCost,
-      cashAfterCost: cash - opCost,
+      cashAfterCost: cash - opCost.total,
     });
   }
 
   function startNextDay() {
     const remainingCustomers = Math.max(0, customers.length - customerIndex);
     const nextDay = day + 1;
-    const opCost = getOperatingCost(day);
-    const cashAfterCost = cash - opCost;
+    const opTotal = daySummary?.operatingCost?.total ?? 0;
+    const cashAfterCost = cash - opTotal;
 
     const overnightSpoilage = applyOvernightSpoilage(products, { freezerLevel: upgrades.freezer });
     const unlockedProducts = getUnlockedProducts(nextDay, overnightSpoilage.products);
