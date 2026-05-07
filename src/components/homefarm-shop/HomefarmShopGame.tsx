@@ -479,7 +479,7 @@ export function HomefarmShopGame() {
           <div className="hfs-bg" />
           <div className="hfs-version-badge">v{GAME_VERSION}</div>
           <StartScreen onStart={() => {}} dimmed />
-          <TutorialModal onConfirm={() => setGamePhase("playing")} />
+          <TutorialModal onConfirm={(name) => { if (name) setPlayerName(name); setGamePhase("playing"); }} />
         </div>
       </div>
     );
@@ -940,7 +940,8 @@ function StartScreen({ onStart, dimmed }: { onStart: () => void; dimmed?: boolea
   );
 }
 
-function TutorialModal({ onConfirm }: { onConfirm: () => void }) {
+function TutorialModal({ onConfirm }: { onConfirm: (name: string) => void }) {
+  const [name, setName] = useState("");
   const features = [
     { icon: "🛒", name: "Đặt hàng và quản lý hàng hoá", desc: "Chọn sản phẩm phù hợp, nhập hàng và xử lý hàng hoá." },
     { icon: "👥", name: "Phục vụ khách hàng", desc: "Đáp ứng nhu cầu đa dạng và giữ cho khách luôn hài lòng." },
@@ -963,6 +964,18 @@ function TutorialModal({ onConfirm }: { onConfirm: () => void }) {
           Bạn sẽ vào vai quản lý cửa hàng Homefarm — nhập hàng, phục vụ khách và phát triển cửa hàng ngày một lớn mạnh!
         </div>
 
+        <div className="hfs-tutorial-name-wrap">
+          <label className="hfs-tutorial-name-label">👤 NHẬP TÊN NGƯỜI CHƠI</label>
+          <input
+            className="hfs-tutorial-name-input"
+            type="text"
+            placeholder="Tên của bạn..."
+            maxLength={24}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+
         <div className="hfs-tutorial-features">
           {features.map((f) => (
             <div key={f.name} className="hfs-tutorial-feature">
@@ -975,7 +988,11 @@ function TutorialModal({ onConfirm }: { onConfirm: () => void }) {
           ))}
         </div>
 
-        <button className="hfs-tutorial-btn" onClick={onConfirm}>
+        <button
+          className="hfs-tutorial-btn"
+          onClick={() => onConfirm(name.trim())}
+          disabled={!name.trim()}
+        >
           OK, VÀO CA BÁN! 🚀
         </button>
       </div>
