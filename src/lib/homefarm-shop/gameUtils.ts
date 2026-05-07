@@ -1,4 +1,4 @@
-import type { Customer, CustomerType, Product, ShopEvent } from "@/types/homefarm-shop";
+import type { AchievementId, Customer, CustomerType, Product, ShopEvent } from "@/types/homefarm-shop";
 import { ALL_PRODUCTS, CUSTOMER_TYPES, SHOP_EVENTS } from "./data";
 
 const PRODUCT_WEIGHTS: Record<string, number> = {
@@ -437,6 +437,36 @@ export function getDailyCostDelta(product: Product, day: number): number {
   return Math.round(((dailyCost - product.cost) / product.cost) * 100);
 }
 
+export const ACHIEVEMENT_BONUS: Partial<Record<AchievementId, number>> = {
+  // Dễ
+  first_serve:     200,
+  combo_5:         500,
+  sold_egg_50:     500,
+  bulk_save_200:   500,
+  sold_dairy_100:  800,
+  sold_shrimp_50:  700,
+  // Trung bình
+  combo_10:        1500,
+  perfect_day:     1500,
+  total_100:       1200,
+  sold_sashimi_30: 800,
+  sold_salmon_100: 1200,
+  sold_beef_100:   1200,
+  sold_pork_100:   1000,
+  sold_fruit_100:  1000,
+  bulk_save_500:   1000,
+  bulk_save_1000:  1500,
+  // Khó
+  big_revenue:     2000,
+  sold_seafood_200: 2000,
+  sold_meat_200:   2000,
+  bulk_save_1500:  2000,
+  // Rất khó
+  salmon_master:   2500,
+  bulk_save_2000:  3000,
+  millionaire:     5000,
+};
+
 export function calculateScore(params: {
   day: number;
   cash: number;
@@ -444,7 +474,11 @@ export function calculateScore(params: {
   totalProfit: number;
   servedCount: number;
   maxCombo: number;
+  unlockedAchievements?: Set<AchievementId>;
 }) {
+  const achievementBonus = params.unlockedAchievements
+    ? Array.from(params.unlockedAchievements).reduce((s, id) => s + (ACHIEVEMENT_BONUS[id] ?? 0), 0)
+    : 0;
   return Math.max(
     0,
     Math.round(
@@ -453,7 +487,8 @@ export function calculateScore(params: {
         params.totalProfit * 2.2 +
         params.servedCount * 90 +
         params.day * 120 +
-        params.maxCombo * 220,
+        params.maxCombo * 220 +
+        achievementBonus,
     ),
   );
 }

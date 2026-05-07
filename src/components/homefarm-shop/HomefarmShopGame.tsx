@@ -327,6 +327,7 @@ export function HomefarmShopGame() {
     totalProfit,
     servedCount,
     maxCombo,
+    unlockedAchievements,
   });
 
   const comboMultiplier = combo >= 10 ? 2 : combo >= 5 ? 1.5 : combo >= 3 ? 1.2 : 1;
