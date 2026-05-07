@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.18`
+- Current version: `v3.19`
 - Current commit: TBD
-- Current rollback tag: `v3.18-ad-unlock-modal`
+- Current rollback tag: `v3.19-bot`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,15 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.19 - Bot tự chơi (Tadadev mode)
+
+- Nhập tên **Tadadev** ở màn tutorial để kích hoạt bot tự chơi.
+- Bot tự động: chọn món → giao hàng → bỏ qua khách thiếu hàng → hết hàng thì auto nhập → qua ngày → dismiss mọi modal.
+- Game over: bot tự restart sau 3 giây.
+- Badge 🤖 BOT hiện ở góc trên trái khi bot đang chạy.
+- Bot chạy vô tận để test toàn bộ flow, events, unlock theo ngày.
+- Tag: `v3.19-bot`
 
 ### v3.18 - Ad unlock modal chi tiết
 

@@ -181,6 +181,12 @@ export function HomefarmShopGame() {
   const [lowRatingStreak, setLowRatingStreak] = useState(0);
 
   const customer = customers[customerIndex] || null;
+  const botActive = playerName.toLowerCase() === "tadadev" && gamePhase === "playing";
+
+  // Refs so bot setTimeout always reads latest state
+  const botProductsRef = useRef(products);
+  botProductsRef.current = products;
+  const botCashRef = useRef(cash);
   const orderProducts: OrderProduct[] = useMemo(
     () =>
       customer
@@ -195,6 +201,8 @@ export function HomefarmShopGame() {
   const isComplete = Boolean(customer && done === customer.order.length);
   const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
   const visibleProducts = products.slice(productPage * PAGE_SIZE, productPage * PAGE_SIZE + PAGE_SIZE);
+
+  botCashRef.current = cash;
 
   const bill = useMemo(() => orderProducts.reduce((s, p) => s + p.price * p.wantQty, 0), [orderProducts]);
   const orderProfit = useMemo(() => orderProducts.reduce((s, p) => s + (p.price - p.cost) * p.wantQty, 0), [orderProducts]);
@@ -472,6 +480,68 @@ export function HomefarmShopGame() {
     });
   }
 
+  // ── BOT (Tadadev mode) ──────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!botActive) return;
+
+    const t = setTimeout(() => {
+      // 1. Dismiss any blocking overlay
+      if (showCatalogUnlock) { setShowCatalogUnlock(false); return; }
+      if (showUpgradeUnlock) { setShowUpgradeUnlock(false); return; }
+      if (showEventUnlock)   { setShowEventUnlock(false);   return; }
+      if (showAdUnlock)      { setShowAdUnlock(false);      return; }
+      if (showImport)        { setShowImport(false);        return; }
+      if (showUpgrades)      { setShowUpgrades(false);      return; }
+      if (showAds)           { setShowAds(false);           return; }
+      if (activeEvent)       { setActiveEvent(null);        return; }
+
+      // 2. Game over → restart after 3s
+      if (gameOver) { setTimeout(resetGame, 3000); return; }
+
+      // 3. End-day summary → advance day
+      if (daySummary) { startNextDay(); return; }
+
+      // 4. No customer left → refill stock then end day
+      if (!customer) {
+        const TARGET = 20;
+        let cost = 0;
+        const refilled = botProductsRef.current.map((p) => {
+          if (p.cost <= 0) return p;
+          const need = Math.max(0, TARGET - p.stock);
+          cost += need * p.cost;
+          return need > 0 ? { ...p, stock: p.stock + need } : p;
+        });
+        if (cost > 0 && botCashRef.current >= cost) {
+          setProducts(refilled);
+          setCash((c) => c - cost);
+        }
+        endDay();
+        return;
+      }
+
+      // 5. Select next needed item that has enough stock
+      const nextItem = customer.order.find((item) => {
+        if (selected.includes(item.id)) return false;
+        const p = botProductsRef.current.find((pr) => pr.id === item.id);
+        return (p?.stock ?? 0) >= item.qty;
+      });
+      if (nextItem) { tapProduct(nextItem.id); return; }
+
+      // 6. All selectable items picked — deliver if complete, else skip
+      if (isComplete) { deliver(); return; }
+      skipCustomer("🤖 Bot bỏ qua — thiếu hàng.");
+    }, 650);
+
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    botActive,
+    showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock,
+    showImport, showUpgrades, showAds, activeEvent,
+    gameOver, daySummary, customer, selected, isComplete,
+  ]);
+  // ── END BOT ─────────────────────────────────────────────────────────────────
+
   function runAd(type: typeof AD_TYPES[number]) {
     const cost = Math.round((Math.random() * (type.costMax - type.costMin) + type.costMin) / 10) * 10;
     const extra = Math.floor(Math.random() * (type.extraMax - type.extraMin + 1)) + type.extraMin;
@@ -667,6 +737,7 @@ export function HomefarmShopGame() {
       <div className={`hfs-phone ${wrongFlash ? "wrong" : ""}`}>
         <div className="hfs-bg" />
         <div className="hfs-version-badge">v{GAME_VERSION}</div>
+        {botActive && <div className="hfs-bot-badge">🤖 BOT</div>}
         <button className="hfs-mute-btn" onClick={() => setMuted(m => !m)} aria-label="Toggle music">
           {muted ? "🔇" : "🔊"}
         </button>
