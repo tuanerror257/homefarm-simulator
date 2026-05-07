@@ -638,8 +638,9 @@ export function HomefarmShopGame() {
             </div>
           </section>
 
-          <div className="hfs-toast">💬 {toast}</div>
         </main>
+
+        <div className="hfs-toast">💬 {toast}</div>
 
         <footer className="hfs-footer">
           <button onClick={fillet} className="hfs-action hfs-fillet">🔪 Fillet</button>

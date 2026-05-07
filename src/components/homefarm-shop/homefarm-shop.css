@@ -1606,8 +1606,8 @@
 }
 
 .hfs-shelf {
-  height: 314px;
-  flex-basis: 314px;
+  flex: 1;
+  min-height: 0;
   border-radius: 22px;
   padding: 7px;
 }
@@ -1680,11 +1680,11 @@
 
 .hfs-toast {
   height: 26px;
-  flex-basis: 26px;
-  border-radius: 14px;
-  padding: 5px 11px;
+  flex: 0 0 26px;
+  border-radius: 0;
+  padding: 5px 12px;
   font-size: 10px;
-  margin-top: auto;
+  margin: 0;
 }
 
 .hfs-leaderboard-btn,
@@ -1811,8 +1811,8 @@
 }
 
 .hfs-shelf {
-  height: 298px;
-  flex-basis: 298px;
+  flex: 1;
+  height: auto;
 }
 
 .hfs-toast {
@@ -1840,8 +1840,8 @@
   }
 
   .hfs-shelf {
-    height: 286px;
-    flex-basis: 286px;
+    flex: 1;
+    height: auto;
   }
 }
 
@@ -2100,8 +2100,8 @@
   }
 
   .hfs-shelf {
-    height: 270px;
-    flex-basis: 270px;
+    flex: 1;
+    height: auto;
   }
 
   .hfs-product-icon {
