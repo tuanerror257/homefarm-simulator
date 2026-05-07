@@ -1040,6 +1040,7 @@
   flex-direction: column;
   gap: 7px;
   z-index: 3;
+  overflow: hidden;
 }
 
 .hfs-dashboard-main {
