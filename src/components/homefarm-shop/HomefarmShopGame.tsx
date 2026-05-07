@@ -475,10 +475,12 @@ export function HomefarmShopGame() {
   }
 
   function endDay() {
-    const skippedTotal = skippedTodayCount + Math.max(0, customers.length - customerIndex);
+    const remaining = Math.max(0, customers.length - customerIndex);
+    const skippedTotal = skippedTodayCount + remaining;
+    // Rating chỉ tính khách bị bỏ qua (timer hết / hết hàng), không phạt khách chưa tới lượt
     const rating = Math.max(
       1,
-      Math.min(5, Number((5 - skippedTotal * 0.35 + servedTodayCount * 0.08).toFixed(1))),
+      Math.min(5, Number((5 - skippedTodayCount * 0.35 + servedTodayCount * 0.08).toFixed(1))),
     );
     const opCost = getOperatingCost(day);
 
@@ -595,7 +597,8 @@ export function HomefarmShopGame() {
         }
 
         // Decide: open ads modal once per day if affordable
-        if (day >= AD_UNLOCK_DAY && !adRunToday && curCash > 1000) {
+        // 2500k buffer = max opCost(1000) + max leaflet(500) + 1000 safety
+        if (day >= AD_UNLOCK_DAY && !adRunToday && curCash > 2500) {
           setShowAds(true);
           return;
         }
