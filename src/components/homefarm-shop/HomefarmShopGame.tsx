@@ -965,7 +965,7 @@ function TutorialModal({ onConfirm }: { onConfirm: (name: string) => void }) {
         </div>
 
         <div className="hfs-tutorial-name-wrap">
-          <label className="hfs-tutorial-name-label">👤 NHẬP TÊN NGƯỜI CHƠI</label>
+          <label className="hfs-tutorial-name-label">🧑‍🌾 Hãy nhập tên của bạn</label>
           <input
             className="hfs-tutorial-name-input"
             type="text"

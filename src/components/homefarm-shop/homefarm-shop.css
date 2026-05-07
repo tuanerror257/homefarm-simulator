@@ -2328,10 +2328,11 @@
 }
 
 .hfs-tutorial-name-label {
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 900;
-  color: rgba(45,33,24,.65);
-  letter-spacing: .5px;
+  color: rgba(45,33,24,.75);
+  letter-spacing: .3px;
+  text-align: center;
 }
 
 .hfs-tutorial-name-input {
