@@ -194,6 +194,9 @@ export function HomefarmShopGame() {
   const botImportTargetRef = useRef<Record<string, number>>({});
   const botImportQtyRef = useRef(importQty);
   botImportQtyRef.current = importQty;
+  // Tracks whether bot has already scrolled to confirm button (avoid double-confirm)
+  const botImportScrolledRef = useRef(false);
+  const botImportConfirmRef = useRef<HTMLButtonElement>(null);
   const orderProducts: OrderProduct[] = useMemo(
     () =>
       customer
@@ -542,16 +545,24 @@ export function HomefarmShopGame() {
         // Ads modal open → run leaflet ad
         if (showAds) { runAd(AD_TYPES[0]); return; }
 
-        // Import modal open → increment qty by +1 per tick per product, then confirm
+        // Import modal open → scroll to product row, increment +1 per tick, then scroll to confirm
         if (showImport) {
           const target = botImportTargetRef.current;
           const curQty = botImportQtyRef.current;
           const nextEntry = Object.entries(target).find(([id, need]) => (curQty[id] || 0) < need);
           if (nextEntry) {
             const [id] = nextEntry;
+            document.querySelector(`[data-import-id="${id}"]`)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
             setImportQty((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
             return;
           }
+          // All filled — scroll to confirm button first, then confirm on next tick
+          if (!botImportScrolledRef.current) {
+            botImportConfirmRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+            botImportScrolledRef.current = true;
+            return;
+          }
+          botImportScrolledRef.current = false;
           confirmImport();
           return;
         }
@@ -573,7 +584,7 @@ export function HomefarmShopGame() {
           return;
         }
 
-        // Broad refill: record target then open empty import modal
+        // Broad refill: record target then open empty import modal (qty reset so bot fills from 0)
         const TARGET = 15;
         const refillQty: Record<string, number> = {};
         let refillCost = 0;
@@ -584,6 +595,7 @@ export function HomefarmShopGame() {
         }
         if (refillCost > 0 && curCash >= refillCost) {
           botImportTargetRef.current = refillQty;
+          botImportScrolledRef.current = false;
           setImportQty({});
           setShowImport(true);
           return;
@@ -592,16 +604,23 @@ export function HomefarmShopGame() {
         return;
       }
 
-      // 5. Has customer — import modal open → increment +1 per tick per product, then confirm
+      // 5. Has customer — import modal open → scroll + increment +1 per tick, scroll to confirm
       if (showImport) {
         const target = botImportTargetRef.current;
         const curQty = botImportQtyRef.current;
         const nextEntry = Object.entries(target).find(([id, need]) => (curQty[id] || 0) < need);
         if (nextEntry) {
           const [id] = nextEntry;
+          document.querySelector(`[data-import-id="${id}"]`)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
           setImportQty((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
           return;
         }
+        if (!botImportScrolledRef.current) {
+          botImportConfirmRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+          botImportScrolledRef.current = true;
+          return;
+        }
+        botImportScrolledRef.current = false;
         confirmImport();
         return;
       }
@@ -632,6 +651,7 @@ export function HomefarmShopGame() {
         }
         if (totalImportCost > 0 && curCash >= totalImportCost) {
           botImportTargetRef.current = importItems;
+          botImportScrolledRef.current = false;
           setImportQty({});
           setShowImport(true);
           return;
@@ -1055,7 +1075,7 @@ export function HomefarmShopGame() {
                 {products.filter((p) => p.cost > 0).map((product) => {
                   const q = importQty[product.id] || 0;
                   return (
-                    <div key={product.id} className="hfs-import-row">
+                    <div key={product.id} className="hfs-import-row" data-import-id={product.id}>
                       <div className="hfs-import-icon">{product.icon}</div>
                       <div className="hfs-import-info">
                         <div className="hfs-import-name">{product.name}</div>
@@ -1075,7 +1095,7 @@ export function HomefarmShopGame() {
 
               <div className="hfs-modal-actions">
                 <button onClick={() => setShowImport(false)} className="hfs-cancel">Huỷ</button>
-                <button onClick={confirmImport} className="hfs-confirm">Nhập {money(importCost)}</button>
+                <button ref={botImportConfirmRef} onClick={confirmImport} className="hfs-confirm">Nhập {money(importCost)}</button>
               </div>
             </div>
           </div>

@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v4.4`
+- Current version: `v4.5`
 - Current commit: TBD
-- Current rollback tag: `v4.4-bot-import-plus1`
+- Current rollback tag: `v4.5-bot-import-scroll`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,16 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v4.5 - Bot scroll modal nhập hàng như người thật
+
+- Mỗi khi tăng qty +1, bot scroll đến hàng sản phẩm đó trong modal (`scrollIntoView smooth`).
+- Sau khi điền đủ hết: bot scroll xuống nút "Nhập hàng" (1s pause), rồi mới click confirm.
+- Thêm `data-import-id` attribute trên mỗi hàng sản phẩm để bot định vị DOM.
+- Thêm `ref` trên nút Nhập để bot scroll đúng vị trí.
+- `botImportScrolledRef` đảm bảo chỉ confirm sau khi đã scroll xuống.
+- Reset scroll ref mỗi khi mở modal mới.
+- Tag: `v4.5-bot-import-scroll`
 
 ### v4.4 - Bot nhấn +1 từng lần như người thật khi nhập hàng
 
