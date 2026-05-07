@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.14`
+- Current version: `v3.15`
 - Current commit: TBD
-- Current rollback tag: `v3.14-start-btn-center`
+- Current rollback tag: `v3.15-start-btn-flex`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.15 - Fix start button centering (flex approach)
+
+- Đổi `.hfs-start-screen` thành flex container (`align-items: center; justify-content: flex-end`) để căn nút Start Game chính giữa một cách đáng tin cậy.
+- Bỏ `position: absolute` khỏi nút, dùng flex layout thay thế.
+- Tag: `v3.15-start-btn-flex`
 
 ### v3.14 - Fix start button centering
 

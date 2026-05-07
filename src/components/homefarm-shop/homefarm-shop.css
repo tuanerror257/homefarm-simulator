@@ -2414,6 +2414,11 @@
   background-position: center top;
   background-repeat: no-repeat;
   transition: filter .2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 8px;
 }
 
 .hfs-start-screen.dimmed {
@@ -2421,12 +2426,8 @@
 }
 
 .hfs-start-btn {
-  position: absolute;
+  position: relative;
   z-index: 2;
-  bottom: 1%;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
   width: 78%;
   aspect-ratio: 1536 / 1024;
   background: transparent url('/homefarm-shop/start-btn.png') center / contain no-repeat;
