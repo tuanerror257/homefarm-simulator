@@ -194,8 +194,8 @@ export function HomefarmShopGame() {
   const botImportTargetRef = useRef<Record<string, number>>({});
   const botImportQtyRef = useRef(importQty);
   botImportQtyRef.current = importQty;
-  // Tracks whether bot has already scrolled to confirm button (avoid double-confirm)
-  const botImportScrolledRef = useRef(false);
+  // Tracks whether bot has scrolled to confirm button — must be state to trigger re-render
+  const [botImportScrolled, setBotImportScrolled] = useState(false);
   const botImportConfirmRef = useRef<HTMLButtonElement>(null);
   const orderProducts: OrderProduct[] = useMemo(
     () =>
@@ -346,8 +346,8 @@ export function HomefarmShopGame() {
     const baseTip = bill * calcTipRate(customer, timeLeft, moodScore, combo);
     const nextCombo = speedRatio > 0.45 && moodScore >= 40 ? combo + 1 : 0;
     const nextMultiplier = nextCombo >= 10 ? 2 : nextCombo >= 5 ? 1.5 : nextCombo >= 3 ? 1.2 : 1;
-    const comboBonus = nextCombo >= 3 ? Math.round(bill * (nextMultiplier - 1) * 0.12) : 0;
-    const tip = Math.round(baseTip * nextMultiplier);
+    const comboBonus = nextCombo >= 3 ? Math.round(bill * (nextMultiplier - 1) * 0.04) : 0;
+    const tip = Math.round(baseTip);
     const shippingFee = customer.appOrder ? APP_ORDER_SHIPPING_FEE : 0;
     const thisOrderProfit = orderProfit + tip + comboBonus - shippingFee;
 
@@ -503,7 +503,8 @@ export function HomefarmShopGame() {
       if (targetEntries.length > 0) {
         const anyFilled = targetEntries.some(([id]) => (importQty[id] || 0) > 0);
         const allFilled = targetEntries.every(([id, need]) => (importQty[id] || 0) >= need);
-        delay = allFilled ? 1000  // pause before confirm so user sees final state
+        // After all filled: 1s to see scroll-to-confirm, then 800ms before clicking confirm
+        delay = allFilled ? (botImportScrolled ? 800 : 1000)
               : anyFilled ? 150   // fast +1 clicks while filling
               : 1500;             // first pause after modal opens (shows empty form)
       }
@@ -557,12 +558,12 @@ export function HomefarmShopGame() {
             return;
           }
           // All filled — scroll to confirm button first, then confirm on next tick
-          if (!botImportScrolledRef.current) {
+          if (!botImportScrolled) {
             botImportConfirmRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-            botImportScrolledRef.current = true;
+            setBotImportScrolled(true); // triggers re-render so effect re-fires
             return;
           }
-          botImportScrolledRef.current = false;
+          setBotImportScrolled(false);
           confirmImport();
           return;
         }
@@ -595,7 +596,7 @@ export function HomefarmShopGame() {
         }
         if (refillCost > 0 && curCash >= refillCost) {
           botImportTargetRef.current = refillQty;
-          botImportScrolledRef.current = false;
+          setBotImportScrolled(false);
           setImportQty({});
           setShowImport(true);
           return;
@@ -615,12 +616,12 @@ export function HomefarmShopGame() {
           setImportQty((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
           return;
         }
-        if (!botImportScrolledRef.current) {
+        if (!botImportScrolled) {
           botImportConfirmRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-          botImportScrolledRef.current = true;
+          setBotImportScrolled(true);
           return;
         }
-        botImportScrolledRef.current = false;
+        setBotImportScrolled(false);
         confirmImport();
         return;
       }
@@ -651,7 +652,7 @@ export function HomefarmShopGame() {
         }
         if (totalImportCost > 0 && curCash >= totalImportCost) {
           botImportTargetRef.current = importItems;
-          botImportScrolledRef.current = false;
+          setBotImportScrolled(false);
           setImportQty({});
           setShowImport(true);
           return;
@@ -682,7 +683,7 @@ export function HomefarmShopGame() {
     showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock,
     showImport, showUpgrades, showAds, activeEvent,
     gameOver, daySummary, customer, selected, isComplete,
-    upgrades, adRunToday, day, products, productPage, importQty,
+    upgrades, adRunToday, day, products, productPage, importQty, botImportScrolled,
   ]);
   // ── END BOT ─────────────────────────────────────────────────────────────────
 

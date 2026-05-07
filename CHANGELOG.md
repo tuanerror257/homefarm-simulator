@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v4.5`
+- Current version: `v4.6`
 - Current commit: TBD
-- Current rollback tag: `v4.5-bot-import-scroll`
+- Current rollback tag: `v4.6-tips-rebalance-bot-scroll-fix`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,20 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v4.6 - Rebalance tips + fix bot freeze sau scroll
+
+**Tips rebalance:**
+- `calcTipRate`: giảm tất cả rate xuống ~50%: fast→+3%, medium→+1.5%, mood→+1.5%, combo→max 2%, repeat→+1%, VIP→+3%.
+- Cap mới: 8% regular, 12% VIP (cũ: 20%/28%).
+- Bỏ nhân `comboMultiplier` vào tip (tip = baseTip, không x2 hay x1.5 nữa).
+- `comboBonus` giảm factor từ 0.12 → 0.04 (combo 10 chỉ thêm tối đa 4% bill).
+
+**Fix bot freeze:**
+- `botImportScrolledRef` (useRef) không trigger re-render → bot treo sau scroll.
+- Đổi thành `botImportScrolled` useState → `setBotImportScrolled(true)` trigger re-render đúng.
+- Thêm `botImportScrolled` vào dependency array của bot useEffect.
+- Tag: `v4.6-tips-rebalance-bot-scroll-fix`
 
 ### v4.5 - Bot scroll modal nhập hàng như người thật
 

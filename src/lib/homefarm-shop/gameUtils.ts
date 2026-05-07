@@ -267,14 +267,14 @@ export function calcTipRate(customer: Customer, timeLeft: number, moodScore: num
   const moodRatio = Math.max(0, Math.min(1, moodScore / 100));
 
   let rate = 0;
-  if (speedRatio > 0.65) rate += 0.06;
-  if (speedRatio > 0.35) rate += 0.03;
-  if (moodRatio > 0.8) rate += 0.03;
-  if (combo >= 2) rate += Math.min(0.05, combo * 0.01);
-  if (customer.repeat) rate += 0.02;
-  if (customer.vip) rate += 0.06;
+  if (speedRatio > 0.65) rate += 0.03; // phục vụ nhanh
+  if (speedRatio > 0.35) rate += 0.015; // phục vụ ổn
+  if (moodRatio > 0.8)   rate += 0.015; // mood tốt
+  if (combo >= 2) rate += Math.min(0.02, combo * 0.004); // combo nhỏ
+  if (customer.repeat)   rate += 0.01;  // khách quen
+  if (customer.vip)      rate += 0.03;  // VIP
 
-  return Math.min(rate, customer.vip ? 0.28 : 0.2);
+  return Math.min(rate, customer.vip ? 0.12 : 0.08);
 }
 
 export function getStockShortageMessage(product: Product) {
