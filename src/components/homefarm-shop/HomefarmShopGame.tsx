@@ -823,17 +823,69 @@ export function HomefarmShopGame() {
               </div>
 
               <div className="hfs-rank-list">
-                {leaderboard.length === 0 && <div className="hfs-rank-meta">Chưa có dữ liệu leaderboard.</div>}
-                {leaderboard.map((row, index) => (
-                  <div className="hfs-rank-row" key={row.id || `${row.player_name}-${index}`}>
-                    <div>#{index + 1}</div>
-                    <div>
-                      <div>{row.player_name}</div>
-                      <div className="hfs-rank-meta">Day {row.day_reached} · Lãi {money(row.total_profit)} · Combo x{row.max_combo}</div>
+                {(() => {
+                  const MEDALS = ["🥇", "🥈", "🥉"];
+                  const TOP_N = 6;
+                  const n = leaderboard.length;
+                  const myRank = n === 0 ? 1 : leaderboard.filter(r => r.score > currentScore).length + 1;
+                  const myInTop = myRank <= TOP_N;
+                  const myIsLast = myRank === n && n > TOP_N;
+                  const myIsMid = !myInTop && !myIsLast && myRank <= n;
+                  const myBelowAll = myRank > n;
+
+                  const myGhost = {
+                    player_name: playerName || "Bạn",
+                    score: currentScore,
+                    day_reached: day,
+                    cash: Math.round(cash),
+                    total_revenue: Math.round(totalRevenue),
+                    total_profit: Math.round(totalProfit),
+                    max_combo: maxCombo,
+                    served_count: servedCount,
+                  };
+
+                  const renderRow = (row: LeaderboardEntry, rank: number, isMe: boolean) => (
+                    <div key={`r${rank}`} className={`hfs-rank-row${isMe ? " hfs-rank-row-me" : ""}`}>
+                      <div className="hfs-rank-pos">{rank <= 3 ? MEDALS[rank - 1] : `#${rank}`}</div>
+                      <div>
+                        <div className="hfs-rank-name">{row.player_name}</div>
+                        <div className="hfs-rank-meta">Day {row.day_reached} · Lãi {money(row.total_profit)} · Combo x{row.max_combo}</div>
+                      </div>
+                      <div className="hfs-rank-score">{row.score.toLocaleString("vi-VN")}</div>
                     </div>
-                    <div>{row.score.toLocaleString("vi-VN")}</div>
-                  </div>
-                ))}
+                  );
+
+                  if (n === 0) return <div className="hfs-rank-meta">Chưa có dữ liệu leaderboard.</div>;
+
+                  return (
+                    <>
+                      {leaderboard.slice(0, Math.min(TOP_N, n)).map((row, i) =>
+                        renderRow(row, i + 1, scoreSaved && myRank === i + 1)
+                      )}
+
+                      {n > TOP_N && (
+                        <>
+                          <div className="hfs-rank-ellipsis">· · ·</div>
+                          {myIsMid && renderRow(
+                            scoreSaved ? leaderboard[myRank - 1] : myGhost,
+                            myRank, true
+                          )}
+                          {(!myIsMid || myRank < n - 1) && (
+                            <div className="hfs-rank-ellipsis">· · ·</div>
+                          )}
+                          {renderRow(leaderboard[n - 1], n, scoreSaved && myIsLast)}
+                        </>
+                      )}
+
+                      {myBelowAll && (
+                        <>
+                          <div className="hfs-rank-ellipsis">· · ·</div>
+                          {renderRow(myGhost, myRank, true)}
+                        </>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </div>

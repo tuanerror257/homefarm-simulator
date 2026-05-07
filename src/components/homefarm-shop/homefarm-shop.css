@@ -1420,6 +1420,43 @@
   font-weight: 900;
 }
 
+.hfs-rank-row-me {
+  background: #fffbe6;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245,158,11,.25);
+}
+
+.hfs-rank-pos {
+  font-size: 16px;
+  text-align: center;
+  line-height: 1;
+}
+
+.hfs-rank-name {
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hfs-rank-score {
+  font-size: 11px;
+  font-weight: 900;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.hfs-rank-ellipsis {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 900;
+  color: rgba(45,33,24,.35);
+  letter-spacing: 3px;
+  line-height: 1;
+  padding: 2px 0;
+}
+
 .hfs-rank-meta {
   opacity: .65;
   font-size: 9px;
