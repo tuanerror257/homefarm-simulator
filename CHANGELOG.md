@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v4.0`
+- Current version: `v4.1`
 - Current commit: TBD
-- Current rollback tag: `v4.0-bot-fillet-fix`
+- Current rollback tag: `v4.1-bot-ui-navigation`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,15 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v4.1 - Bot chơi như người thật (UI navigation)
+
+- Bot điều hướng đúng trang sản phẩm (trang 2, 3...) trước khi bấm chọn món.
+- Import: bot stage `importQty` rồi mở modal → tick sau confirmImport() — giống thao tác người thật.
+- Upgrade: bot mở modal nâng cấp → tick sau chọn và buy — không gọi thẳng function.
+- Ads: bot mở modal quảng cáo → tick sau runAd() — đúng flow UI.
+- Thêm `productPage` vào dependency array của bot useEffect.
+- Tag: `v4.1-bot-ui-navigation`
 
 ### v4.0 - Fix bot fillet bug + version milestone
 

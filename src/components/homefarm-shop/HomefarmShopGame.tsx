@@ -491,14 +491,11 @@ export function HomefarmShopGame() {
       const curCash = botCashRef.current;
       const curUpgrades = botUpgradesRef.current;
 
-      // 1. Dismiss any blocking overlay
+      // 1. Dismiss blocking overlays bot never intentionally opens
       if (showCatalogUnlock) { setShowCatalogUnlock(false); return; }
       if (showUpgradeUnlock) { setShowUpgradeUnlock(false); return; }
       if (showEventUnlock)   { setShowEventUnlock(false);   return; }
       if (showAdUnlock)      { setShowAdUnlock(false);      return; }
-      if (showImport)        { setShowImport(false);        return; }
-      if (showUpgrades)      { setShowUpgrades(false);      return; }
-      if (showAds)           { setShowAds(false);           return; }
       if (activeEvent)       { setActiveEvent(null);        return; }
 
       // 2. Game over → restart after 3s
@@ -509,8 +506,8 @@ export function HomefarmShopGame() {
 
       // 4. No customer → upgrade / ads / refill / end day
       if (!customer) {
-        // Auto-upgrade: one per tick, priority staff > freezer > sign > knife
-        if (upgradesUnlocked) {
+        // Upgrade modal open → buy highest-priority affordable upgrade then close
+        if (showUpgrades) {
           const upgradeOrder: ShopUpgradeId[] = ["staff", "freezer", "sign", "knife"];
           for (const upId of upgradeOrder) {
             const level = curUpgrades[upId];
@@ -518,32 +515,55 @@ export function HomefarmShopGame() {
             const cost = UPGRADE_DEFS.find((u) => u.id === upId)!.costs[level];
             if (curCash >= cost + 1500) { buyUpgrade(upId); return; }
           }
-        }
-
-        // Auto-run leaflet ad once per day if affordable
-        if (day >= AD_UNLOCK_DAY && !adRunToday && curCash > 1000) {
-          runAd(AD_TYPES[0]);
+          setShowUpgrades(false);
           return;
         }
 
-        // Broad refill: top up all importable products to TARGET units
+        // Ads modal open → run leaflet ad
+        if (showAds) { runAd(AD_TYPES[0]); return; }
+
+        // Import modal open → confirm the import bot already staged
+        if (showImport) { confirmImport(); return; }
+
+        // Decide: open upgrade modal if there's something to buy
+        if (upgradesUnlocked) {
+          const upgradeOrder: ShopUpgradeId[] = ["staff", "freezer", "sign", "knife"];
+          for (const upId of upgradeOrder) {
+            const level = curUpgrades[upId];
+            if (level >= MAX_UPGRADE_LEVEL) continue;
+            const cost = UPGRADE_DEFS.find((u) => u.id === upId)!.costs[level];
+            if (curCash >= cost + 1500) { setShowUpgrades(true); return; }
+          }
+        }
+
+        // Decide: open ads modal once per day if affordable
+        if (day >= AD_UNLOCK_DAY && !adRunToday && curCash > 1000) {
+          setShowAds(true);
+          return;
+        }
+
+        // Broad refill: stage importQty then open import modal
         const TARGET = 15;
+        const refillQty: Record<string, number> = {};
         let refillCost = 0;
-        const refilled = curProducts.map((p) => {
-          if (p.cost <= 0) return p;
+        for (const p of curProducts) {
+          if (p.cost <= 0) continue;
           const need = Math.max(0, TARGET - p.stock);
-          refillCost += need * p.cost;
-          return need > 0 ? { ...p, stock: p.stock + need } : p;
-        });
+          if (need > 0) { refillQty[p.id] = need; refillCost += need * p.cost; }
+        }
         if (refillCost > 0 && curCash >= refillCost) {
-          setProducts(refilled);
-          setCash((c) => c - refillCost);
+          setImportQty(refillQty);
+          setShowImport(true);
+          return; // next tick: showImport=true → confirmImport()
         }
         endDay();
         return;
       }
 
-      // 5. Has customer — fix stock shortages before selecting
+      // 5. Has customer — import modal open → confirm staged import
+      if (showImport) { confirmImport(); return; }
+
+      // 6. Fix stock shortages
       const shortItems = customer.order.filter((item) => {
         const p = curProducts.find((pr) => pr.id === item.id);
         return (p?.stock ?? 0) < item.qty;
@@ -557,30 +577,36 @@ export function HomefarmShopGame() {
           if (wholeStock >= 1) { fillet(); return; }
         }
 
-        // Direct import for everything else that's short
-        let importCost = 0;
-        const withImport = curProducts.map((p) => {
+        // Stage import quantities then open modal
+        const importItems: Record<string, number> = {};
+        let totalImportCost = 0;
+        for (const p of curProducts) {
           const short = shortItems.find((s) => s.id === p.id);
-          if (!short || p.cost <= 0) return p;
+          if (!short || p.cost <= 0) continue;
           const need = Math.ceil(short.qty - p.stock) + 3;
-          importCost += need * p.cost;
-          return { ...p, stock: p.stock + need };
-        });
-        if (importCost > 0 && curCash >= importCost) {
-          setProducts(withImport);
-          setCash((c) => c - importCost);
-          return; // re-check next tick
+          importItems[p.id] = need;
+          totalImportCost += need * p.cost;
         }
-        // Still can't fulfill → skip
+        if (totalImportCost > 0 && curCash >= totalImportCost) {
+          setImportQty(importItems);
+          setShowImport(true);
+          return; // next tick: showImport=true → confirmImport()
+        }
         skipCustomer("🤖 Bot bỏ qua — không đủ tiền nhập hàng.");
         return;
       }
 
-      // 6. Select next unselected item
+      // 7. Navigate to the correct product page before tapping
       const nextItem = customer.order.find((item) => !selected.includes(item.id));
-      if (nextItem) { tapProduct(nextItem.id); return; }
+      if (nextItem) {
+        const productIndex = curProducts.findIndex((p) => p.id === nextItem.id);
+        const targetPage = Math.max(0, Math.floor(productIndex / PAGE_SIZE));
+        if (targetPage !== productPage) { setProductPage(targetPage); return; }
+        tapProduct(nextItem.id);
+        return;
+      }
 
-      // 7. All items selected → deliver
+      // 8. All items selected → deliver
       if (isComplete) { deliver(); return; }
       skipCustomer("🤖 Bot bỏ qua.");
     }, 650);
@@ -592,7 +618,7 @@ export function HomefarmShopGame() {
     showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock,
     showImport, showUpgrades, showAds, activeEvent,
     gameOver, daySummary, customer, selected, isComplete,
-    upgrades, adRunToday, day, products,
+    upgrades, adRunToday, day, products, productPage,
   ]);
   // ── END BOT ─────────────────────────────────────────────────────────────────
 
