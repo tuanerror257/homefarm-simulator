@@ -435,7 +435,7 @@ export function HomefarmShopGame() {
 
     const overnightSpoilage = applyOvernightSpoilage(products, { freezerLevel: upgrades.freezer });
     const unlockedProducts = getUnlockedProducts(nextDay, overnightSpoilage.products);
-    const nextEvent = maybeCreateEvent(nextDay);
+    const nextEvent = maybeCreateEvent(nextDay, unlockedProducts);
     const nextProducts = applyEventToProducts(unlockedProducts, nextEvent, { freezerLevel: upgrades.freezer });
     const nextCustomers = generateCustomers(nextProducts, nextDay, {
       signLevel: upgrades.sign,

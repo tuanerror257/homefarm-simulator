@@ -73,12 +73,12 @@ export const CUSTOMER_TYPES: CustomerType[] = [
 ];
 
 export const SHOP_EVENTS: ShopEvent[] = [
-  { id: "staff-off", type: "bad", title: "Nhân viên nghỉ đột xuất", description: "Khách hôm nay dễ sốt ruột hơn. Mood đầu ngày giảm 10 điểm.", moodDelta: -10 },
-  { id: "thief", type: "bad", title: "Bị trộm vặt", description: "Mất 150k tiền mặt.", cashDelta: -150 },
-  { id: "freezer-issue", type: "bad", title: "Tủ đông trục trặc", description: "Hao hụt nhẹ bò Mỹ và cá hồi.", stockDelta: { salmon: -0.5, beef: -0.5 } },
-  { id: "viral-post", type: "good", title: "Bài TikTok viral", description: "Được cộng 100k tiền mặt và mood đầu ngày +8.", cashDelta: 100, moodDelta: 8 },
-  { id: "supplier-bonus", type: "good", title: "Nhà cung cấp tặng hàng", description: "Được tặng thêm trứng và xúc xích.", stockDelta: { egg: 3, sausage: 3 } },
-  { id: "rainy-day", type: "neutral", title: "Trời mưa", description: "Đơn app nhiều hơn, khách hơi vội hơn. Mood đầu ngày -4.", moodDelta: -4 },
+  { id: "staff-off", type: "bad", title: "Nhân viên nghỉ đột xuất", description: "😴 Nhân viên gọi báo ốm sáng nay. Khách dễ sốt ruột hơn — mood đầu ngày -10 điểm.", moodDelta: -10 },
+  { id: "thief", type: "bad", title: "Bị trộm vặt", description: "🦹 Có kẻ lén lút móc tiền quầy thu ngân. Mất tiền mặt.", cashDelta: -150 },
+  { id: "freezer-issue", type: "bad", title: "Tủ đông trục trặc", description: "🌡️ Tủ đông mất điện một lúc. Bò Mỹ và cá hồi bị hao hụt nhẹ.", stockDelta: { salmon: -0.5, beef: -0.5 } },
+  { id: "viral-post", type: "good", title: "Bài TikTok viral", description: "📱✨ Video check-in cửa hàng lan truyền mạng xã hội! +100k tiền mặt và mood đầu ngày +8.", cashDelta: 100, moodDelta: 8 },
+  { id: "supplier-bonus", type: "good", title: "Nhà cung cấp tặng hàng", description: "📦🎁 Nhà cung cấp gửi quà tri ân, kho thêm một ít hàng.", stockDelta: { egg: 3, sausage: 3 } },
+  { id: "rainy-day", type: "neutral", title: "Trời mưa", description: "🌧️ Trời đổ mưa to, khách ngại ra đường — đơn app tăng vọt nhưng khách vội hơn. Mood đầu ngày -4.", moodDelta: -4 },
 ];
 
 export const MASCOT_ASSETS: Record<MascotState, string> = {

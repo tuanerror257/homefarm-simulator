@@ -289,7 +289,7 @@ export function getStockShortageMessage(product: Product) {
   return `Thiếu ${product.name}. Hãy nhập thêm hàng.`;
 }
 
-export function maybeCreateEvent(day: number): ShopEvent | null {
+export function maybeCreateEvent(day: number, products: Product[] = []): ShopEvent | null {
   // Day 1-11 yên bình để người chơi làm quen và mở rộng shop.
   if (day <= 11) return null;
 
@@ -297,7 +297,53 @@ export function maybeCreateEvent(day: number): ShopEvent | null {
   const chance = Math.min(0.18 + (day - 12) * 0.02, 0.36);
   if (Math.random() > chance) return null;
 
-  return sample(SHOP_EVENTS);
+  const event = sample(SHOP_EVENTS);
+
+  if (event.id === "thief") {
+    const stolen = Math.round((Math.random() * (2000 - 150) + 150) / 50) * 50;
+    return {
+      ...event,
+      cashDelta: -stolen,
+      description: `🦹 Có kẻ lén lút móc tiền quầy thu ngân. Mất ${money(stolen)} tiền mặt.`,
+    };
+  }
+
+  if (event.id === "supplier-bonus") {
+    const eligible = products.filter(
+      (p) => p.cost > 0 && !["wholeSalmon", "headBone"].includes(p.id),
+    );
+    if (eligible.length === 0) return event;
+
+    const count = Math.min(eligible.length, sample([1, 2, 2]));
+    const shuffled = [...eligible].sort(() => Math.random() - 0.5);
+    const picked = shuffled.slice(0, count);
+
+    const stockDelta: Record<string, number> = {};
+    const itemDescs: string[] = [];
+
+    for (const p of picked) {
+      let giftQty: number;
+      if (["egg", "sausage", "cheese", "milk", "butter", "yogurt", "bacon", "ham", "bread"].includes(p.id)) {
+        giftQty = sample([1, 2, 2, 3]);
+      } else if (["cherry", "strawberry", "blueberry", "kiwi"].includes(p.id)) {
+        giftQty = sample([0.3, 0.5, 0.5, 0.7]);
+      } else if (["grape", "avocado", "mango", "orange"].includes(p.id)) {
+        giftQty = sample([0.5, 0.7, 1, 1]);
+      } else {
+        giftQty = sample([0.3, 0.5, 0.5, 0.7]);
+      }
+      stockDelta[p.id] = giftQty;
+      itemDescs.push(`${p.icon} ${p.name} +${qty(giftQty)}${p.unit}`);
+    }
+
+    return {
+      ...event,
+      stockDelta,
+      description: `📦🎁 Nhà cung cấp gửi quà tri ân hôm nay: ${itemDescs.join(", ")}.`,
+    };
+  }
+
+  return event;
 }
 
 export function applyEventToProducts(
