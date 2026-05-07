@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.21`
+- Current version: `v4.0`
 - Current commit: TBD
-- Current rollback tag: `v3.21-bot-smarter`
+- Current rollback tag: `v4.0-bot-fillet-fix`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v4.0 - Fix bot fillet bug + version milestone
+
+- Fix: thêm `products` vào dependency array của bot useEffect — sau khi `fillet()` gọi `setProducts`, effect nay re-fire đúng cách thay vì bị stuck.
+- Root cause: bot gọi `fillet()` xong nhưng `products` không trong deps → effect không chạy lại → bot treo.
+- Bump lên v4.0.
+- Tag: `v4.0-bot-fillet-fix`
 
 ### v3.21 - Bot thông minh hơn
 

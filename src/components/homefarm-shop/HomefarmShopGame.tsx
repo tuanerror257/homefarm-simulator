@@ -592,7 +592,7 @@ export function HomefarmShopGame() {
     showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock,
     showImport, showUpgrades, showAds, activeEvent,
     gameOver, daySummary, customer, selected, isComplete,
-    upgrades, adRunToday, day,
+    upgrades, adRunToday, day, products,
   ]);
   // ── END BOT ─────────────────────────────────────────────────────────────────
 
