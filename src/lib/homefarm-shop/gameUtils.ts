@@ -216,9 +216,8 @@ export function getDayTheme(day: number): "busy" | "slow" | "normal" {
 }
 
 function customersCountByDay(day: number) {
-  // Tăng nhẹ theo ngày để ngày sau đông khách hơn nhưng không quá loạn UI.
   if (day <= 5) return 3 + day; // 4 -> 8 khách
-  return Math.min(8 + Math.floor((day - 5) * 0.55), 18);
+  return Math.min(8 + Math.floor((day - 5) * 0.55), 13);
 }
 
 function patienceByDay(type: CustomerType, day: number, staffLevel = 0, theme: "busy" | "slow" | "normal" = "normal") {
