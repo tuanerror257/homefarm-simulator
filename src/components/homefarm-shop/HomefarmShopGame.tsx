@@ -201,6 +201,11 @@ export function HomefarmShopGame() {
   }, [customerIndex, customers.length]);
 
   useEffect(() => {
+    if (gameOver) loadLeaderboard();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameOver]);
+
+  useEffect(() => {
     if (!customer) {
       // Customer transitions intentionally reset transient round state.
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -909,7 +914,7 @@ export function HomefarmShopGame() {
           </div>
         )}
 
-        {gameOver && (
+        {gameOver && !showLeaderboard && (
           <div className="hfs-gameover-backdrop">
             <div className="hfs-gameover-panel">
               <div className="hfs-gameover-icon">
@@ -923,6 +928,11 @@ export function HomefarmShopGame() {
                 {gameOverReason === "stolen" && `Bị trộm sạch tiền mặt sau khi trả chi phí vận hành ngày ${day}.`}
                 {gameOverReason === "reputation" && "Rating dưới ⭐2.0 ba ngày liên tiếp — khách hàng đã mất niềm tin vào cửa hàng."}
                 {gameOverReason === "" && `Không đủ tiền chi trả vận hành ngày ${day}. Trò chơi kết thúc.`}
+              </div>
+              <div className="hfs-gameover-rank">
+                {leaderboard.length > 0
+                  ? `🏆 Xếp hạng của bạn: #${leaderboard.filter(r => r.score > currentScore).length + 1} / ${leaderboard.length} người chơi`
+                  : "⏳ Đang tải xếp hạng..."}
               </div>
               <div className="hfs-gameover-stats">
                 <div><span>Ngày đạt được</span><strong>{day}</strong></div>
