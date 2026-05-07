@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v3.16`
+- Current version: `v3.17`
 - Current commit: TBD
-- Current rollback tag: `v3.16-start-btn-nudge`
+- Current rollback tag: `v3.17-advertising`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,15 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v3.17 - Hệ thống quảng cáo
+
+- Mở khóa từ Day 15 với modal thông báo riêng.
+- Hai loại quảng cáo: Phát tờ rơi (150k–500k, +3–5 khách) và Facebook Ads (350k–800k, +4–6 khách).
+- Chi phí random trong khoảng, số khách thêm random và được áp dụng vào ngày hôm sau.
+- Mỗi ngày chỉ chạy được 1 loại. Nút 📣 Ads trên shelf, đổi màu xanh khi đã chạy.
+- Timer dừng khi mở modal ads.
+- Tag: `v3.17-advertising`
 
 ### v3.16 - Start button nudge right +5%
 

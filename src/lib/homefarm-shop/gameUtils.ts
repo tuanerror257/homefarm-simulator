@@ -225,9 +225,10 @@ export function generateCustomers(
     signLevel?: number;
     staffLevel?: number;
     rainyDay?: boolean;
+    extraCount?: number;
   } = {},
 ): Customer[] {
-  const count = customersCountByDay(day);
+  const count = customersCountByDay(day) + (options.extraCount ?? 0);
   const signLevel = options.signLevel ?? 0;
   const staffLevel = options.staffLevel ?? 0;
   const rainyDay = options.rainyDay ?? false;

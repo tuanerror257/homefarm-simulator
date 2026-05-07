@@ -29,6 +29,28 @@ const APP_ORDER_SHIPPING_FEE = 20;
 const PRODUCT_EXPANSION_DAY = 6;
 const UPGRADE_UNLOCK_DAY = 8;
 const EVENT_UNLOCK_DAY = 12;
+const AD_UNLOCK_DAY = 15;
+
+const AD_TYPES = [
+  {
+    id: "leaflet" as const,
+    icon: "📄",
+    name: "Phát tờ rơi",
+    desc: "In và phát tờ rơi quanh khu phố.",
+    costMin: 150, costMax: 500,
+    extraMin: 3, extraMax: 5,
+  },
+  {
+    id: "facebook" as const,
+    icon: "📘",
+    name: "Quảng cáo Facebook",
+    desc: "Nhắm đúng khách hàng mục tiêu trong bán kính 5km.",
+    costMin: 350, costMax: 800,
+    extraMin: 4, extraMax: 6,
+  },
+] as const;
+
+type AdId = typeof AD_TYPES[number]["id"];
 const MAX_UPGRADE_LEVEL = 3;
 const OPERATING_COST_TIERS = [
   { untilDay: 5,        rent: 200, staff: 150, utilities: 30,  otherMin: 10, otherMax: 50  },
@@ -136,6 +158,10 @@ export function HomefarmShopGame() {
   const [showCatalogUnlock, setShowCatalogUnlock] = useState(false);
   const [showUpgradeUnlock, setShowUpgradeUnlock] = useState(false);
   const [showEventUnlock, setShowEventUnlock] = useState(false);
+  const [showAdUnlock, setShowAdUnlock] = useState(false);
+  const [showAds, setShowAds] = useState(false);
+  const [adRunToday, setAdRunToday] = useState<AdId | null>(null);
+  const [pendingExtraCustomers, setPendingExtraCustomers] = useState(0);
   const [importQty, setImportQty] = useState<Record<string, number>>({});
   const [upgrades, setUpgrades] = useState<ShopUpgrades>(INITIAL_UPGRADES);
   const [combo, setCombo] = useState(0);
@@ -221,7 +247,7 @@ export function HomefarmShopGame() {
   }, [customerIndex, day, customer, eventMoodPenalty]);
 
   useEffect(() => {
-    if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showLeaderboard || activeEvent || gameOver) return;
+    if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showAds || showLeaderboard || activeEvent || gameOver) return;
 
     const timer = setInterval(() => {
       setMoodScore((m) => Math.max(0, m - (0.8 + day * 0.035) * 2.535));
@@ -240,7 +266,7 @@ export function HomefarmShopGame() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showLeaderboard, activeEvent, day, skipCustomer]);
+  }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showAds, showLeaderboard, activeEvent, day, skipCustomer]);
 
   async function loadLeaderboard() {
     try {
@@ -446,6 +472,21 @@ export function HomefarmShopGame() {
     });
   }
 
+  function runAd(type: typeof AD_TYPES[number]) {
+    const cost = Math.round((Math.random() * (type.costMax - type.costMin) + type.costMin) / 10) * 10;
+    const extra = Math.floor(Math.random() * (type.extraMax - type.extraMin + 1)) + type.extraMin;
+    if (cash < cost) {
+      setToast(`Không đủ tiền chạy ${type.name}.`);
+      return;
+    }
+    setCash((c) => c - cost);
+    setPendingExtraCustomers(extra);
+    setAdRunToday(type.id);
+    setShowAds(false);
+    sfx.cash();
+    setToast(`📣 Đã chạy ${type.name} · -${money(cost)} · ngày mai thêm ${extra} khách.`);
+  }
+
   function startNextDay() {
     const remainingCustomers = Math.max(0, customers.length - customerIndex);
     const nextDay = day + 1;
@@ -460,6 +501,7 @@ export function HomefarmShopGame() {
       signLevel: upgrades.sign,
       staffLevel: upgrades.staff,
       rainyDay: nextEvent?.id === "rainy-day",
+      extraCount: pendingExtraCustomers,
     });
 
     if (cashAfterCost < 0) {
@@ -511,16 +553,20 @@ export function HomefarmShopGame() {
     setActiveEvent(nextEvent);
     setDaySummary(null);
     setScoreSaved(false);
+    setPendingExtraCustomers(0);
+    setAdRunToday(null);
     if (nextDay === PRODUCT_EXPANSION_DAY) setShowCatalogUnlock(true);
     if (nextDay === UPGRADE_UNLOCK_DAY) setShowUpgradeUnlock(true);
     if (nextDay === EVENT_UNLOCK_DAY) setShowEventUnlock(true);
+    if (nextDay === AD_UNLOCK_DAY) setShowAdUnlock(true);
 
     const skippedText = remainingCustomers > 0 ? ` · bỏ qua ${remainingCustomers} khách còn lại` : "";
     const spoilageText = overnightSpoilage.affectedCount > 0 ? ` · hao hụt qua đêm ${overnightSpoilage.affectedCount} mặt hàng` : "";
     const catalogText = nextDay === PRODUCT_EXPANSION_DAY ? " · danh mục sản phẩm đã mở rộng" : "";
     const upgradeText = nextDay === UPGRADE_UNLOCK_DAY ? " · đã mở Nâng cấp cửa hàng" : "";
     const eventText = nextDay === EVENT_UNLOCK_DAY ? " · các vấn đề vận hành bắt đầu xuất hiện" : "";
-    setToast(`Ngày ${nextDay}: mở khóa ${nextProducts.length} mặt hàng · có ${nextCustomers.length} khách${skippedText}${spoilageText}${catalogText}${upgradeText}${eventText}. Combo tốt nhất: ${maxCombo}.`);
+    const adText = nextDay === AD_UNLOCK_DAY ? " · đã mở Quảng Cáo" : pendingExtraCustomers > 0 ? ` · +${pendingExtraCustomers} khách từ quảng cáo` : "";
+    setToast(`Ngày ${nextDay}: mở khóa ${nextProducts.length} mặt hàng · có ${nextCustomers.length} khách${skippedText}${spoilageText}${catalogText}${upgradeText}${eventText}${adText}. Combo tốt nhất: ${maxCombo}.`);
   }
 
   async function saveScore() {
@@ -570,6 +616,10 @@ export function HomefarmShopGame() {
     setShowCatalogUnlock(false);
     setShowUpgradeUnlock(false);
     setShowEventUnlock(false);
+    setShowAdUnlock(false);
+    setShowAds(false);
+    setAdRunToday(null);
+    setPendingExtraCustomers(0);
     setImportQty({});
     setUpgrades(INITIAL_UPGRADES);
     setCombo(0);
@@ -751,6 +801,14 @@ export function HomefarmShopGame() {
                     ⬆️ Lv {upgradeCount}
                   </button>
                 )}
+                {day >= AD_UNLOCK_DAY && (
+                  <button
+                    className={`hfs-board-pill hfs-ad-pill${adRunToday ? " done" : ""}`}
+                    onClick={() => { sfx.button(); setShowAds(true); }}
+                  >
+                    📣{adRunToday ? " ✓" : " Ads"}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -922,6 +980,64 @@ export function HomefarmShopGame() {
               <button className="hfs-unlock-btn" onClick={() => setShowEventUnlock(false)}>
                 Đã hiểu
               </button>
+            </div>
+          </div>
+        )}
+
+        {showAdUnlock && (
+          <div className="hfs-modal-backdrop hfs-unlock-backdrop">
+            <div className="hfs-unlock-panel">
+              <div className="hfs-unlock-icon">📣</div>
+              <div className="hfs-unlock-title">Mở khóa Quảng Cáo</div>
+              <div className="hfs-unlock-desc">
+                Từ ngày {AD_UNLOCK_DAY}, bạn có thể chi tiền chạy quảng cáo để tăng lượng khách ngày hôm sau. Phát tờ rơi hoặc Facebook Ads — mỗi ngày chọn một loại.
+              </div>
+              <button
+                className="hfs-unlock-btn"
+                onClick={() => { setShowAdUnlock(false); setShowAds(true); }}
+              >
+                Xem ngay
+              </button>
+              <button className="hfs-unlock-skip" onClick={() => setShowAdUnlock(false)}>
+                Để sau
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showAds && (
+          <div className="hfs-modal-backdrop">
+            <div className="hfs-modal">
+              <div className="hfs-modal-top">
+                <div>
+                  <div className="hfs-modal-title">📣 Chạy Quảng Cáo</div>
+                  <div className="hfs-modal-sub">Tăng khách ngày mai · chỉ chạy được 1 lần/ngày</div>
+                </div>
+                <button onClick={() => setShowAds(false)} className="hfs-modal-close">×</button>
+              </div>
+              <div className="hfs-ad-list">
+                {AD_TYPES.map((type) => {
+                  const isRun = adRunToday === type.id;
+                  const cantAfford = cash < type.costMin;
+                  return (
+                    <div key={type.id} className={`hfs-ad-row${isRun ? " done" : ""}`}>
+                      <div className="hfs-import-icon">{type.icon}</div>
+                      <div className="hfs-import-info">
+                        <div className="hfs-import-name">{type.name}</div>
+                        <div className="hfs-import-sub">{type.desc}</div>
+                        <div className="hfs-ad-stats">{type.costMin}k–{type.costMax}k · +{type.extraMin}–{type.extraMax} khách ngày mai</div>
+                      </div>
+                      <button
+                        className="hfs-ad-btn"
+                        onClick={() => runAd(type)}
+                        disabled={!!adRunToday || cantAfford}
+                      >
+                        {isRun ? "✓ Đã chạy" : cantAfford ? "Không đủ" : "Chạy"}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
