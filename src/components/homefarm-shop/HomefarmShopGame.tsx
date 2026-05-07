@@ -11,6 +11,8 @@ import {
   calcTipRate,
   calculateScore,
   generateCustomers,
+  getDailyCost,
+  getDailyCostDelta,
   getStockShortageMessage,
   getUnlockedProducts,
   maybeCreateEvent,
@@ -223,7 +225,7 @@ export function HomefarmShopGame() {
   const orderProfit = useMemo(() => orderProducts.reduce((s, p) => s + (p.price - p.cost) * p.wantQty, 0), [orderProducts]);
   const timePercent = customer ? Math.max(0, Math.round((timeLeft / customer.patience) * 100)) : 0;
   const estimatedTip = customer ? bill * calcTipRate(customer, timeLeft, moodScore, combo) : 0;
-  const importCost = products.reduce((s, p) => s + (importQty[p.id] || 0) * p.cost, 0);
+  const importCost = products.reduce((s, p) => s + (importQty[p.id] || 0) * getDailyCost(p, day), 0);
   const upgradesUnlocked = day >= UPGRADE_UNLOCK_DAY;
   const upgradeCount = Object.values(upgrades).reduce((sum, level) => sum + level, 0);
 
@@ -632,7 +634,7 @@ export function HomefarmShopGame() {
             const need = Math.max(0, target - p.stock);
             if (need > 0) {
               refillQty[p.id] = need;
-              refillCost += need * p.cost;
+              refillCost += need * getDailyCost(p, nextDay);
             }
           }
 
@@ -692,7 +694,7 @@ export function HomefarmShopGame() {
           if (!short || p.cost <= 0) continue;
           const need = Math.ceil(short.qty - p.stock) + 3;
           importItems[p.id] = need;
-          totalImportCost += need * p.cost;
+          totalImportCost += need * getDailyCost(p, day);
         }
         if (totalImportCost > 0 && curCash >= totalImportCost) {
           botImportTargetRef.current = importItems;
@@ -1121,13 +1123,22 @@ export function HomefarmShopGame() {
               <div className="hfs-import-list">
                 {products.filter((p) => p.cost > 0).map((product) => {
                   const q = importQty[product.id] || 0;
+                  const dailyCost = getDailyCost(product, day);
+                  const delta = getDailyCostDelta(product, day);
                   return (
                     <div key={product.id} className="hfs-import-row" data-import-id={product.id}>
                       <div className="hfs-import-icon">{product.icon}</div>
                       <div className="hfs-import-info">
-                        <div className="hfs-import-name">{product.name}</div>
+                        <div className="hfs-import-name">
+                          {product.name}
+                          {delta !== 0 && (
+                            <span className={`hfs-price-delta ${delta > 0 ? "up" : "down"}`}>
+                              {delta > 0 ? `+${delta}%` : `${delta}%`}
+                            </span>
+                          )}
+                        </div>
                         <div className="hfs-import-sub">
-                          Tồn {qty(product.stock)} {product.unit} · {product.id === "wholeSalmon" ? "1 con = 6kg · Vốn 2.580k/con" : `Vốn ${money(product.cost)}/${product.unit}`}
+                          Tồn {qty(product.stock)} {product.unit} · {product.id === "wholeSalmon" ? "1 con = 6kg · Vốn 2.580k/con" : `Vốn ${money(dailyCost)}/${product.unit}`}
                         </div>
                       </div>
                       <div className="hfs-stepper">

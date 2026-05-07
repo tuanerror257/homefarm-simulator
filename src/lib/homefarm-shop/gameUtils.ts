@@ -397,6 +397,27 @@ export function applyOvernightSpoilage(
   };
 }
 
+// Hàm seeded pseudo-random để giá biến động cố định trong cùng 1 ngày
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
+export function getDailyCost(product: Product, day: number): number {
+  if (product.cost <= 0) return 0;
+  const seed = day * 1000 + product.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const rand = seededRandom(seed);
+  // ±15% biến động, làm tròn về bội số 5
+  const multiplier = 0.85 + rand * 0.3; // [0.85, 1.15]
+  return Math.round((product.cost * multiplier) / 5) * 5;
+}
+
+export function getDailyCostDelta(product: Product, day: number): number {
+  if (product.cost <= 0) return 0;
+  const dailyCost = getDailyCost(product, day);
+  return Math.round(((dailyCost - product.cost) / product.cost) * 100);
+}
+
 export function calculateScore(params: {
   day: number;
   cash: number;
