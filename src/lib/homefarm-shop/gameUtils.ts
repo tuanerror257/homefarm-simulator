@@ -11,15 +11,15 @@ const PRODUCT_WEIGHTS: Record<string, number> = {
   shrimp: 7,
   squid: 6,
   pork: 6,
-  chicken: 7,
+  sashimi: 6,
   avocado: 5,
   blueberry: 5,
   cheese: 5,
   milk: 6,
   oyster: 5,
   crab: 4,
-  lamb: 4,
-  duck: 4,
+  boCanada: 5,
+  pizza: 5,
   strawberry: 5,
   kiwi: 4,
   butter: 4,
@@ -146,7 +146,7 @@ function randomQty(product: Product, day: number) {
     return sample(day >= 12 ? [1, 1, 1, 2] : [1, 1, 1]);
   }
 
-  if (["egg", "sausage", "cheese", "milk", "butter", "yogurt", "bacon", "ham", "bread"].includes(product.id)) {
+  if (["egg", "sausage", "cheese", "milk", "butter", "yogurt", "bacon", "ham", "bread", "sashimi", "pizza"].includes(product.id)) {
     return sample(day >= 12 ? [1, 2, 2, 3, 3, 4] : [1, 1, 2, 2, 3]);
   }
 
