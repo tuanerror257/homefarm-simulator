@@ -126,9 +126,10 @@ const AD_TYPES = [
 type AdId = typeof AD_TYPES[number]["id"];
 const MAX_UPGRADE_LEVEL = 5;
 const OPERATING_COST_TIERS = [
-  { untilDay: 5,        rent: 200, staff: 150, utilities: 30,  otherMin: 10, otherMax: 50  },
-  { untilDay: 11,       rent: 280, staff: 250, utilities: 70,  otherMin: 30, otherMax: 80  },
-  { untilDay: Infinity, rent: 350, staff: 400, utilities: 100, otherMin: 50, otherMax: 150 },
+  { untilDay: 5,        rent: 400, staff: 150, utilities: 30,  otherMin: 10,  otherMax: 50  },
+  { untilDay: 11,       rent: 400, staff: 250, utilities: 70,  otherMin: 30,  otherMax: 80  },
+  { untilDay: 17,       rent: 400, staff: 400, utilities: 100, otherMin: 50,  otherMax: 150 },
+  { untilDay: Infinity, rent: 400, staff: 600, utilities: 150, otherMin: 100, otherMax: 300 },
 ] as const;
 
 function getOperatingCost(day: number): OperatingCostBreakdown {
