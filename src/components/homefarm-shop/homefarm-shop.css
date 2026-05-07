@@ -1575,6 +1575,58 @@
   text-align: center;
 }
 
+.hfs-loan-banner {
+  position: absolute;
+  bottom: 70px;
+  left: 10px;
+  right: 10px;
+  z-index: 28;
+  background: #fff8e1;
+  border: 2px solid #f59f00;
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hfs-loan-text {
+  font-size: 11px;
+  font-weight: 800;
+  color: #7c4d00;
+  line-height: 1.4;
+}
+
+.hfs-loan-text span {
+  opacity: 0.7;
+}
+
+.hfs-loan-btn {
+  flex-shrink: 0;
+  background: #f59f00;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.hfs-loan-hud {
+  position: absolute;
+  top: 60px;
+  right: 8px;
+  z-index: 20;
+  background: #d63031;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
 .hfs-gameover-backdrop {
   position: absolute;
   inset: 0;

@@ -184,6 +184,7 @@ export function HomefarmShopGame() {
   const [gameOver, setGameOver] = useState(false);
   const [gameOverReason, setGameOverReason] = useState<"" | "bankrupt" | "stolen" | "reputation">("");
   const [lowRatingStreak, setLowRatingStreak] = useState(0);
+  const [loanDebt, setLoanDebt] = useState(0);
 
   const customer = customers[customerIndex] || null;
   const botActive = botMode && gamePhase === "playing";
@@ -804,7 +805,11 @@ export function HomefarmShopGame() {
       return;
     }
 
-    setCash(cashWithEvent);
+    const LOAN_DAILY_INTEREST = 50;
+    const loanInterest = loanDebt > 0 ? Math.min(loanDebt, LOAN_DAILY_INTEREST) : 0;
+    const newLoanDebt = Math.max(0, loanDebt - loanInterest);
+    setLoanDebt(newLoanDebt);
+    setCash(cashWithEvent - loanInterest);
 
     setDay(nextDay);
     setRevenue(0);
@@ -911,6 +916,7 @@ export function HomefarmShopGame() {
     setGameOver(false);
     setGameOverReason("");
     setLowRatingStreak(0);
+    setLoanDebt(0);
   }
 
   if (gamePhase === "start") {
@@ -1390,6 +1396,27 @@ export function HomefarmShopGame() {
         )}
 
         <EndDaySummary data={daySummary} onNext={startNextDay} day={day} />
+
+        {daySummary && cash < 500 && loanDebt === 0 && (
+          <div className="hfs-loan-banner">
+            <div className="hfs-loan-text">💸 Tiền mặt đang thấp. Vay khẩn cấp 500k?<br /><span>Lãi 50k/ngày, tự trừ đầu ngày hôm sau.</span></div>
+            <button
+              className="hfs-loan-btn"
+              onClick={() => {
+                sfx.cash();
+                setCash((v) => v + 500);
+                setLoanDebt(500);
+                setToast("Đã vay 500k. Nhớ trả lãi 50k/ngày nhé!");
+              }}
+            >
+              Vay 500k
+            </button>
+          </div>
+        )}
+
+        {loanDebt > 0 && (
+          <div className="hfs-loan-hud">💳 Nợ: {money(loanDebt)} · Lãi 50k/ngày</div>
+        )}
 
         {showLeaderboard && (
           <div className="hfs-modal-center">
