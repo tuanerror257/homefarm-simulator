@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v8.2.1`
+- Current version: `v8.2.2`
 - Current commit: TBD
-- Current rollback tag: `v8.2.1-tutorial-mode-buttons`
+- Current rollback tag: `v8.2.2-mode-badge-placement`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v8.2.2 - Chuyển badge chế độ ra khỏi HUD
+
+- Đưa badge `Ca Part-time` / `Ca Full-time` xuống ngay dưới badge phiên bản game.
+- Khôi phục khu vực HUD chính về bố cục cũ, không còn bị badge chế độ chen vào.
+- Dời badge bot thấp hơn để không chồng với badge chế độ.
+- Tag: `v8.2.2-mode-badge-placement`
 
 ### v8.2.1 - Chỉnh nút chọn ca ở tutorial
 

@@ -1237,6 +1237,9 @@ export function HomefarmShopGame() {
       <div className={`hfs-phone ${wrongFlash ? "wrong" : ""}`}>
         <div className="hfs-bg" />
         <div className="hfs-version-badge">v{GAME_VERSION}</div>
+        <div className={`hfs-mode-badge ${gameMode === "partTime" ? "part-time" : "full-time"}`}>
+          {modeConfig.label}
+        </div>
         {botActive && <div className="hfs-bot-badge">🤖 BOT</div>}
         <button className="hfs-mute-btn" onClick={() => setMuted(m => !m)} aria-label="Toggle music">
           {muted ? "🔇" : "🔊"}
@@ -1262,9 +1265,6 @@ export function HomefarmShopGame() {
             </div>
 
             <div className="hfs-dashboard-sub">
-              <span className={`hfs-mode-badge ${gameMode === "partTime" ? "part-time" : "full-time"}`}>
-                {modeConfig.label}
-              </span>
               <MiniHud label="DAY" value={day} />
               <MiniHud label="DT NGÀY" value={money(revenue)} />
               <MiniHud label="LÃI NGÀY" value={money(profit)} />
