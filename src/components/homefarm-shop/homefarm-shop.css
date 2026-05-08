@@ -86,7 +86,7 @@
 .hfs-version-badge {
   position: absolute;
   left: 8px;
-  top: 6px;
+  top: 28px;
   z-index: 10;
   height: 18px;
   min-width: 48px;
@@ -1148,7 +1148,7 @@
 .hfs-mode-badge {
   position: absolute;
   left: 8px;
-  top: 28px;
+  top: 6px;
   z-index: 10;
   min-height: 18px;
   font-size: 9px;

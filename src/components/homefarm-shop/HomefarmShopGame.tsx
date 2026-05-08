@@ -1236,10 +1236,10 @@ export function HomefarmShopGame() {
     <div className="hfs-page">
       <div className={`hfs-phone ${wrongFlash ? "wrong" : ""}`}>
         <div className="hfs-bg" />
-        <div className="hfs-version-badge">v{GAME_VERSION}</div>
         <div className={`hfs-mode-badge ${gameMode === "partTime" ? "part-time" : "full-time"}`}>
           {modeConfig.label}
         </div>
+        <div className="hfs-version-badge">v{GAME_VERSION}</div>
         {botActive && <div className="hfs-bot-badge">🤖 BOT</div>}
         <button className="hfs-mute-btn" onClick={() => setMuted(m => !m)} aria-label="Toggle music">
           {muted ? "🔇" : "🔊"}

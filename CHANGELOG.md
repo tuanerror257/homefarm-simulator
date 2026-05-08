@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v8.2.2`
+- Current version: `v8.2.3`
 - Current commit: TBD
-- Current rollback tag: `v8.2.2-mode-badge-placement`
+- Current rollback tag: `v8.2.3-badge-stack-order`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v8.2.3 - Đổi thứ tự badge góc trái
+
+- Đưa badge chế độ chơi lên trên cùng.
+- Chuyển badge phiên bản xuống dưới badge chế độ.
+- Giữ badge bot ở dưới cùng để tránh đè logo và HUD.
+- Tag: `v8.2.3-badge-stack-order`
 
 ### v8.2.2 - Chuyển badge chế độ ra khỏi HUD
 
