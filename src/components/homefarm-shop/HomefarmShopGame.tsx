@@ -130,6 +130,21 @@ const OPERATING_COST_TIERS = [
   { untilDay: 17,       rent: 400, staff: 400, utilities: 100, otherMin: 50,  otherMax: 150 },
   { untilDay: Infinity, rent: 400, staff: 600, utilities: 150, otherMin: 100, otherMax: 300 },
 ] as const;
+const BOT_NAME_PATTERN = /^tadadev(\d*)$/i;
+
+function parseBotStartDay(name: string) {
+  const trimmed = name.trim();
+  const match = trimmed.match(BOT_NAME_PATTERN);
+  if (!match) return null;
+  if (!match[1]) return 1;
+  const parsed = Number.parseInt(match[1], 10);
+  if (!Number.isFinite(parsed)) return 1;
+  return Math.max(1, Math.min(60, parsed));
+}
+
+function isBotTestName(name: string) {
+  return parseBotStartDay(name) !== null;
+}
 
 function getOperatingCost(day: number, multiplier = 1): OperatingCostBreakdown {
   const tier = OPERATING_COST_TIERS.find((t) => day <= t.untilDay) ?? OPERATING_COST_TIERS[OPERATING_COST_TIERS.length - 1];
@@ -1174,7 +1189,7 @@ export function HomefarmShopGame() {
   }
 
   async function saveScore() {
-    if (playerName.toLowerCase() === "tadadev") return;
+    if (isBotTestName(playerName)) return;
     try {
       await saveLeaderboardEntry({
         player_name: playerName.trim() || "Ẩn danh",
@@ -1195,17 +1210,41 @@ export function HomefarmShopGame() {
     }
   }
 
-  function resetGame() {
-    if (gamePhase === "playing" && !gameOver) {
-      persistSessionTelemetry("restart");
-    }
+  const startRun = useCallback((options: {
+    mode: GameMode;
+    startDay?: number;
+    botMode?: boolean;
+    playerName?: string;
+  }) => {
+    const nextMode = options.mode;
+    const nextModeConfig = GAME_MODE_CONFIGS[nextMode];
+    const nextStartDay = Math.max(1, Math.min(60, Math.floor(options.startDay ?? 1)));
+    const nextPlayerName = options.playerName?.trim() || playerName;
+    const nextBotMode = options.botMode ?? false;
+
     audioRef.current?.pause();
     if (audioRef.current) audioRef.current.currentTime = 0;
-    const initCustomers = generateCustomers(START_PRODUCTS, 1);
-    setGamePhase("start");
-    setProducts(START_PRODUCTS);
-    setDay(1);
-    setCash(1000);
+
+    const unlockedProducts = getUnlockedProducts(nextStartDay, START_PRODUCTS, nextMode);
+    const startEvent = maybeCreateEvent(nextStartDay, unlockedProducts, nextMode);
+    const nextProducts = applyEventToProducts(unlockedProducts, startEvent, { freezerLevel: 0 });
+    const nextCustomers = generateCustomers(nextProducts, nextStartDay, {
+      signLevel: 0,
+      staffLevel: 0,
+      rainyDay: startEvent?.id === "rainy-day",
+      extraCount: 0,
+      theme: getDayTheme(nextStartDay),
+      crisisMultiplier: 1,
+      mode: nextMode,
+    });
+
+    setGameMode(nextMode);
+    setGamePhase("playing");
+    setPlayerName(nextPlayerName);
+    setBotMode(nextBotMode);
+    setProducts(nextProducts);
+    setDay(nextStartDay);
+    setCash(Math.max(0, 1000 + (startEvent?.cashDelta ?? 0)));
     setRevenue(0);
     setProfit(0);
     setTotalRevenue(0);
@@ -1216,17 +1255,17 @@ export function HomefarmShopGame() {
     setSoldByProduct({});
     setMaxCombo(0);
     setDayMaxCombo(0);
-    setCustomers(initCustomers);
+    setCustomers(nextCustomers);
     setCustomerIndex(0);
     setSelected([]);
-    setTimeLeft(initCustomers[0].patience);
-    setToast("Tap từng món khách cần mua trên kệ hàng");
+    setTimeLeft(nextCustomers[0]?.patience ?? 30);
+    setToast(nextStartDay === 1 ? "Tap từng món khách cần mua trên kệ hàng" : `Bắt đầu từ ngày ${nextStartDay}. Tap từng món khách cần mua trên kệ hàng`);
     setShowImport(false);
     setShowUpgrades(false);
-    setShowCatalogUnlock(false);
-    setShowUpgradeUnlock(false);
-    setShowEventUnlock(false);
-    setShowAdUnlock(false);
+    setShowCatalogUnlock(nextStartDay === nextModeConfig.productExpansionDay);
+    setShowUpgradeUnlock(nextStartDay === nextModeConfig.upgradeUnlockDay);
+    setShowEventUnlock(nextStartDay === nextModeConfig.eventUnlockDay);
+    setShowAdUnlock(nextStartDay === nextModeConfig.adUnlockDay);
     setShowAds(false);
     setAdRunToday(null);
     setPendingExtraCustomers(0);
@@ -1237,26 +1276,37 @@ export function HomefarmShopGame() {
     setWrongFlash(false);
     setMascotState("idle");
     setProductPage(0);
-    setActiveEvent(null);
-    setEventMoodPenalty(0);
+    setActiveEvent(startEvent);
+    setEventMoodPenalty(startEvent?.moodDelta ?? 0);
+    setDaySummary(null);
     setShowLeaderboard(false);
     setScoreSaved(false);
-    setBotMode(false);
-    setGameMode("fullTime");
-    setDaySummary(null);
     setGameOver(false);
     setGameOverReason("");
     setLowRatingStreak(0);
     setLoanDebt(0);
     setActiveCrises([]);
-    setShowGodModeUnlock(false);
+    setShowGodModeUnlock(nextStartDay === nextModeConfig.godModeStartDay);
     setUnlockedAchievements(new Set());
     setNewAchievement(null);
     totalBulkSavingsRef.current = 0;
     productSoldTotalRef.current = {};
     totalTipsRef.current = 0;
+    sessionStartedAtRef.current = Date.now();
     sessionTelemetryRecordedRef.current = false;
     godModeStartPlayedRef.current = false;
+    setSessionTelemetry(null);
+    setSessionTelemetryCount(0);
+  }, [playerName]);
+
+  function resetGame() {
+    if (gamePhase === "playing" && !gameOver) {
+      persistSessionTelemetry("restart");
+    }
+    setGamePhase("start");
+    setGameMode("fullTime");
+    setBotMode(false);
+    startRun({ mode: "fullTime", startDay: 1, botMode: false });
   }
 
   if (gamePhase === "start") {
@@ -1279,12 +1329,14 @@ export function HomefarmShopGame() {
           <div className="hfs-version-badge">v{GAME_VERSION}</div>
           <StartScreen onStart={() => {}} dimmed />
           <TutorialModal onConfirm={(name, mode) => {
-            if (name) {
-              setPlayerName(name);
-              setBotMode(name.toLowerCase() === "tadadev");
-            }
-            setGameMode(mode);
-            setGamePhase("playing");
+            const nextName = name.trim();
+            const nextBotStartDay = parseBotStartDay(nextName);
+            startRun({
+              mode,
+              startDay: nextBotStartDay ?? 1,
+              botMode: nextBotStartDay !== null,
+              playerName: nextName,
+            });
           }} />
         </div>
       </div>

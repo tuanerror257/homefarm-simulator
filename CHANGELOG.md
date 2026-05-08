@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v8.5.2`
+- Current version: `v9.0.0`
 - Current commit: TBD
-- Current rollback tag: `v8.5.2-godmode-screen-fx`
+- Current rollback tag: `v9.0.0-bot-start-day`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.0.0 - Thêm bot test bắt đầu từ ngày tùy chọn
+
+- Cho phép tên bot dạng `tadadevNN` để bot khởi động trực tiếp ở day `NN`.
+- `tadadev` vẫn giữ hành vi cũ, bắt đầu từ ngày 1 như hiện tại.
+- Các unlock, event và trạng thái của ngày bắt đầu được dựng theo day đó thay vì luôn khởi đầu ở day 1.
+- Bot test vẫn bị loại khỏi leaderboard bằng rule tên bot.
+- Tag: `v9.0.0-bot-start-day`
 
 ### v8.5.2 - Thêm hiệu ứng màn hình khi vào God Mode
 
