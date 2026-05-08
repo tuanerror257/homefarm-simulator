@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v5.2`
+- Current version: `v7.5.1`
 - Current commit: TBD
-- Current rollback tag: `v5.2-product-swap-sashimi-bocanada-pizza`
+- Current rollback tag: `v7.5.1-fix-godmode-popup-ratio`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v7.5.1 - Fix tỷ lệ popup God Mode ngày 36
+
+- Fix popup God Mode bị lệch do kế thừa layout căn đáy từ modal chung.
+- Căn giữa `.hfs-godmode-backdrop` theo cả ngang và dọc trong khung game.
+- Giới hạn chiều cao panel theo container thay vì viewport ngoài để đúng tỷ lệ trên màn phone.
+- Thêm breakpoint compact cho màn thấp dưới 720px.
+- Tag: `v7.5.1-fix-godmode-popup-ratio`
 
 ### v5.2 - Thay sản phẩm Day 8 & Day 16
 

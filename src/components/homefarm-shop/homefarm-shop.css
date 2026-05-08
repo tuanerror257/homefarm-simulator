@@ -1181,15 +1181,18 @@
 .hfs-godmode-backdrop {
   background: rgba(0,0,0,0.88) !important;
   z-index: 50;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  overflow: hidden;
 }
 .hfs-godmode-panel {
   background: linear-gradient(160deg, #1a0000 0%, #2d0a0a 60%, #1a0008 100%);
   border: 2px solid #cc0000;
   border-radius: 18px;
-  padding: 22px 18px 18px;
-  width: 90%;
-  max-width: 340px;
-  max-height: 85vh;
+  padding: 18px 16px 16px;
+  width: min(100%, 348px);
+  max-height: calc(100% - 24px);
   overflow-y: auto;
   box-shadow: 0 0 40px rgba(255,0,0,0.25);
   display: flex;
@@ -1293,6 +1296,35 @@
 }
 .hfs-godmode-btn:active {
   background: #990000;
+}
+
+@media (max-height: 720px) {
+  .hfs-godmode-backdrop {
+    padding: 10px;
+  }
+
+  .hfs-godmode-panel {
+    width: min(100%, 342px);
+    max-height: calc(100% - 20px);
+    padding: 14px;
+    gap: 7px;
+  }
+
+  .hfs-godmode-skull {
+    font-size: 38px;
+  }
+
+  .hfs-godmode-title {
+    font-size: 24px;
+  }
+
+  .hfs-godmode-crisis-list {
+    gap: 5px;
+  }
+
+  .hfs-godmode-crisis-row {
+    padding: 6px 8px;
+  }
 }
 
 .hfs-customer-zone {
