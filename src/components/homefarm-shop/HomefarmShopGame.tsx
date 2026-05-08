@@ -262,6 +262,7 @@ export function HomefarmShopGame() {
   const [newAchievement, setNewAchievement] = useState<Achievement | null>(null);
   const totalBulkSavingsRef = useRef(0);
   const productSoldTotalRef = useRef<Record<string, number>>({});
+  const totalTipsRef = useRef(0);
 
   useEffect(() => {
     if (!showGodModeUnlock || muted) return;
@@ -512,6 +513,13 @@ export function HomefarmShopGame() {
     if (bill >= 2000) unlockAchievement("order_2000");
     if (bill >= 5000) unlockAchievement("order_5000");
     if (bill >= 10000) unlockAchievement("order_10000");
+    if (tip > 0) unlockAchievement("first_tip");
+    if (tip >= 200) unlockAchievement("tip_200");
+    if (tip > 0) {
+      const nextTotalTips = totalTipsRef.current + tip;
+      if (totalTipsRef.current < 2000 && nextTotalTips >= 2000) unlockAchievement("total_tip_2000");
+      totalTipsRef.current = nextTotalTips;
+    }
     const newCash = cash + bill + tip + comboBonus - shippingFee;
     if (newCash >= 50000) unlockAchievement("millionaire");
     setCombo(nextCombo);
@@ -1182,6 +1190,7 @@ export function HomefarmShopGame() {
     setNewAchievement(null);
     totalBulkSavingsRef.current = 0;
     productSoldTotalRef.current = {};
+    totalTipsRef.current = 0;
   }
 
   if (gamePhase === "start") {

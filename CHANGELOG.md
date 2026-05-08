@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v7.5.4`
+- Current version: `v7.5.5`
 - Current commit: TBD
-- Current rollback tag: `v7.5.4-order-value-achievements`
+- Current rollback tag: `v7.5.5-tip-achievements`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v7.5.5 - Thêm achievement liên quan tới tip
+
+- Thêm 3 achievement mới: "Bo nhẹ lấy vía", "Khách thương quá trời", "Vua săn tip".
+- Unlock theo tip đầu tiên, tip một đơn đạt 200k và tổng tip tích lũy đạt 2.000k.
+- Thêm bonus điểm cho cả 3 achievement vào điểm tổng kết.
+- Tag: `v7.5.5-tip-achievements`
 
 ### v7.5.4 - Thêm achievement theo giá trị đơn hàng
 
