@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.5`
+- Current version: `v9.1.6`
 - Current commit: TBD
-- Current rollback tag: `v9.1.5-godmode-start-screen-restored`
+- Current rollback tag: `v9.1.6-godmode-start-screen-restored`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.6 - Khôi phục nội dung đầy đủ cho màn God Mode bắt đầu
+
+- Màn day 24 được đổi lại sang layout cảnh báo God Mode lớn như bản trước.
+- Giữ teaser day 18 ở dạng popup unlock, còn day 24 là alert đầy đủ với crisis list, warning và footnote.
+- Tag: `v9.1.6-godmode-start-screen-restored`
 
 ### v9.1.5 - Khôi phục màn God Mode bắt đầu ở ngày 24
 
