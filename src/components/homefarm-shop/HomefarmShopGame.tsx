@@ -1281,7 +1281,7 @@ export function HomefarmShopGame() {
     if (nextDay === modeConfig.upgradeUnlockDay) setShowUpgradeUnlock(true);
     if (nextDay === modeConfig.eventUnlockDay) setShowEventUnlock(true);
     if (nextDay === modeConfig.adUnlockDay) setShowAdUnlock(true);
-    if (nextDay === modeConfig.godModeStartDay) setShowGodModeUnlock(true);
+    if (nextDay === modeConfig.godModeTeaserDay) setShowGodModeUnlock(true);
 
     setToast(buildDayToast({
       dayValue: nextDay,
@@ -1420,7 +1420,7 @@ export function HomefarmShopGame() {
     setLowRatingStreak(0);
     setLoanDebt(0);
     setActiveCrises([]);
-    setShowGodModeUnlock(nextStartDay === nextModeConfig.godModeStartDay);
+    setShowGodModeUnlock(nextStartDay === nextModeConfig.godModeTeaserDay);
     setUnlockedAchievements(new Set());
     setNewAchievement(null);
     totalBulkSavingsRef.current = 0;
@@ -1898,7 +1898,7 @@ export function HomefarmShopGame() {
               <div className="hfs-unlock-desc">
                 Từ ngày {modeConfig.godModeStartDay}, chế độ hủy diệt sẽ bắt đầu.
                 <br /><br />
-                Hãy chuẩn bị sẵn tiền mặt, stock hàng và tinh thần vì từ đây mỗi ngày sẽ là một chuỗi khủng hoảng mới.
+                Bạn còn vài ngày để chuẩn bị tiền mặt, stock hàng và tinh thần trước khi địa ngục chính thức mở cửa.
               </div>
               <div className="hfs-godmode-unlock-list">
                 {GOD_MODE_CRISIS_DEFS.slice(0, 4).map((def) => (

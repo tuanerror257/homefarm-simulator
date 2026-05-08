@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.2`
+- Current version: `v9.1.3`
 - Current commit: TBD
-- Current rollback tag: `v9.1.2-godmode-teaser-unlock-modal`
+- Current rollback tag: `v9.1.3-godmode-teaser-day-18-fix`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.3 - Sửa teaser God Mode về đúng ngày 18
+
+- Teaser God Mode trước đó đang bị gắn nhầm vào `godModeStartDay`.
+- Sửa lại để modal God Mode hiện ở `godModeTeaserDay`, nên Day 18 của Ca Part-time sẽ bật thông báo đúng lúc.
+- Tag: `v9.1.3-godmode-teaser-day-18-fix`
 
 ### v9.1.2 - Đổi teaser God Mode sang modal unlock kiểu day 6
 
