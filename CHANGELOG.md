@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v7.5.9`
+- Current version: `v7.5.10`
 - Current commit: TBD
-- Current rollback tag: `v7.5.9-knife-late-level-roi`
+- Current rollback tag: `v7.5.10-supabase-publishable-env`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v7.5.10 - Ghi nhận chuyển Supabase env sang publishable key
+
+- Cập nhật local `.env.local` sang Supabase publishable key cho project `tadavibes`.
+- Không commit `.env.local` để tránh đưa key/config local vào git.
+- Giữ nguyên tên biến public hiện tại để không cần đổi code client.
+- Tag: `v7.5.10-supabase-publishable-env`
 
 ### v7.5.9 - Tăng ROI level cao của Dao fillet
 
