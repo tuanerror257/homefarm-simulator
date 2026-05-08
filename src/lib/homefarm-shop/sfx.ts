@@ -59,6 +59,79 @@ function swish(duration: number, vol: number, delay: number, filterFreq = 1800) 
   source.stop(c.currentTime + delay + duration + 0.05);
 }
 
+function godModeAmbience() {
+  if (_muted) return () => {};
+  const c = getCtx();
+  if (!c) return () => {};
+
+  const master = c.createGain();
+  const lowDrone = c.createOscillator();
+  const subDrone = c.createOscillator();
+  const pulse = c.createOscillator();
+  const pulseGain = c.createGain();
+  const lowFilter = c.createBiquadFilter();
+  const noiseGain = c.createGain();
+  const droneFilter = c.createBiquadFilter();
+
+  master.gain.setValueAtTime(0.0001, c.currentTime);
+  master.gain.exponentialRampToValueAtTime(0.18, c.currentTime + 1.2);
+  master.connect(c.destination);
+
+  lowDrone.type = "sawtooth";
+  lowDrone.frequency.setValueAtTime(44, c.currentTime);
+  subDrone.type = "sine";
+  subDrone.frequency.setValueAtTime(29, c.currentTime);
+  droneFilter.type = "lowpass";
+  droneFilter.frequency.setValueAtTime(180, c.currentTime);
+  droneFilter.Q.setValueAtTime(7, c.currentTime);
+
+  pulse.type = "sine";
+  pulse.frequency.setValueAtTime(0.45, c.currentTime);
+  pulseGain.gain.setValueAtTime(0.035, c.currentTime);
+  pulse.connect(pulseGain);
+  pulseGain.connect(lowDrone.frequency);
+
+  const frameCount = Math.ceil(c.sampleRate * 1.6);
+  const buffer = c.createBuffer(1, frameCount, c.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < frameCount; i += 1) data[i] = Math.random() * 2 - 1;
+
+  const noise = c.createBufferSource();
+  noise.buffer = buffer;
+  noise.loop = true;
+  lowFilter.type = "lowpass";
+  lowFilter.frequency.setValueAtTime(260, c.currentTime);
+  lowFilter.Q.setValueAtTime(4, c.currentTime);
+  noiseGain.gain.setValueAtTime(0.045, c.currentTime);
+
+  lowDrone.connect(droneFilter);
+  subDrone.connect(droneFilter);
+  droneFilter.connect(master);
+  noise.connect(lowFilter);
+  lowFilter.connect(noiseGain);
+  noiseGain.connect(master);
+
+  lowDrone.start();
+  subDrone.start();
+  pulse.start();
+  noise.start();
+
+  let stopped = false;
+  return () => {
+    if (stopped) return;
+    stopped = true;
+    const stopAt = c.currentTime + 0.35;
+    master.gain.cancelScheduledValues(c.currentTime);
+    master.gain.setValueAtTime(Math.max(master.gain.value, 0.0001), c.currentTime);
+    master.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+    lowDrone.stop(stopAt + 0.05);
+    subDrone.stop(stopAt + 0.05);
+    pulse.stop(stopAt + 0.05);
+    noise.stop(stopAt + 0.05);
+    window.setTimeout(() => master.disconnect(), 500);
+  };
+}
+
 export function setSfxMuted(muted: boolean) {
   _muted = muted;
 }
@@ -125,4 +198,6 @@ export const sfx = {
     tone(523, 0.1, "sine", 0.6, 0.11);
     tone(659, 0.22, "sine", 0.65, 0.22);
   },
+
+  godModeAmbience,
 };

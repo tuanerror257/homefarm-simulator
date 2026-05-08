@@ -263,6 +263,12 @@ export function HomefarmShopGame() {
   const [totalBulkSavings, setTotalBulkSavings] = useState(0);
   const [productSoldTotal, setProductSoldTotal] = useState<Record<string, number>>({});
 
+  useEffect(() => {
+    if (!showGodModeUnlock || muted) return;
+    const stopAmbience = sfx.godModeAmbience();
+    return stopAmbience;
+  }, [showGodModeUnlock, muted]);
+
   const customer = customers[customerIndex] || null;
   const botActive = botMode && gamePhase === "playing";
 

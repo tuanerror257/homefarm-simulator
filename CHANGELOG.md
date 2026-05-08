@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v7.5.1`
+- Current version: `v7.5.2`
 - Current commit: TBD
-- Current rollback tag: `v7.5.1-fix-godmode-popup-ratio`
+- Current rollback tag: `v7.5.2-godmode-spooky-ambience`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v7.5.2 - Thêm nhạc nền rùng rợn cho popup God Mode
+
+- Thêm ambient loop bằng Web Audio cho màn thông báo God Mode ngày 36.
+- Âm nền tự bật khi popup God Mode xuất hiện và tự tắt khi đóng popup.
+- Tôn trọng trạng thái mute hiện có, bật mute sẽ dừng ambience ngay.
+- Tag: `v7.5.2-godmode-spooky-ambience`
 
 ### v7.5.1 - Fix tỷ lệ popup God Mode ngày 36
 
