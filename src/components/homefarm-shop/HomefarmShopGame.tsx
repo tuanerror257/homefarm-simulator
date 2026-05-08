@@ -420,6 +420,56 @@ export function HomefarmShopGame() {
     }
   }, [customerIndex, customers.length]);
 
+  function buildDayToast(params: {
+    dayValue: number;
+    productCount: number;
+    customerCount: number;
+    remainingCustomers?: number;
+    spoilageAffectedCount?: number;
+    pendingExtraCustomers?: number;
+    catalogUnlocked?: boolean;
+    upgradeUnlocked?: boolean;
+    eventUnlocked?: boolean;
+    adUnlocked?: boolean;
+    godModeTeaser?: boolean;
+    godModeStart?: boolean;
+    crisisToastParts?: string[];
+    closedByEpidemic?: boolean;
+    eventLabel?: string;
+  }) {
+    const {
+      dayValue,
+      productCount,
+      customerCount,
+      remainingCustomers = 0,
+      spoilageAffectedCount = 0,
+      pendingExtraCustomers = 0,
+      catalogUnlocked = false,
+      upgradeUnlocked = false,
+      eventUnlocked = false,
+      adUnlocked = false,
+      godModeTeaser = false,
+      godModeStart = false,
+      crisisToastParts = [],
+      closedByEpidemic = false,
+      eventLabel = "",
+    } = params;
+
+    const skippedText = remainingCustomers > 0 ? ` · bỏ qua ${remainingCustomers} khách còn lại` : "";
+    const spoilageText = spoilageAffectedCount > 0 ? ` · hao hụt qua đêm ${spoilageAffectedCount} mặt hàng` : "";
+    const catalogText = catalogUnlocked ? " · danh mục sản phẩm đã mở rộng" : "";
+    const upgradeText = upgradeUnlocked ? " · đã mở Nâng cấp cửa hàng" : "";
+    const eventText = eventUnlocked ? " · các vấn đề vận hành bắt đầu xuất hiện" : "";
+    const adText = adUnlocked ? " · đã mở Quảng Cáo" : pendingExtraCustomers > 0 ? ` · +${pendingExtraCustomers} khách từ quảng cáo` : "";
+    const godModeTeaserText = godModeTeaser ? " · GOD MODE is coming: chuẩn bị tiền mặt và stock hàng, chế độ hủy diệt sẽ tới trong vài ngày nữa" : "";
+    const godModeText = godModeStart ? " · ⚠️ GOD MODE bắt đầu!" : "";
+    const eventLabelText = eventLabel ? ` · 🎲 ${eventLabel}` : "";
+    const crisisText = crisisToastParts.length > 0 ? ` · 🚨 Crisis: ${crisisToastParts.join(", ")}` : "";
+    const closedText = closedByEpidemic ? " · 😷 Đóng cửa hôm nay!" : "";
+
+    return `Ngày ${dayValue}: ${productCount} mặt hàng · ${customerCount} khách${skippedText}${spoilageText}${catalogText}${upgradeText}${eventText}${adText}${godModeTeaserText}${godModeText}${eventLabelText}${crisisText}${closedText}. Combo: ${maxCombo}.`;
+  }
+
   useEffect(() => {
     if (gameOver) {
       persistSessionTelemetry("game_over");
@@ -1175,17 +1225,23 @@ export function HomefarmShopGame() {
     if (nextDay === modeConfig.adUnlockDay) setShowAdUnlock(true);
     if (nextDay === modeConfig.godModeStartDay) setShowGodModeUnlock(true);
 
-    const skippedText = remainingCustomers > 0 ? ` · bỏ qua ${remainingCustomers} khách còn lại` : "";
-    const spoilageText = overnightSpoilage.affectedCount > 0 ? ` · hao hụt qua đêm ${overnightSpoilage.affectedCount} mặt hàng` : "";
-    const catalogText = nextDay === modeConfig.productExpansionDay ? " · danh mục sản phẩm đã mở rộng" : "";
-    const upgradeText = nextDay === modeConfig.upgradeUnlockDay ? " · đã mở Nâng cấp cửa hàng" : "";
-    const eventText = nextDay === modeConfig.eventUnlockDay ? " · các vấn đề vận hành bắt đầu xuất hiện" : "";
-    const adText = nextDay === modeConfig.adUnlockDay ? " · đã mở Quảng Cáo" : pendingExtraCustomers > 0 ? ` · +${pendingExtraCustomers} khách từ quảng cáo` : "";
-    const godModeTeaserText = nextDay === modeConfig.godModeTeaserDay ? " · GOD MODE is coming: chuẩn bị tiền mặt và stock hàng, chế độ hủy diệt sẽ tới trong vài ngày nữa" : "";
-    const godModeText = nextDay === modeConfig.godModeStartDay ? " · ⚠️ GOD MODE bắt đầu!" : "";
-    const crisisText = crisisToastParts.length > 0 ? ` · 🚨 Crisis: ${crisisToastParts.join(", ")}` : "";
-    const closedText = closedByEpidemic ? " · 😷 Đóng cửa hôm nay!" : "";
-    setToast(`Ngày ${nextDay}: ${nextProducts.length} mặt hàng · ${nextCustomers.length} khách${skippedText}${spoilageText}${catalogText}${upgradeText}${eventText}${adText}${godModeTeaserText}${godModeText}${crisisText}${closedText}. Combo: ${maxCombo}.`);
+    setToast(buildDayToast({
+      dayValue: nextDay,
+      productCount: nextProducts.length,
+      customerCount: nextCustomers.length,
+      remainingCustomers,
+      spoilageAffectedCount: overnightSpoilage.affectedCount,
+      pendingExtraCustomers,
+      catalogUnlocked: nextDay === modeConfig.productExpansionDay,
+      upgradeUnlocked: nextDay === modeConfig.upgradeUnlockDay,
+      eventUnlocked: nextDay === modeConfig.eventUnlockDay,
+      adUnlocked: nextDay === modeConfig.adUnlockDay,
+      godModeTeaser: nextDay === modeConfig.godModeTeaserDay,
+      godModeStart: nextDay === modeConfig.godModeStartDay,
+      crisisToastParts,
+      closedByEpidemic,
+      eventLabel: nextEvent?.title ?? "",
+    }));
   }
 
   async function saveScore() {
@@ -1259,14 +1315,21 @@ export function HomefarmShopGame() {
     setCustomerIndex(0);
     setSelected([]);
     setTimeLeft(nextCustomers[0]?.patience ?? 30);
-    const teaserText = nextStartDay === nextModeConfig.godModeTeaserDay
-      ? " · GOD MODE is coming: chuẩn bị tiền mặt và stock hàng, chế độ hủy diệt sẽ tới trong vài ngày nữa"
-      : "";
-    const godModeText = nextStartDay === nextModeConfig.godModeStartDay ? " · ⚠️ GOD MODE bắt đầu!" : "";
     setToast(
       nextStartDay === 1
         ? "Tap từng món khách cần mua trên kệ hàng"
-        : `Bắt đầu từ ngày ${nextStartDay}. Tap từng món khách cần mua trên kệ hàng${teaserText}${godModeText}`,
+        : buildDayToast({
+            dayValue: nextStartDay,
+            productCount: nextProducts.length,
+            customerCount: nextCustomers.length,
+            catalogUnlocked: nextStartDay === nextModeConfig.productExpansionDay,
+            upgradeUnlocked: nextStartDay === nextModeConfig.upgradeUnlockDay,
+            eventUnlocked: nextStartDay === nextModeConfig.eventUnlockDay,
+            adUnlocked: nextStartDay === nextModeConfig.adUnlockDay,
+            godModeTeaser: nextStartDay === nextModeConfig.godModeTeaserDay,
+            godModeStart: nextStartDay === nextModeConfig.godModeStartDay,
+            eventLabel: startEvent?.title ?? "",
+          }),
     );
     setShowImport(false);
     setShowUpgrades(false);

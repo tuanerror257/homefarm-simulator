@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.0.1`
+- Current version: `v9.0.2`
 - Current commit: TBD
-- Current rollback tag: `v9.0.1-bot-start-day-teaser-fix`
+- Current rollback tag: `v9.0.2-bot-start-toast-helper`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.0.2 - Đồng bộ toast ngày bắt đầu cho bot test
+
+- Bot `tadadevNN` giờ sẽ nhận đúng toast của ngày đang bắt đầu, gồm unlock, event, teaser God Mode và crisis nếu có.
+- Helper toast dùng chung giữa `startRun()` và chuyển ngày để mọi mốc test hiển thị nhất quán.
+- Tag: `v9.0.2-bot-start-toast-helper`
 
 ### v9.0.1 - Hiện teaser God Mode khi bot bắt đầu đúng ngày teaser
 
