@@ -1144,6 +1144,27 @@
   border: 1px solid #ff444488;
   animation: hfs-godmode-pulse 1.5s ease-in-out infinite;
 }
+
+.hfs-mode-badge {
+  font-size: 9px;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 8px;
+  white-space: nowrap;
+  align-self: center;
+  border: 1px solid rgba(45,33,24,.22);
+}
+
+.hfs-mode-badge.part-time {
+  background: #dcfce7;
+  color: #137a3a;
+}
+
+.hfs-mode-badge.full-time {
+  background: #e0f2fe;
+  color: #075985;
+}
+
 @keyframes hfs-godmode-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.55; }
@@ -3121,6 +3142,62 @@
 .hfs-tutorial-btn:active {
   transform: translateY(2px);
   box-shadow: 0 2px 0 #2d2118;
+}
+
+.hfs-mode-select {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.hfs-mode-option {
+  width: 100%;
+  border: 3px solid #2d2118;
+  border-radius: 14px;
+  background: #fff;
+  color: #2d2118;
+  box-shadow: 0 3px 0 #2d2118;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+
+.hfs-mode-option span {
+  display: block;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.hfs-mode-option strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.35;
+  opacity: .72;
+}
+
+.hfs-mode-option.part-time {
+  background: linear-gradient(180deg, #ecfdf5 0%, #bbf7d0 100%);
+}
+
+.hfs-mode-option.full-time {
+  background: linear-gradient(180deg, #eff6ff 0%, #bfdbfe 100%);
+}
+
+.hfs-mode-option:disabled {
+  background: #d1d5db;
+  color: rgba(45,33,24,.55);
+  cursor: not-allowed;
+  opacity: .72;
+}
+
+.hfs-mode-option:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #2d2118;
 }
 
 /* v3.9 — game over redesign */

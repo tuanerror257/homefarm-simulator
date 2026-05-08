@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v7.5.13`
+- Current version: `v8.0.0`
 - Current commit: TBD
-- Current rollback tag: `v7.5.13-reduce-pre-godmode-customers`
+- Current rollback tag: `v8.0.0-game-mode-foundation`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v8.0.0 - Thêm nền chọn ca chơi
+
+- Đổi tutorial từ một nút vào game thành hai lựa chọn `Ca Part-time` và `Ca Full-time`.
+- Thêm state mode nền tảng để chuẩn bị balance riêng cho chế độ tàu nhanh ở các bản 8.x tiếp theo.
+- Hiển thị badge mode trong HUD khi vào ca bán.
+- Giữ `Ca Full-time` và `Ca Part-time` cùng balance hiện tại ở bản nền này để tránh trộn thay đổi economy.
+- Tag: `v8.0.0-game-mode-foundation`
 
 ### v7.5.13 - Giảm nhịp khách trước God Mode
 

@@ -192,8 +192,16 @@ const UPGRADE_DEFS: Array<{
   },
 ];
 
+type GameMode = "partTime" | "fullTime";
+
+const GAME_MODE_LABELS: Record<GameMode, string> = {
+  partTime: "Ca Part-time",
+  fullTime: "Ca Full-time",
+};
+
 export function HomefarmShopGame() {
   const [gamePhase, setGamePhase] = useState<"start" | "tutorial" | "playing">("start");
+  const [gameMode, setGameMode] = useState<GameMode>("fullTime");
   const [muted, setMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -1184,6 +1192,7 @@ export function HomefarmShopGame() {
     setShowLeaderboard(false);
     setScoreSaved(false);
     setBotMode(false);
+    setGameMode("fullTime");
     setDaySummary(null);
     setGameOver(false);
     setGameOverReason("");
@@ -1217,7 +1226,14 @@ export function HomefarmShopGame() {
           <div className="hfs-bg" />
           <div className="hfs-version-badge">v{GAME_VERSION}</div>
           <StartScreen onStart={() => {}} dimmed />
-          <TutorialModal onConfirm={(name) => { if (name) { setPlayerName(name); setBotMode(name.toLowerCase() === "tadadev"); } setGamePhase("playing"); }} />
+          <TutorialModal onConfirm={(name, mode) => {
+            if (name) {
+              setPlayerName(name);
+              setBotMode(name.toLowerCase() === "tadadev");
+            }
+            setGameMode(mode);
+            setGamePhase("playing");
+          }} />
         </div>
       </div>
     );
@@ -1253,6 +1269,9 @@ export function HomefarmShopGame() {
             </div>
 
             <div className="hfs-dashboard-sub">
+              <span className={`hfs-mode-badge ${gameMode === "partTime" ? "part-time" : "full-time"}`}>
+                {GAME_MODE_LABELS[gameMode]}
+              </span>
               <MiniHud label="DAY" value={day} />
               <MiniHud label="DT NGÀY" value={money(revenue)} />
               <MiniHud label="LÃI NGÀY" value={money(profit)} />
@@ -1955,7 +1974,7 @@ function StartScreen({ onStart, dimmed }: { onStart: () => void; dimmed?: boolea
   );
 }
 
-function TutorialModal({ onConfirm }: { onConfirm: (name: string) => void }) {
+function TutorialModal({ onConfirm }: { onConfirm: (name: string, mode: GameMode) => void }) {
   const [name, setName] = useState("");
   const features = [
     { icon: "🛒", name: "Đặt hàng và quản lý hàng hoá", desc: "Chọn sản phẩm phù hợp, nhập hàng và xử lý hàng hoá." },
@@ -2007,13 +2026,24 @@ function TutorialModal({ onConfirm }: { onConfirm: (name: string) => void }) {
           ))}
         </div>
 
-        <button
-          className="hfs-tutorial-btn"
-          onClick={() => onConfirm(name.trim())}
-          disabled={!name.trim()}
-        >
-          OK, VÀO CA BÁN! 🚀
-        </button>
+        <div className="hfs-mode-select">
+          <button
+            className="hfs-mode-option part-time"
+            onClick={() => onConfirm(name.trim(), "partTime")}
+            disabled={!name.trim()}
+          >
+            <span>Ca Part-time</span>
+            <strong>Ca Part-time là chế độ tàu nhanh: ít chờ hơn, God Mode tới sớm hơn hihi.</strong>
+          </button>
+          <button
+            className="hfs-mode-option full-time"
+            onClick={() => onConfirm(name.trim(), "fullTime")}
+            disabled={!name.trim()}
+          >
+            <span>Ca Full-time</span>
+            <strong>Ca đầy đủ: build shop từ từ, cân bằng hiện tại, dành cho người chơi kiên nhẫn.</strong>
+          </button>
+        </div>
       </div>
     </div>
   );
