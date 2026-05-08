@@ -21,12 +21,12 @@ const MODE_CONFIGS = {
   },
   "part-time": {
     label: "Ca Part-time",
-    eventUnlockDay: 10,
-    adUnlockDay: 12,
-    godModeStartDay: 26,
-    botUpgradeDayGate: [7, 11, 15, 18, 21],
-    productUnlockDayScale: 0.7,
-    operatingCostMultiplier: 0.85,
+    eventUnlockDay: 9,
+    adUnlockDay: 11,
+    godModeStartDay: 24,
+    botUpgradeDayGate: [6, 9, 12, 15, 18],
+    productUnlockDayScale: 0.6,
+    operatingCostMultiplier: 0.82,
   },
 };
 
@@ -207,8 +207,8 @@ function customersCountByDay(day) {
 function customerPaceMultiplier(day, mode) {
   if (mode === "part-time") {
     if (day <= 5) return 1;
-    if (day <= 15) return 0.78;
-    return 0.68;
+    if (day <= 15) return 0.72;
+    return 0.62;
   }
   if (day <= 5) return 1;
   if (day <= 15) return 0.85;

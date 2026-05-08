@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v8.2.5`
+- Current version: `v8.3.0`
 - Current commit: TBD
-- Current rollback tag: `v8.2.5-full-time-badge-red`
+- Current rollback tag: `v8.3.0-part-time-speed-tune`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v8.3.0 - Tuning nhanh cho Ca Part-time
+
+- Rút nhịp Part-time ngắn hơn nữa: teaser sớm hơn, God Mode sớm hơn và mở khóa hệ thống sớm hơn.
+- Giảm nhịp khách và tăng tốc progression Part-time để run gọn, phù hợp chế độ tàu nhanh.
+- Simulator cho thấy Part-time vẫn vào God Mode 100% nhưng đạt mốc sớm hơn đáng kể.
+- Tag: `v8.3.0-part-time-speed-tune`
 
 ### v8.2.5 - Đổi màu badge Ca Full-time
 

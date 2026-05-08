@@ -239,8 +239,8 @@ function customersCountByDay(day: number) {
 function customerPaceMultiplier(day: number, mode: GameMode = "fullTime") {
   if (mode === "partTime") {
     if (day <= 5) return 1;
-    if (day <= 15) return 0.78;
-    return 0.68;
+    if (day <= 15) return 0.72;
+    return 0.62;
   }
   if (day <= 5) return 1;
   if (day <= 15) return 0.85;
