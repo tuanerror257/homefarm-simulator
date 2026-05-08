@@ -260,8 +260,8 @@ export function HomefarmShopGame() {
   const [showGodModeUnlock, setShowGodModeUnlock] = useState(false);
   const [unlockedAchievements, setUnlockedAchievements] = useState<Set<AchievementId>>(new Set());
   const [newAchievement, setNewAchievement] = useState<Achievement | null>(null);
-  const [totalBulkSavings, setTotalBulkSavings] = useState(0);
-  const [productSoldTotal, setProductSoldTotal] = useState<Record<string, number>>({});
+  const totalBulkSavingsRef = useRef(0);
+  const productSoldTotalRef = useRef<Record<string, number>>({});
 
   useEffect(() => {
     if (!showGodModeUnlock || muted) return;
@@ -389,7 +389,7 @@ export function HomefarmShopGame() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showAds, showLeaderboard, activeEvent, day, skipCustomer]);
+  }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeUnlock, showAds, showLeaderboard, activeEvent, gameOver, day, skipCustomer]);
 
   async function loadLeaderboard() {
     try {
@@ -479,7 +479,8 @@ export function HomefarmShopGame() {
       return next;
     });
 
-    setProductSoldTotal((prev) => {
+    {
+      const prev = productSoldTotalRef.current;
       const next = { ...prev };
       for (const item of customer.order) {
         next[item.id] = (next[item.id] ?? 0) + item.qty;
@@ -499,8 +500,8 @@ export function HomefarmShopGame() {
       check(["salmon", "shrimp", "squid", "oyster", "crab", "sashimi", "scallop", "cod"], 200, "sold_seafood_200");
       check(["beef", "boCanada", "wagyu", "pork", "bacon", "ham"], 200, "sold_meat_200");
       check(["milk", "yogurt", "cheese", "butter"], 100, "sold_dairy_100");
-      return next;
-    });
+      productSoldTotalRef.current = next;
+    }
 
     // Achievement checks
     const newServedCount = servedCount + 1;
@@ -609,20 +610,19 @@ export function HomefarmShopGame() {
       prev.map((p) => ({ ...p, stock: Number((p.stock + (importQty[p.id] || 0)).toFixed(1)) })),
     );
     if (importSaving > 0) {
-      setTotalBulkSavings((prev) => {
-        const next = prev + importSaving;
-        const milestones: { threshold: number; id: AchievementId }[] = [
-          { threshold: 200,  id: "bulk_save_200"  },
-          { threshold: 500,  id: "bulk_save_500"  },
-          { threshold: 1000, id: "bulk_save_1000" },
-          { threshold: 1500, id: "bulk_save_1500" },
-          { threshold: 2000, id: "bulk_save_2000" },
-        ];
-        for (const m of milestones) {
-          if (prev < m.threshold && next >= m.threshold) unlockAchievement(m.id);
-        }
-        return next;
-      });
+      const prev = totalBulkSavingsRef.current;
+      const next = prev + importSaving;
+      const milestones: { threshold: number; id: AchievementId }[] = [
+        { threshold: 200,  id: "bulk_save_200"  },
+        { threshold: 500,  id: "bulk_save_500"  },
+        { threshold: 1000, id: "bulk_save_1000" },
+        { threshold: 1500, id: "bulk_save_1500" },
+        { threshold: 2000, id: "bulk_save_2000" },
+      ];
+      for (const m of milestones) {
+        if (prev < m.threshold && next >= m.threshold) unlockAchievement(m.id);
+      }
+      totalBulkSavingsRef.current = next;
     }
     setImportQty({});
     setShowImport(false);
@@ -1177,8 +1177,8 @@ export function HomefarmShopGame() {
     setShowGodModeUnlock(false);
     setUnlockedAchievements(new Set());
     setNewAchievement(null);
-    setTotalBulkSavings(0);
-    setProductSoldTotal({});
+    totalBulkSavingsRef.current = 0;
+    productSoldTotalRef.current = {};
   }
 
   if (gamePhase === "start") {

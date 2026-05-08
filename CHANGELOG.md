@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v7.5.2`
+- Current version: `v7.5.3`
 - Current commit: TBD
-- Current rollback tag: `v7.5.2-godmode-spooky-ambience`
+- Current rollback tag: `v7.5.3-fix-achievement-lint-warnings`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v7.5.3 - Fix warning lint liên quan achievement
+
+- Đổi bộ đếm tiết kiệm nhập sỉ và tổng bán theo sản phẩm từ state write-only sang ref.
+- Giữ nguyên logic unlock achievement theo milestone nhưng tránh render thừa và warning unused state.
+- Bổ sung dependency còn thiếu cho effect timer khách hàng.
+- Tag: `v7.5.3-fix-achievement-lint-warnings`
 
 ### v7.5.2 - Thêm nhạc nền rùng rợn cho popup God Mode
 
