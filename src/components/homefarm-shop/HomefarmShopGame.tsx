@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Achievement, AchievementId, ActiveCrisis, EndDaySummaryData, GodModeCrisisId, MascotState, OperatingCostBreakdown, Product, ProductStat, ShopEvent, ShopUpgradeId, ShopUpgrades } from "@/types/homefarm-shop";
+import type { Achievement, AchievementId, ActiveCrisis, EndDaySummaryData, GameMode, GodModeCrisisId, MascotState, OperatingCostBreakdown, Product, ProductStat, ShopEvent, ShopUpgradeId, ShopUpgrades } from "@/types/homefarm-shop";
 import { ACHIEVEMENTS, MASCOT_ASSETS, MASCOT_TALK, START_PRODUCTS } from "@/lib/homefarm-shop/data";
+import { GAME_MODE_CONFIGS } from "@/lib/homefarm-shop/modeConfig";
 import { GAME_VERSION } from "@/config/version";
 import {
   applyEventToProducts,
@@ -30,16 +31,9 @@ type OrderProduct = Product & { wantQty: number };
 
 const PAGE_SIZE = 8;
 const APP_ORDER_SHIPPING_FEE = 20;
-const PRODUCT_EXPANSION_DAY = 6;
-const UPGRADE_UNLOCK_DAY = 8;
-const EVENT_UNLOCK_DAY = 12;
-const AD_UNLOCK_DAY = 15;
-const GOD_MODE_TEASER_DAY = 22;
-const GOD_MODE_START_DAY = 36;
 const GOD_MODE_CHANCE_INCREMENT = 0.03;
 const GOD_MODE_MAX_CHANCE = 0.65;
 // Bot gate: minimum day required to purchase each upgrade level (index = currentLevel)
-const BOT_UPGRADE_DAY_GATE = [8, 14, 20, 24, 27];
 const KNIFE_SALMON_BONUS_BY_LEVEL = [0, 0.35, 0.7, 1.1, 1.55, 2.1] as const;
 const KNIFE_HEAD_BONE_BONUS_BY_LEVEL = [0, 0.1, 0.2, 0.35, 0.5, 0.7] as const;
 
@@ -136,11 +130,15 @@ const OPERATING_COST_TIERS = [
   { untilDay: Infinity, rent: 400, staff: 600, utilities: 150, otherMin: 100, otherMax: 300 },
 ] as const;
 
-function getOperatingCost(day: number): OperatingCostBreakdown {
+function getOperatingCost(day: number, multiplier = 1): OperatingCostBreakdown {
   const tier = OPERATING_COST_TIERS.find((t) => day <= t.untilDay) ?? OPERATING_COST_TIERS[OPERATING_COST_TIERS.length - 1];
   const other = Math.round((Math.random() * (tier.otherMax - tier.otherMin) + tier.otherMin) / 10) * 10;
-  const total = tier.rent + tier.staff + tier.utilities + other;
-  return { rent: tier.rent, staff: tier.staff, utilities: tier.utilities, other, total };
+  const rent = Math.round(tier.rent * multiplier);
+  const staff = Math.round(tier.staff * multiplier);
+  const utilities = Math.round(tier.utilities * multiplier);
+  const scaledOther = Math.round(other * multiplier);
+  const total = rent + staff + utilities + scaledOther;
+  return { rent, staff, utilities, other: scaledOther, total };
 }
 
 const INITIAL_UPGRADES: ShopUpgrades = {
@@ -192,16 +190,10 @@ const UPGRADE_DEFS: Array<{
   },
 ];
 
-type GameMode = "partTime" | "fullTime";
-
-const GAME_MODE_LABELS: Record<GameMode, string> = {
-  partTime: "Ca Part-time",
-  fullTime: "Ca Full-time",
-};
-
 export function HomefarmShopGame() {
   const [gamePhase, setGamePhase] = useState<"start" | "tutorial" | "playing">("start");
   const [gameMode, setGameMode] = useState<GameMode>("fullTime");
+  const modeConfig = GAME_MODE_CONFIGS[gameMode];
   const [muted, setMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -336,7 +328,7 @@ export function HomefarmShopGame() {
     if (q < BULK_THRESHOLD) return s;
     return s + q * getDailyCost(p, day) * crisisImportMultiplier * BULK_DISCOUNT;
   }, 0);
-  const upgradesUnlocked = day >= UPGRADE_UNLOCK_DAY;
+  const upgradesUnlocked = day >= modeConfig.upgradeUnlockDay;
   const upgradeCount = Object.values(upgrades).reduce((sum, level) => sum + level, 0);
 
   const currentScore = calculateScore({
@@ -588,7 +580,7 @@ export function HomefarmShopGame() {
 
   function buyUpgrade(id: ShopUpgradeId) {
     if (!upgradesUnlocked) {
-      setToast(`Nâng cấp cửa hàng sẽ mở từ ngày ${UPGRADE_UNLOCK_DAY}.`);
+      setToast(`Nâng cấp cửa hàng sẽ mở từ ngày ${modeConfig.upgradeUnlockDay}.`);
       return;
     }
 
@@ -673,7 +665,7 @@ export function HomefarmShopGame() {
       1,
       Math.min(5, Number((5 - skippedTodayCount * 0.35 + servedTodayCount * 0.08).toFixed(1))),
     );
-    const opCost = getOperatingCost(day);
+    const opCost = getOperatingCost(day, modeConfig.operatingCostMultiplier);
 
     const topSellers: ProductStat[] = Object.entries(soldByProduct)
       .map(([id, stat]) => {
@@ -760,7 +752,7 @@ export function HomefarmShopGame() {
           for (const upId of upgradeOrder) {
             const level = curUpgrades[upId];
             if (level >= MAX_UPGRADE_LEVEL) continue;
-            if (day < BOT_UPGRADE_DAY_GATE[level]) continue;
+            if (day < modeConfig.botUpgradeDayGate[level]) continue;
             const cost = UPGRADE_DEFS.find((u) => u.id === upId)!.costs[level];
             if (curCash >= cost * 2) { buyUpgrade(upId); setShowUpgrades(false); return; }
           }
@@ -799,7 +791,7 @@ export function HomefarmShopGame() {
           for (const upId of upgradeOrder) {
             const level = curUpgrades[upId];
             if (level >= MAX_UPGRADE_LEVEL) continue;
-            if (day < BOT_UPGRADE_DAY_GATE[level]) continue; // not yet time for this level
+            if (day < modeConfig.botUpgradeDayGate[level]) continue; // not yet time for this level
             const cost = UPGRADE_DEFS.find((u) => u.id === upId)!.costs[level];
             if (curCash >= cost * 2) { // keep at least 1× cost as buffer after purchase
               setBotUpgradedToday(true);
@@ -811,7 +803,7 @@ export function HomefarmShopGame() {
 
         // Decide: open ads modal once per day if affordable
         // 2500k buffer = max opCost(1000) + max leaflet(500) + 1000 safety
-        if (day >= AD_UNLOCK_DAY && !adRunToday && curCash > 2500) {
+        if (day >= modeConfig.adUnlockDay && !adRunToday && curCash > 2500) {
           setShowAds(true);
           return;
         }
@@ -819,7 +811,7 @@ export function HomefarmShopGame() {
         // Demand-based broad refill: estimate next day's consumption per product
         {
           const nextDay = day + 1;
-          const nextCustomers = expectedCustomerCountByDay(nextDay);
+          const nextCustomers = expectedCustomerCountByDay(nextDay, gameMode);
           // Average items per order, increasing with day
           const avgItems = nextDay <= 8 ? 2 : nextDay <= 16 ? 3.5 : 4.5;
           // Importable products excluding wholeSalmon (handled by fillet + spot import)
@@ -963,8 +955,8 @@ export function HomefarmShopGame() {
     const cashAfterCost = cash - opTotal;
 
     const overnightSpoilage = applyOvernightSpoilage(products, { freezerLevel: upgrades.freezer });
-    const unlockedProducts = getUnlockedProducts(nextDay, overnightSpoilage.products);
-    const nextEvent = maybeCreateEvent(nextDay, unlockedProducts);
+    const unlockedProducts = getUnlockedProducts(nextDay, overnightSpoilage.products, gameMode);
+    const nextEvent = maybeCreateEvent(nextDay, unlockedProducts, gameMode);
     let nextProducts = applyEventToProducts(unlockedProducts, nextEvent, { freezerLevel: upgrades.freezer });
 
     if (cashAfterCost < 0) {
@@ -1007,8 +999,8 @@ export function HomefarmShopGame() {
     const newCrises: ActiveCrisis[] = [];
     const crisisToastParts: string[] = [];
 
-    if (nextDay >= GOD_MODE_START_DAY) {
-      const daysInGodMode = nextDay - GOD_MODE_START_DAY;
+    if (nextDay >= modeConfig.godModeStartDay) {
+      const daysInGodMode = nextDay - modeConfig.godModeStartDay;
       for (const def of GOD_MODE_CRISIS_DEFS) {
         const chance = Math.min(def.baseChance + daysInGodMode * GOD_MODE_CHANCE_INCREMENT, GOD_MODE_MAX_CHANCE);
         if (Math.random() >= chance) continue;
@@ -1077,6 +1069,7 @@ export function HomefarmShopGame() {
           extraCount: pendingExtraCustomers,
           theme: getDayTheme(nextDay),
           crisisMultiplier: crisisCustomerMult,
+          mode: gameMode,
         });
     // ── END GOD MODE ─────────────────────────────────────────────────────────
 
@@ -1108,20 +1101,20 @@ export function HomefarmShopGame() {
     setPendingExtraCustomers(0);
     setAdRunToday(null);
     setBotUpgradedToday(false);
-    if (nextDay === PRODUCT_EXPANSION_DAY) setShowCatalogUnlock(true);
-    if (nextDay === UPGRADE_UNLOCK_DAY) setShowUpgradeUnlock(true);
-    if (nextDay === EVENT_UNLOCK_DAY) setShowEventUnlock(true);
-    if (nextDay === AD_UNLOCK_DAY) setShowAdUnlock(true);
-    if (nextDay === GOD_MODE_START_DAY) setShowGodModeUnlock(true);
+    if (nextDay === modeConfig.productExpansionDay) setShowCatalogUnlock(true);
+    if (nextDay === modeConfig.upgradeUnlockDay) setShowUpgradeUnlock(true);
+    if (nextDay === modeConfig.eventUnlockDay) setShowEventUnlock(true);
+    if (nextDay === modeConfig.adUnlockDay) setShowAdUnlock(true);
+    if (nextDay === modeConfig.godModeStartDay) setShowGodModeUnlock(true);
 
     const skippedText = remainingCustomers > 0 ? ` · bỏ qua ${remainingCustomers} khách còn lại` : "";
     const spoilageText = overnightSpoilage.affectedCount > 0 ? ` · hao hụt qua đêm ${overnightSpoilage.affectedCount} mặt hàng` : "";
-    const catalogText = nextDay === PRODUCT_EXPANSION_DAY ? " · danh mục sản phẩm đã mở rộng" : "";
-    const upgradeText = nextDay === UPGRADE_UNLOCK_DAY ? " · đã mở Nâng cấp cửa hàng" : "";
-    const eventText = nextDay === EVENT_UNLOCK_DAY ? " · các vấn đề vận hành bắt đầu xuất hiện" : "";
-    const adText = nextDay === AD_UNLOCK_DAY ? " · đã mở Quảng Cáo" : pendingExtraCustomers > 0 ? ` · +${pendingExtraCustomers} khách từ quảng cáo` : "";
-    const godModeTeaserText = nextDay === GOD_MODE_TEASER_DAY ? " · GOD MODE is coming: chuẩn bị tiền mặt và stock hàng, chế độ hủy diệt sẽ tới trong vài ngày nữa" : "";
-    const godModeText = nextDay === GOD_MODE_START_DAY ? " · ⚠️ GOD MODE bắt đầu!" : "";
+    const catalogText = nextDay === modeConfig.productExpansionDay ? " · danh mục sản phẩm đã mở rộng" : "";
+    const upgradeText = nextDay === modeConfig.upgradeUnlockDay ? " · đã mở Nâng cấp cửa hàng" : "";
+    const eventText = nextDay === modeConfig.eventUnlockDay ? " · các vấn đề vận hành bắt đầu xuất hiện" : "";
+    const adText = nextDay === modeConfig.adUnlockDay ? " · đã mở Quảng Cáo" : pendingExtraCustomers > 0 ? ` · +${pendingExtraCustomers} khách từ quảng cáo` : "";
+    const godModeTeaserText = nextDay === modeConfig.godModeTeaserDay ? " · GOD MODE is coming: chuẩn bị tiền mặt và stock hàng, chế độ hủy diệt sẽ tới trong vài ngày nữa" : "";
+    const godModeText = nextDay === modeConfig.godModeStartDay ? " · ⚠️ GOD MODE bắt đầu!" : "";
     const crisisText = crisisToastParts.length > 0 ? ` · 🚨 Crisis: ${crisisToastParts.join(", ")}` : "";
     const closedText = closedByEpidemic ? " · 😷 Đóng cửa hôm nay!" : "";
     setToast(`Ngày ${nextDay}: ${nextProducts.length} mặt hàng · ${nextCustomers.length} khách${skippedText}${spoilageText}${catalogText}${upgradeText}${eventText}${adText}${godModeTeaserText}${godModeText}${crisisText}${closedText}. Combo: ${maxCombo}.`);
@@ -1270,7 +1263,7 @@ export function HomefarmShopGame() {
 
             <div className="hfs-dashboard-sub">
               <span className={`hfs-mode-badge ${gameMode === "partTime" ? "part-time" : "full-time"}`}>
-                {GAME_MODE_LABELS[gameMode]}
+                {modeConfig.label}
               </span>
               <MiniHud label="DAY" value={day} />
               <MiniHud label="DT NGÀY" value={money(revenue)} />
@@ -1280,7 +1273,7 @@ export function HomefarmShopGame() {
                   {getDayTheme(day) === "busy" ? "🔥 Mùa bận" : "😴 Ế ẩm"}
                 </span>
               )}
-              {day >= GOD_MODE_START_DAY && (
+              {day >= modeConfig.godModeStartDay && (
                 <span className="hfs-theme-badge god-mode">☠️ GOD</span>
               )}
             </div>
@@ -1402,7 +1395,7 @@ export function HomefarmShopGame() {
                     ⬆️ Lv {upgradeCount}
                   </button>
                 )}
-                {day >= AD_UNLOCK_DAY && (
+                {day >= modeConfig.adUnlockDay && (
                   <button
                     className={`hfs-board-pill hfs-ad-pill${adRunToday ? " done" : ""}`}
                     onClick={() => { sfx.button(); setShowAds(true); }}
@@ -1549,7 +1542,7 @@ export function HomefarmShopGame() {
               <div className="hfs-unlock-icon hfs-catalog-unlock-icon">🛒</div>
               <div className="hfs-unlock-title">Danh mục sản phẩm mở rộng</div>
               <div className="hfs-unlock-desc">
-                Cửa hàng đã được biết đến rộng rãi hơn. Từ ngày {PRODUCT_EXPANSION_DAY}, danh mục sản phẩm được mở rộng để đáp ứng nhu cầu đa dạng của khách hàng.
+                Cửa hàng đã được biết đến rộng rãi hơn. Từ ngày {modeConfig.productExpansionDay}, danh mục sản phẩm được mở rộng để đáp ứng nhu cầu đa dạng của khách hàng.
                 <br /><br />
                 Để đáp ứng nhu cầu vận hành tăng cao, bạn sẽ cần thuê thêm nhân viên — chi phí hàng ngày sẽ tăng theo.
               </div>
@@ -1566,7 +1559,7 @@ export function HomefarmShopGame() {
               <div className="hfs-unlock-icon">⬆️</div>
               <div className="hfs-unlock-title">Mở khóa Nâng cấp cửa hàng</div>
               <div className="hfs-unlock-desc">
-                Từ ngày {UPGRADE_UNLOCK_DAY}, bạn có thể dùng tiền mặt để nâng cấp dao fillet, nhân viên, bảng hiệu VIP và tủ lạnh.
+                Từ ngày {modeConfig.upgradeUnlockDay}, bạn có thể dùng tiền mặt để nâng cấp dao fillet, nhân viên, bảng hiệu VIP và tủ lạnh.
               </div>
               <button
                 className="hfs-unlock-btn"
@@ -1590,7 +1583,7 @@ export function HomefarmShopGame() {
               <div className="hfs-unlock-icon hfs-event-unlock-icon">⚡</div>
               <div className="hfs-unlock-title">Vận hành bắt đầu phức tạp</div>
               <div className="hfs-unlock-desc">
-                Cửa hàng càng ngày càng làm ăn phát đạt, nhưng các vấn đề cũng sẽ bắt đầu xuất hiện từ ngày {EVENT_UNLOCK_DAY}. Hãy chuẩn bị tiền mặt, tồn kho và nâng cấp phù hợp.
+                Cửa hàng càng ngày càng làm ăn phát đạt, nhưng các vấn đề cũng sẽ bắt đầu xuất hiện từ ngày {modeConfig.eventUnlockDay}. Hãy chuẩn bị tiền mặt, tồn kho và nâng cấp phù hợp.
               </div>
               <button className="hfs-unlock-btn" onClick={() => setShowEventUnlock(false)}>
                 Đã hiểu
@@ -1638,7 +1631,7 @@ export function HomefarmShopGame() {
             <div className="hfs-godmode-panel">
               <div className="hfs-godmode-skull">☠️</div>
               <div className="hfs-godmode-title">GOD MODE</div>
-              <div className="hfs-godmode-sub">Ngày {GOD_MODE_START_DAY} — Thử thách tột cùng</div>
+              <div className="hfs-godmode-sub">Ngày {modeConfig.godModeStartDay} — Thử thách tột cùng</div>
               <div className="hfs-godmode-desc">
                 Từ hôm nay, mỗi ngày 6 khủng hoảng sẽ roll độc lập. Xác suất tăng thêm 3% mỗi ngày — không có điểm dừng.
               </div>

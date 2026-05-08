@@ -1,5 +1,6 @@
-import type { AchievementId, Customer, CustomerType, Product, ShopEvent } from "@/types/homefarm-shop";
+import type { AchievementId, Customer, CustomerType, GameMode, Product, ShopEvent } from "@/types/homefarm-shop";
 import { ALL_PRODUCTS, CUSTOMER_TYPES, SHOP_EVENTS } from "./data";
+import { GAME_MODE_CONFIGS } from "./modeConfig";
 
 const PRODUCT_WEIGHTS: Record<string, number> = {
   salmon: 30,
@@ -73,17 +74,25 @@ function getFreezerReduction(level = 0) {
   return FREEZER_REDUCTION_BY_LEVEL[index];
 }
 
-function unlockedCountByDay(day: number) {
+function getModeProgressDay(day: number, mode: GameMode) {
+  const scale = GAME_MODE_CONFIGS[mode].productUnlockDayScale;
+  if (scale === 1) return day;
+  return Math.max(1, Math.floor(1 + (day - 1) / scale));
+}
+
+function unlockedCountByDay(day: number, mode: GameMode = "fullTime") {
+  const progressDay = getModeProgressDay(day, mode);
   // Day 1-5: giữ 8 món core để người chơi làm quen.
   // Day 6: mở thêm 2 món.
   // Sau đó mỗi 2 ngày mở thêm 2 món, tối đa 32 món.
-  if (day <= 5) return 8;
-  return Math.min(32, 8 + (Math.floor((day - 6) / 2) + 1) * 2);
+  if (progressDay <= 5) return 8;
+  return Math.min(32, 8 + (Math.floor((progressDay - 6) / 2) + 1) * 2);
 }
 
 export function getUnlockedProducts(
   arg1: number | Product[],
   arg2?: number | Product[],
+  mode: GameMode = "fullTime",
 ): Product[] {
   // Backward compatible:
   // - getUnlockedProducts(day, products)
@@ -96,7 +105,7 @@ export function getUnlockedProducts(
       : [];
 
   const currentById = new Map(currentProducts.map((p) => [p.id, p]));
-  const count = unlockedCountByDay(day);
+  const count = unlockedCountByDay(day, mode);
 
   // Quan trọng: unlock phải dựa trên ALL_PRODUCTS, không dựa trên list hiện tại.
   // Nếu không, game sẽ bị kẹt mãi ở 8 món đầu.
@@ -227,13 +236,18 @@ function customersCountByDay(day: number) {
   return Math.min(8 + Math.floor((day - 5) * 0.55), 13);
 }
 
-function customerPaceMultiplier(day: number) {
+function customerPaceMultiplier(day: number, mode: GameMode = "fullTime") {
+  if (mode === "partTime") {
+    if (day <= 5) return 1;
+    if (day <= 15) return 0.78;
+    return 0.68;
+  }
   if (day <= 5) return 1;
   if (day <= 15) return 0.85;
   return 0.75;
 }
 
-export function expectedCustomerCountByDay(day: number) {
+export function expectedCustomerCountByDay(day: number, mode: GameMode = "fullTime") {
   const theme = getDayTheme(day);
   const baseCount = customersCountByDay(day);
   const themedCount = theme === "busy"
@@ -242,7 +256,7 @@ export function expectedCustomerCountByDay(day: number) {
       ? Math.round(baseCount * 0.75)
       : baseCount;
 
-  return Math.max(1, Math.round(themedCount * customerPaceMultiplier(day)));
+  return Math.max(1, Math.round(themedCount * customerPaceMultiplier(day, mode)));
 }
 
 function patienceByDay(type: CustomerType, day: number, staffLevel = 0, theme: "busy" | "slow" | "normal" = "normal") {
@@ -262,8 +276,10 @@ export function generateCustomers(
     extraCount?: number;
     theme?: "busy" | "slow" | "normal";
     crisisMultiplier?: number;
+    mode?: GameMode;
   } = {},
 ): Customer[] {
+  const mode = options.mode ?? "fullTime";
   const theme = options.theme ?? getDayTheme(day);
   const baseCount = customersCountByDay(day);
   const rawThemedCount = theme === "busy"
@@ -271,7 +287,7 @@ export function generateCustomers(
     : theme === "slow"
       ? Math.round(baseCount * 0.75)
       : baseCount;
-  const themedCount = Math.max(1, Math.round(rawThemedCount * customerPaceMultiplier(day)));
+  const themedCount = Math.max(1, Math.round(rawThemedCount * customerPaceMultiplier(day, mode)));
   const crisisMultiplier = options.crisisMultiplier ?? 1;
   const count = Math.max(0, Math.round(themedCount * crisisMultiplier)) + (options.extraCount ?? 0);
   const signLevel = options.signLevel ?? 0;
@@ -337,12 +353,13 @@ export function getStockShortageMessage(product: Product) {
   return `Thiếu ${product.name}. Hãy nhập thêm hàng.`;
 }
 
-export function maybeCreateEvent(day: number, products: Product[] = []): ShopEvent | null {
-  // Day 1-11 yên bình để người chơi làm quen và mở rộng shop.
-  if (day <= 11) return null;
+export function maybeCreateEvent(day: number, products: Product[] = [], mode: GameMode = "fullTime"): ShopEvent | null {
+  // Early days stay quiet so players can learn the shop loop first.
+  const eventUnlockDay = GAME_MODE_CONFIGS[mode].eventUnlockDay;
+  if (day < eventUnlockDay) return null;
 
-  // Từ ngày 12 bắt đầu có sự kiện. Chance tăng dần nhưng có trần.
-  const chance = Math.min(0.18 + (day - 12) * 0.02, 0.36);
+  // Events start at the mode unlock day. Chance ramps up but keeps a cap.
+  const chance = Math.min(0.18 + (day - eventUnlockDay) * 0.02, 0.36);
   if (Math.random() > chance) return null;
 
   const event = sample(SHOP_EVENTS);

@@ -11,6 +11,8 @@ export type Product = {
   category?: "core" | "fruit" | "meat" | "seafood" | "addon";
 };
 
+export type GameMode = "partTime" | "fullTime";
+
 export type OrderItem = {
   id: string;
   qty: number;

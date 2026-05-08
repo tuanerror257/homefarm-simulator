@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v8.0.0`
+- Current version: `v8.1.0`
 - Current commit: TBD
-- Current rollback tag: `v8.0.0-game-mode-foundation`
+- Current rollback tag: `v8.1.0-part-time-balance-config`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v8.1.0 - Thêm balance config cho Ca Part-time
+
+- Tách thông số mode vào `GAME_MODE_CONFIGS` để Full-time và Part-time có thể balance riêng.
+- Ca Full-time giữ nguyên nhịp hiện tại: teaser ngày 22 và God Mode ngày 36.
+- Ca Part-time dùng nhịp nhanh hơn: teaser ngày 16, God Mode ngày 26, unlock/event/ads/upgrade đến sớm hơn.
+- Ca Part-time mở danh mục sản phẩm nhanh hơn và giảm nhẹ operating cost để phù hợp run ngắn.
+- Tag: `v8.1.0-part-time-balance-config`
 
 ### v8.0.0 - Thêm nền chọn ca chơi
 
