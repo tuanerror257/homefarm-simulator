@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sim": "node scripts/simulate-balance.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",

@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v7.5.10`
+- Current version: `v7.5.11`
 - Current commit: TBD
-- Current rollback tag: `v7.5.10-supabase-publishable-env`
+- Current rollback tag: `v7.5.11-balance-simulator`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v7.5.11 - Thêm dev balance simulator
+
+- Thêm `npm run sim` để chạy mô phỏng balance nhiều seed từ terminal.
+- Simulator report tỷ lệ sống sót, ngày kết thúc, cash snapshot, doanh thu/lãi, chi nhập hàng, spoilage, upgrade timing, event/crisis counts.
+- Hỗ trợ `--runs`, `--days`, `--seed`, `--json` để dùng cho kiểm tra thủ công hoặc automation sau này.
+- Cập nhật ESLint ignore để không quét `.claude/worktrees` và build cache local.
+- Tag: `v7.5.11-balance-simulator`
 
 ### v7.5.10 - Ghi nhận chuyển Supabase env sang publishable key
 
