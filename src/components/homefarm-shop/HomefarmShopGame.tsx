@@ -10,6 +10,7 @@ import {
   applyOvernightSpoilage,
   calcTipRate,
   calculateScore,
+  expectedCustomerCountByDay,
   generateCustomers,
   getDailyCost,
   getDailyCostDelta,
@@ -810,10 +811,7 @@ export function HomefarmShopGame() {
         // Demand-based broad refill: estimate next day's consumption per product
         {
           const nextDay = day + 1;
-          // Mirror customersCountByDay formula from gameUtils
-          const nextCustomers = nextDay <= 5
-            ? 3 + nextDay
-            : Math.min(8 + Math.floor((nextDay - 5) * 0.55), 18);
+          const nextCustomers = expectedCustomerCountByDay(nextDay);
           // Average items per order, increasing with day
           const avgItems = nextDay <= 8 ? 2 : nextDay <= 16 ? 3.5 : 4.5;
           // Importable products excluding wholeSalmon (handled by fillet + spot import)

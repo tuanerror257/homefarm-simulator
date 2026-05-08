@@ -169,11 +169,21 @@ function customersCountByDay(day) {
   return Math.min(8 + Math.floor((day - 5) * 0.55), 13);
 }
 
-function themedCustomerCount(day, crisisMultiplier, extraCount) {
+function customerPaceMultiplier(day) {
+  if (day <= 5) return 1;
+  if (day <= 15) return 0.85;
+  return 0.75;
+}
+
+function expectedCustomerCountByDay(day) {
   const base = customersCountByDay(day);
   const theme = getDayTheme(day);
   const themed = theme === "busy" ? Math.round(base * 1.2) : theme === "slow" ? Math.round(base * 0.75) : base;
-  return Math.max(0, Math.round(themed * crisisMultiplier)) + extraCount;
+  return Math.max(1, Math.round(themed * customerPaceMultiplier(day)));
+}
+
+function themedCustomerCount(day, crisisMultiplier, extraCount) {
+  return Math.max(0, Math.round(expectedCustomerCountByDay(day) * crisisMultiplier)) + extraCount;
 }
 
 function maxItemsPerOrder(day) {
@@ -376,7 +386,7 @@ function buyOneUpgrade(state, day) {
 
 function restockForTomorrow(state, day, crisisImportMultiplier) {
   const nextDay = day + 1;
-  const nextCustomers = customersCountByDay(nextDay);
+  const nextCustomers = expectedCustomerCountByDay(nextDay);
   const avgItems = nextDay <= 8 ? 2 : nextDay <= 16 ? 3.5 : 4.5;
   const importable = state.products.filter((p) => p.cost > 0 && p.id !== "wholeSalmon");
   const orderProb = Math.min(0.9, avgItems / Math.max(1, importable.length));

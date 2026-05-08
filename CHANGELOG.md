@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v7.5.12`
+- Current version: `v7.5.13`
 - Current commit: TBD
-- Current rollback tag: `v7.5.12-godmode-teaser-day-22`
+- Current rollback tag: `v7.5.13-reduce-pre-godmode-customers`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v7.5.13 - Giảm nhịp khách trước God Mode
+
+- Giữ nguyên lượng khách ngày 1-5 để không đổi onboarding.
+- Giảm khoảng 15% lượng khách ngày 6-15 và khoảng 25% từ ngày 16 trở đi.
+- Đồng bộ công thức khách giữa game thật, bot auto-restock và balance simulator.
+- Tag: `v7.5.13-reduce-pre-godmode-customers`
 
 ### v7.5.12 - Thêm teaser God Mode ngày 22
 

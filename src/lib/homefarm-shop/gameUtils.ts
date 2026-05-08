@@ -227,6 +227,24 @@ function customersCountByDay(day: number) {
   return Math.min(8 + Math.floor((day - 5) * 0.55), 13);
 }
 
+function customerPaceMultiplier(day: number) {
+  if (day <= 5) return 1;
+  if (day <= 15) return 0.85;
+  return 0.75;
+}
+
+export function expectedCustomerCountByDay(day: number) {
+  const theme = getDayTheme(day);
+  const baseCount = customersCountByDay(day);
+  const themedCount = theme === "busy"
+    ? Math.round(baseCount * 1.2)
+    : theme === "slow"
+      ? Math.round(baseCount * 0.75)
+      : baseCount;
+
+  return Math.max(1, Math.round(themedCount * customerPaceMultiplier(day)));
+}
+
 function patienceByDay(type: CustomerType, day: number, staffLevel = 0, theme: "busy" | "slow" | "normal" = "normal") {
   const pressure = day <= 5 ? 0 : (day - 5) * 0.55;
   const randomBonus = Math.random() * 5;
@@ -248,11 +266,12 @@ export function generateCustomers(
 ): Customer[] {
   const theme = options.theme ?? getDayTheme(day);
   const baseCount = customersCountByDay(day);
-  const themedCount = theme === "busy"
+  const rawThemedCount = theme === "busy"
     ? Math.round(baseCount * 1.2)
     : theme === "slow"
       ? Math.round(baseCount * 0.75)
       : baseCount;
+  const themedCount = Math.max(1, Math.round(rawThemedCount * customerPaceMultiplier(day)));
   const crisisMultiplier = options.crisisMultiplier ?? 1;
   const count = Math.max(0, Math.round(themedCount * crisisMultiplier)) + (options.extraCount ?? 0);
   const signLevel = options.signLevel ?? 0;
