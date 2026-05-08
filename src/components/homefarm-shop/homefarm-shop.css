@@ -35,7 +35,8 @@
 .hfs-phone.godmode-active {
   border-color: #7f1d1d;
   box-shadow: 0 0 0 2px rgba(239,68,68,.18), 0 18px 35px rgba(0,0,0,.28);
-  animation: hfs-godmode-shell 1.7s ease-in-out infinite;
+  animation: hfs-godmode-shell 1.8s ease-in-out infinite;
+  will-change: transform;
 }
 
 .hfs-bg {
@@ -3489,8 +3490,12 @@
 }
 
 @keyframes hfs-godmode-shell {
-  0%, 100% { filter: brightness(1) saturate(1); transform: translateZ(0); }
-  50% { filter: brightness(1.06) saturate(1.18); transform: translateX(1px); }
+  0%, 100% { filter: brightness(1) saturate(1); transform: translate3d(0, 0, 0) rotate(0deg); }
+  18% { transform: translate3d(-0.6px, 0.3px, 0) rotate(-0.08deg); }
+  36% { transform: translate3d(0.7px, -0.4px, 0) rotate(0.06deg); }
+  54% { transform: translate3d(-0.4px, -0.2px, 0) rotate(-0.04deg); }
+  72% { transform: translate3d(0.5px, 0.3px, 0) rotate(0.05deg); }
+  50% { filter: brightness(1.03) saturate(1.1); }
 }
 
 @keyframes hfs-godmode-scan {

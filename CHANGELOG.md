@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.0.3`
+- Current version: `v9.0.4`
 - Current commit: TBD
-- Current rollback tag: `v9.0.3-run-intro-banner`
+- Current rollback tag: `v9.0.4-godmode-audio-shake-tune`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.0.4 - Giảm rè God Mode và thêm rung nhẹ toàn màn hình
+
+- God Mode giờ chỉ thêm lớp hiss/crackle rất nhẹ, giữ nhạc nền thoáng hơn và bớt rè.
+- Thêm rung nhẹ toàn bộ phone/UI trong phase God Mode để tạo cảm giác bất ổn mà không phá readability.
+- Tag: `v9.0.4-godmode-audio-shake-tune`
 
 ### v9.0.3 - Thêm banner đầu run cho bot test
 

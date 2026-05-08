@@ -71,56 +71,36 @@ function godModeAmbience() {
   if (!c) return () => {};
 
   const master = c.createGain();
-  const lowDrone = c.createOscillator();
-  const subDrone = c.createOscillator();
-  const pulse = c.createOscillator();
-  const pulseGain = c.createGain();
-  const lowFilter = c.createBiquadFilter();
-  const noiseGain = c.createGain();
-  const droneFilter = c.createBiquadFilter();
+  const hissFilter = c.createBiquadFilter();
+  const hissGain = c.createGain();
+  const hissSource = c.createBufferSource();
 
   master.gain.setValueAtTime(0.0001, c.currentTime);
-  master.gain.exponentialRampToValueAtTime(0.18, c.currentTime + 1.2);
+  master.gain.exponentialRampToValueAtTime(0.022, c.currentTime + 0.45);
   master.connect(c.destination);
 
-  lowDrone.type = "sawtooth";
-  lowDrone.frequency.setValueAtTime(44, c.currentTime);
-  subDrone.type = "sine";
-  subDrone.frequency.setValueAtTime(29, c.currentTime);
-  droneFilter.type = "lowpass";
-  droneFilter.frequency.setValueAtTime(180, c.currentTime);
-  droneFilter.Q.setValueAtTime(7, c.currentTime);
-
-  pulse.type = "sine";
-  pulse.frequency.setValueAtTime(0.45, c.currentTime);
-  pulseGain.gain.setValueAtTime(0.035, c.currentTime);
-  pulse.connect(pulseGain);
-  pulseGain.connect(lowDrone.frequency);
-
-  const frameCount = Math.ceil(c.sampleRate * 1.6);
+  const frameCount = Math.ceil(c.sampleRate * 1.2);
   const buffer = c.createBuffer(1, frameCount, c.sampleRate);
   const data = buffer.getChannelData(0);
   for (let i = 0; i < frameCount; i += 1) data[i] = Math.random() * 2 - 1;
 
-  const noise = c.createBufferSource();
-  noise.buffer = buffer;
-  noise.loop = true;
-  lowFilter.type = "lowpass";
-  lowFilter.frequency.setValueAtTime(260, c.currentTime);
-  lowFilter.Q.setValueAtTime(4, c.currentTime);
-  noiseGain.gain.setValueAtTime(0.045, c.currentTime);
+  hissSource.buffer = buffer;
+  hissSource.loop = true;
+  hissFilter.type = "highpass";
+  hissFilter.frequency.setValueAtTime(2800, c.currentTime);
+  hissFilter.Q.setValueAtTime(0.8, c.currentTime);
+  hissGain.gain.setValueAtTime(0.012, c.currentTime);
 
-  lowDrone.connect(droneFilter);
-  subDrone.connect(droneFilter);
-  droneFilter.connect(master);
-  noise.connect(lowFilter);
-  lowFilter.connect(noiseGain);
-  noiseGain.connect(master);
+  hissSource.connect(hissFilter);
+  hissFilter.connect(hissGain);
+  hissGain.connect(master);
+  hissSource.start();
 
-  lowDrone.start();
-  subDrone.start();
-  pulse.start();
-  noise.start();
+  const crackleTimers = [
+    window.setInterval(() => crackleBurst(), 5600),
+    window.setTimeout(() => crackleBurst(), 420),
+    window.setTimeout(() => crackleBurst(), 1800),
+  ];
 
   let stopped = false;
   return () => {
@@ -130,10 +110,8 @@ function godModeAmbience() {
     master.gain.cancelScheduledValues(c.currentTime);
     master.gain.setValueAtTime(Math.max(master.gain.value, 0.0001), c.currentTime);
     master.gain.exponentialRampToValueAtTime(0.0001, stopAt);
-    lowDrone.stop(stopAt + 0.05);
-    subDrone.stop(stopAt + 0.05);
-    pulse.stop(stopAt + 0.05);
-    noise.stop(stopAt + 0.05);
+    hissSource.stop(stopAt + 0.05);
+    crackleTimers.forEach((timer) => window.clearInterval(timer));
     window.setTimeout(() => master.disconnect(), 500);
   };
 }
@@ -194,8 +172,8 @@ export const sfx = {
 
   // Vào God Mode — nhiễu điện + xẹt xẹt ngắn
   godModeStart: () => {
-    tone(96, 0.18, "square", 0.22);
-    tone(72, 0.24, "sawtooth", 0.18, 0.16);
+    tone(180, 0.08, "square", 0.08);
+    tone(120, 0.1, "sine", 0.06, 0.08);
     crackleBurst();
   },
 
