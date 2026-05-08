@@ -2,13 +2,33 @@
 
 const DEFAULT_RUNS = 100;
 const DEFAULT_DAYS = 60;
-const GOD_MODE_START_DAY = 36;
+const DEFAULT_MODE = "full-time";
 const APP_ORDER_SHIPPING_FEE = 20;
 const MAX_UPGRADE_LEVEL = 5;
-const BOT_UPGRADE_DAY_GATE = [8, 14, 20, 24, 27];
 const BULK_THRESHOLD = 5;
 const BULK_DISCOUNT = 0.06;
 const CASH_RESERVE = 2000;
+
+const MODE_CONFIGS = {
+  "full-time": {
+    label: "Ca Full-time",
+    eventUnlockDay: 12,
+    adUnlockDay: 15,
+    godModeStartDay: 36,
+    botUpgradeDayGate: [8, 14, 20, 24, 27],
+    productUnlockDayScale: 1,
+    operatingCostMultiplier: 1,
+  },
+  "part-time": {
+    label: "Ca Part-time",
+    eventUnlockDay: 10,
+    adUnlockDay: 12,
+    godModeStartDay: 26,
+    botUpgradeDayGate: [7, 11, 15, 18, 21],
+    productUnlockDayScale: 0.7,
+    operatingCostMultiplier: 0.85,
+  },
+};
 
 const ALL_PRODUCTS = [
   { id: "salmon", name: "Ca hoi", stock: 12.4, unit: "kg", price: 769, cost: 520, unlockDay: 1, category: "seafood" },
@@ -96,18 +116,26 @@ const SLOW_DAYS = new Set([9, 10, 16, 17, 23, 24]);
 const SNAPSHOT_DAYS = [5, 10, 15, 20, 30, 36, 45, 60];
 
 function parseArgs(argv) {
-  const args = { runs: DEFAULT_RUNS, days: DEFAULT_DAYS, seed: 20260508, json: false };
+  const args = { runs: DEFAULT_RUNS, days: DEFAULT_DAYS, seed: 20260508, mode: DEFAULT_MODE, json: false };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--json") args.json = true;
     else if (arg === "--runs") args.runs = Number(argv[++i]);
     else if (arg === "--days") args.days = Number(argv[++i]);
     else if (arg === "--seed") args.seed = Number(argv[++i]);
+    else if (arg === "--mode") args.mode = normalizeMode(argv[++i]);
   }
   if (!Number.isFinite(args.runs) || args.runs < 1) throw new Error("--runs must be a positive number");
   if (!Number.isFinite(args.days) || args.days < 1) throw new Error("--days must be a positive number");
   if (!Number.isFinite(args.seed)) throw new Error("--seed must be a number");
+  if (!MODE_CONFIGS[args.mode]) throw new Error("--mode must be part-time or full-time");
   return args;
+}
+
+function normalizeMode(value) {
+  if (value === "partTime" || value === "parttime" || value === "part-time") return "part-time";
+  if (value === "fullTime" || value === "fulltime" || value === "full-time") return "full-time";
+  return value;
 }
 
 function makeRng(seed) {
@@ -145,14 +173,21 @@ function percentile(values, p) {
   return sorted[index];
 }
 
-function unlockedCountByDay(day) {
-  if (day <= 5) return 8;
-  return Math.min(32, 8 + (Math.floor((day - 6) / 2) + 1) * 2);
+function getModeProgressDay(day, mode) {
+  const scale = MODE_CONFIGS[mode].productUnlockDayScale;
+  if (scale === 1) return day;
+  return Math.max(1, Math.floor(1 + (day - 1) / scale));
 }
 
-function getUnlockedProducts(day, currentProducts) {
+function unlockedCountByDay(day, mode) {
+  const progressDay = getModeProgressDay(day, mode);
+  if (progressDay <= 5) return 8;
+  return Math.min(32, 8 + (Math.floor((progressDay - 6) / 2) + 1) * 2);
+}
+
+function getUnlockedProducts(day, currentProducts, mode) {
   const currentById = new Map(currentProducts.map((p) => [p.id, p]));
-  return ALL_PRODUCTS.slice(0, unlockedCountByDay(day)).map((base) => ({
+  return ALL_PRODUCTS.slice(0, unlockedCountByDay(day, mode)).map((base) => ({
     ...base,
     stock: currentById.get(base.id)?.stock ?? base.stock,
   }));
@@ -169,21 +204,26 @@ function customersCountByDay(day) {
   return Math.min(8 + Math.floor((day - 5) * 0.55), 13);
 }
 
-function customerPaceMultiplier(day) {
+function customerPaceMultiplier(day, mode) {
+  if (mode === "part-time") {
+    if (day <= 5) return 1;
+    if (day <= 15) return 0.78;
+    return 0.68;
+  }
   if (day <= 5) return 1;
   if (day <= 15) return 0.85;
   return 0.75;
 }
 
-function expectedCustomerCountByDay(day) {
+function expectedCustomerCountByDay(day, mode) {
   const base = customersCountByDay(day);
   const theme = getDayTheme(day);
   const themed = theme === "busy" ? Math.round(base * 1.2) : theme === "slow" ? Math.round(base * 0.75) : base;
-  return Math.max(1, Math.round(themed * customerPaceMultiplier(day)));
+  return Math.max(1, Math.round(themed * customerPaceMultiplier(day, mode)));
 }
 
-function themedCustomerCount(day, crisisMultiplier, extraCount) {
-  return Math.max(0, Math.round(expectedCustomerCountByDay(day) * crisisMultiplier)) + extraCount;
+function themedCustomerCount(day, crisisMultiplier, extraCount, mode) {
+  return Math.max(0, Math.round(expectedCustomerCountByDay(day, mode) * crisisMultiplier)) + extraCount;
 }
 
 function maxItemsPerOrder(day) {
@@ -253,7 +293,7 @@ function buildOrder(rng, products, customerType, day) {
 }
 
 function generateCustomers(rng, products, day, state, options = {}) {
-  const count = themedCustomerCount(day, options.crisisMultiplier ?? 1, state.pendingExtraCustomers);
+  const count = themedCustomerCount(day, options.crisisMultiplier ?? 1, state.pendingExtraCustomers, state.mode);
   const signLevel = state.upgrades.sign;
   const appCustomer = CUSTOMER_TYPES.find((c) => c.name === "Shipper app");
 
@@ -286,7 +326,7 @@ function seededDailyCost(product, day) {
   return Math.round((product.cost * (0.85 + rand * 0.3)) / 5) * 5;
 }
 
-function getOperatingCost(rng, day) {
+function getOperatingCost(rng, day, mode) {
   const tier = day <= 5
     ? { rent: 400, staff: 150, utilities: 30, otherMin: 10, otherMax: 50 }
     : day <= 11
@@ -295,7 +335,7 @@ function getOperatingCost(rng, day) {
         ? { rent: 400, staff: 400, utilities: 100, otherMin: 50, otherMax: 150 }
         : { rent: 400, staff: 600, utilities: 150, otherMin: 100, otherMax: 300 };
   const other = Math.round((rng() * (tier.otherMax - tier.otherMin) + tier.otherMin) / 10) * 10;
-  return tier.rent + tier.staff + tier.utilities + other;
+  return Math.round((tier.rent + tier.staff + tier.utilities + other) * MODE_CONFIGS[mode].operatingCostMultiplier);
 }
 
 function applySpoilage(products, freezerLevel) {
@@ -311,9 +351,10 @@ function applySpoilage(products, freezerLevel) {
   return { products: next, lossValue };
 }
 
-function maybeCreateEvent(rng, day, products) {
-  if (day <= 11) return { id: null, cashDelta: 0, moodDelta: 0, stockDelta: {} };
-  const chance = Math.min(0.18 + (day - 12) * 0.02, 0.36);
+function maybeCreateEvent(rng, day, products, mode) {
+  const eventUnlockDay = MODE_CONFIGS[mode].eventUnlockDay;
+  if (day < eventUnlockDay) return { id: null, cashDelta: 0, moodDelta: 0, stockDelta: {} };
+  const chance = Math.min(0.18 + (day - eventUnlockDay) * 0.02, 0.36);
   if (rng() > chance) return { id: null, cashDelta: 0, moodDelta: 0, stockDelta: {} };
   const id = sample(rng, ["staff-off", "thief", "freezer-issue", "viral-post", "supplier-bonus", "loyal-customer", "rainy-day"]);
   if (id === "thief") return { id, cashDelta: -Math.round((rng() * (2000 - 150) + 150) / 50) * 50, moodDelta: 0, stockDelta: {} };
@@ -369,10 +410,11 @@ function importItems(state, importPlan, day, multiplier = 1, allowReserve = true
 
 function buyOneUpgrade(state, day) {
   const order = ["staff", "freezer", "sign", "knife"];
+  const gate = MODE_CONFIGS[state.mode].botUpgradeDayGate;
   for (const id of order) {
     const level = state.upgrades[id];
     if (level >= MAX_UPGRADE_LEVEL) continue;
-    if (day < BOT_UPGRADE_DAY_GATE[level]) continue;
+    if (day < gate[level]) continue;
     const cost = UPGRADE_DEFS[id].costs[level];
     if (state.cash >= cost * 2) {
       state.cash -= cost;
@@ -386,7 +428,7 @@ function buyOneUpgrade(state, day) {
 
 function restockForTomorrow(state, day, crisisImportMultiplier) {
   const nextDay = day + 1;
-  const nextCustomers = expectedCustomerCountByDay(nextDay);
+  const nextCustomers = expectedCustomerCountByDay(nextDay, state.mode);
   const avgItems = nextDay <= 8 ? 2 : nextDay <= 16 ? 3.5 : 4.5;
   const importable = state.products.filter((p) => p.cost > 0 && p.id !== "wholeSalmon");
   const orderProb = Math.min(0.9, avgItems / Math.max(1, importable.length));
@@ -487,9 +529,10 @@ function rollGodMode(rng, state, nextDay) {
     .map((crisis) => ({ ...crisis, remainingDays: crisis.remainingDays - 1 }))
     .filter((crisis) => crisis.remainingDays > 0);
   const newCrises = [];
-  const daysInGodMode = nextDay - GOD_MODE_START_DAY;
+  const godModeStartDay = MODE_CONFIGS[state.mode].godModeStartDay;
+  const daysInGodMode = nextDay - godModeStartDay;
 
-  if (nextDay >= GOD_MODE_START_DAY) {
+  if (nextDay >= godModeStartDay) {
     const defs = [
       { id: "fire", baseChance: 0.03, duration: 1 },
       { id: "food_safety", baseChance: 0.04, duration: 1, customerMultiplier: 0.4 },
@@ -520,9 +563,10 @@ function rollGodMode(rng, state, nextDay) {
   state.activeCrises = [...surviving.filter((old) => !newCrises.some((crisis) => crisis.id === old.id)), ...newCrises];
 }
 
-function simulateRun(seed, maxDays) {
+function simulateRun(seed, maxDays, mode) {
   const rng = makeRng(seed);
   const state = {
+    mode,
     cash: 1000,
     totalRevenue: 0,
     totalProfit: 0,
@@ -530,7 +574,7 @@ function simulateRun(seed, maxDays) {
     maxCombo: 0,
     day: 1,
     pendingExtraCustomers: 0,
-    products: getUnlockedProducts(1, []),
+    products: getUnlockedProducts(1, [], mode),
     upgrades: { freezer: 0, knife: 0, sign: 0, staff: 0 },
     activeCrises: [],
     snapshots: {},
@@ -564,14 +608,14 @@ function simulateRun(seed, maxDays) {
     }
 
     buyOneUpgrade(state, day);
-    if (day >= 15 && !state.adRunToday && state.cash > 2500) {
+    if (day >= MODE_CONFIGS[mode].adUnlockDay && !state.adRunToday && state.cash > 2500) {
       state.cash -= Math.round((150 + rng() * 350) / 10) * 10;
       state.pendingExtraCustomers = Math.floor(rng() * 3) + 3;
       state.adRunToday = true;
     }
     restockForTomorrow(state, day, crisisImportMultiplier);
 
-    const opCost = getOperatingCost(rng, day);
+    const opCost = getOperatingCost(rng, day, mode);
     state.cash -= opCost;
     if (state.cash < 0) {
       state.failureReason = "bankrupt";
@@ -579,9 +623,9 @@ function simulateRun(seed, maxDays) {
     }
 
     const spoilage = applySpoilage(state.products, state.upgrades.freezer);
-    state.products = getUnlockedProducts(day + 1, spoilage.products);
+    state.products = getUnlockedProducts(day + 1, spoilage.products, mode);
     state.stats.spoilageLossValue += spoilage.lossValue;
-    const event = maybeCreateEvent(rng, day + 1, state.products);
+    const event = maybeCreateEvent(rng, day + 1, state.products, mode);
     state.currentEvent = event.id;
     if (event.id) state.stats.events[event.id] = (state.stats.events[event.id] ?? 0) + 1;
     state.products = applyEventToProducts(state.products, event, state.upgrades.freezer);
@@ -606,8 +650,12 @@ function simulateRun(seed, maxDays) {
 }
 
 function summarize(results, args) {
+  const godModeStartDay = MODE_CONFIGS[args.mode].godModeStartDay;
   const deathDays = results.map((run) => run.failureReason === "survived" ? args.days : run.day);
   const survived = results.filter((run) => run.failureReason === "survived").length;
+  const reachedGodMode = results.filter((run) => run.day >= godModeStartDay).length;
+  const diedBeforeGodMode = results.filter((run) => run.day < godModeStartDay).length;
+  const diedAfterReachingGodMode = results.filter((run) => run.day >= godModeStartDay && run.failureReason !== "survived").length;
   const reasons = {};
   const crisisCounts = {};
   const eventCounts = {};
@@ -631,12 +679,25 @@ function summarize(results, args) {
       upgradeDays[`${id}_lv${level}`] = days.length ? Math.round(mean(days)) : null;
     }
   }
+  const estimatedCustomersToGodMode = Array.from({ length: godModeStartDay }, (_, index) => expectedCustomerCountByDay(index + 1, args.mode))
+    .reduce((sum, count) => sum + count, 0);
+  const playTimeProfiles = [4, 6, 8, 10];
+  const dayOverheadSeconds = 18;
+  const estimateMinutes = (served, finalDay, secondsPerCustomer) => Math.round(((served * secondsPerCustomer) + (finalDay * dayOverheadSeconds)) / 60);
 
   return {
     config: args,
     runs: results.length,
+    modeLabel: MODE_CONFIGS[args.mode].label,
+    godModeStartDay,
     survived,
     survivalRate: survived / results.length,
+    reachedGodMode,
+    reachedGodModeRate: reachedGodMode / results.length,
+    diedBeforeGodMode,
+    diedBeforeGodModeRate: diedBeforeGodMode / results.length,
+    diedAfterReachingGodMode,
+    diedAfterReachingGodModeRate: diedAfterReachingGodMode / results.length,
     averageFinalDay: mean(deathDays),
     medianFinalDay: percentile(deathDays, 0.5),
     p10FinalDay: percentile(deathDays, 0.1),
@@ -650,6 +711,15 @@ function summarize(results, args) {
     averageSpoilageLossValue: Math.round(mean(results.map((run) => run.stats.spoilageLossValue))),
     averageTips: Math.round(mean(results.map((run) => run.stats.tips))),
     cashByDay,
+    estimatedCustomersToGodMode,
+    estimatedMinutesToGodMode: Object.fromEntries(playTimeProfiles.map((seconds) => [
+      `${seconds}s_per_customer`,
+      estimateMinutes(estimatedCustomersToGodMode, godModeStartDay, seconds),
+    ])),
+    estimatedMinutesToFinalDay: Object.fromEntries(playTimeProfiles.map((seconds) => [
+      `${seconds}s_per_customer`,
+      estimateMinutes(Math.round(mean(results.map((run) => run.stats.served))), mean(deathDays), seconds),
+    ])),
     failureReasons: reasons,
     averageUpgradePurchaseDay: upgradeDays,
     eventCounts,
@@ -659,11 +729,13 @@ function summarize(results, args) {
 
 function printReport(summary) {
   console.log(`Homefarm balance simulation`);
-  console.log(`Runs: ${summary.runs} | Days: ${summary.config.days} | Seed: ${summary.config.seed}`);
+  console.log(`Mode: ${summary.modeLabel} (${summary.config.mode}) | Runs: ${summary.runs} | Days: ${summary.config.days} | Seed: ${summary.config.seed}`);
   console.log(`Survival: ${(summary.survivalRate * 100).toFixed(1)}% (${summary.survived}/${summary.runs})`);
+  console.log(`God Mode day ${summary.godModeStartDay}: reached ${(summary.reachedGodModeRate * 100).toFixed(1)}% (${summary.reachedGodMode}/${summary.runs}) | died before ${(summary.diedBeforeGodModeRate * 100).toFixed(1)}% | died after ${(summary.diedAfterReachingGodModeRate * 100).toFixed(1)}%`);
   console.log(`Final day: avg ${summary.averageFinalDay.toFixed(1)} | p10 ${summary.p10FinalDay} | median ${summary.medianFinalDay} | p90 ${summary.p90FinalDay}`);
   console.log(`Averages: cash ${money(summary.averageCash)} | revenue ${money(summary.averageRevenue)} | profit ${money(summary.averageProfit)} | served ${summary.averageServed} | skipped ${summary.averageSkipped}`);
   console.log(`Costs: imports ${money(summary.averageImportSpend)} | spoilage value ${money(summary.averageSpoilageLossValue)} | tips ${money(summary.averageTips)}`);
+  console.log(`Time estimate: to God Mode ${summary.estimatedMinutesToGodMode["6s_per_customer"]}m @6s/customer | to final day ${summary.estimatedMinutesToFinalDay["6s_per_customer"]}m @6s/customer`);
   console.log("");
   console.log("Average cash snapshots:");
   for (const [day, cash] of Object.entries(summary.cashByDay)) {
@@ -690,7 +762,7 @@ function printReport(summary) {
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
-  const results = Array.from({ length: args.runs }, (_, index) => simulateRun(args.seed + index, args.days));
+  const results = Array.from({ length: args.runs }, (_, index) => simulateRun(args.seed + index, args.days, args.mode));
   const summary = summarize(results, args);
   if (args.json) {
     console.log(JSON.stringify(summary, null, 2));

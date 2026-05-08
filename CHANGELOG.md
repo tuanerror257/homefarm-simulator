@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v8.1.0`
+- Current version: `v8.2.0`
 - Current commit: TBD
-- Current rollback tag: `v8.1.0-part-time-balance-config`
+- Current rollback tag: `v8.2.0-simulator-multi-mode`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v8.2.0 - Thêm simulator đa mode
+
+- Thêm tham số `--mode full-time|part-time` cho `npm run sim`.
+- Simulator nay mirror config Full-time và Part-time, gồm God Mode day, event unlock, ads unlock, upgrade gate, product unlock speed, customer pace và operating cost.
+- Báo cáo thêm tỷ lệ tới God Mode, chết trước God Mode, chết sau God Mode và ước lượng thời gian chơi.
+- Chạy kiểm chứng 100 lượt cho cả hai mode: Full-time tới God Mode 100%, Part-time tới God Mode 100%.
+- Tag: `v8.2.0-simulator-multi-mode`
 
 ### v8.1.0 - Thêm balance config cho Ca Part-time
 
