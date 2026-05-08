@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v8.2.4`
+- Current version: `v8.2.5`
 - Current commit: TBD
-- Current rollback tag: `v8.2.4-smaller-corner-tags`
+- Current rollback tag: `v8.2.5-full-time-badge-red`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v8.2.5 - Đổi màu badge Ca Full-time
+
+- Badge `Ca Full-time` trên màn hình chính chuyển sang màu đỏ.
+- Giữ badge `Ca Part-time` màu xanh như hiện tại.
+- Tag: `v8.2.5-full-time-badge-red`
 
 ### v8.2.4 - Thu nhỏ cụm tag góc trái
 
