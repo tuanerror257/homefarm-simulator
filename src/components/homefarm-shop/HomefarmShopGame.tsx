@@ -1891,38 +1891,27 @@ export function HomefarmShopGame() {
         )}
 
         {showGodModeUnlock && (
-          <div className="hfs-modal-backdrop hfs-godmode-backdrop">
-            <div className="hfs-godmode-panel">
-              <div className="hfs-godmode-alert-top">
-                <div className="hfs-godmode-badge">EVENT ALERT</div>
-                <div className="hfs-godmode-skull">☠️</div>
-                <div className="hfs-godmode-title">GOD MODE</div>
-                <div className="hfs-godmode-sub">Ngày {modeConfig.godModeStartDay} — chế độ hủy diệt chuẩn bị kích hoạt</div>
+          <div className="hfs-modal-backdrop hfs-unlock-backdrop">
+            <div className="hfs-unlock-panel">
+              <div className="hfs-unlock-icon">☠️</div>
+              <div className="hfs-unlock-title">GOD MODE sắp tới</div>
+              <div className="hfs-unlock-desc">
+                Từ ngày {modeConfig.godModeStartDay}, chế độ hủy diệt sẽ bắt đầu.
+                <br /><br />
+                Hãy chuẩn bị sẵn tiền mặt, stock hàng và tinh thần vì từ đây mỗi ngày sẽ là một chuỗi khủng hoảng mới.
               </div>
-              <div className="hfs-godmode-alert-card">
-                <div className="hfs-godmode-desc">
-                  Từ hôm nay, mỗi ngày sẽ roll 6 khủng hoảng độc lập. Xác suất tăng thêm 3% mỗi ngày và không có điểm dừng.
-                </div>
-                <div className="hfs-godmode-warning">
-                  ⚠️ Đây là một event lớn. Hãy chuẩn bị tiền mặt, stock hàng và tâm lý trước khi tiếp tục.
-                </div>
-                <div className="hfs-godmode-crisis-list">
-                  {GOD_MODE_CRISIS_DEFS.map((def) => (
-                    <div key={def.id} className="hfs-godmode-crisis-row">
-                      <span className="hfs-godmode-crisis-icon">{def.icon}</span>
-                      <div className="hfs-godmode-crisis-body">
-                        <div className="hfs-godmode-crisis-name">{def.title}</div>
-                        <div className="hfs-godmode-crisis-desc">{def.popupDesc}</div>
-                      </div>
-                      <span className="hfs-godmode-crisis-chance">{Math.round(def.baseChance * 100)}%</span>
+              <div className="hfs-godmode-unlock-list">
+                {GOD_MODE_CRISIS_DEFS.slice(0, 4).map((def) => (
+                  <div key={def.id} className="hfs-godmode-unlock-row">
+                    <span className="hfs-godmode-unlock-icon">{def.icon}</span>
+                    <div className="hfs-godmode-unlock-body">
+                      <div className="hfs-godmode-unlock-name">{def.title}</div>
+                      <div className="hfs-godmode-unlock-desc-text">{def.popupDesc}</div>
                     </div>
-                  ))}
-                </div>
-                <div className="hfs-godmode-footnote">
-                  Xác suất mỗi crisis tăng +3%/ngày, tối đa 65%.
-                </div>
+                  </div>
+                ))}
               </div>
-              <button className="hfs-godmode-btn" onClick={() => setShowGodModeUnlock(false)}>
+              <button className="hfs-unlock-btn" onClick={() => setShowGodModeUnlock(false)}>
                 Đã hiểu
               </button>
             </div>

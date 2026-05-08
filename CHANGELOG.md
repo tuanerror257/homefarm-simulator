@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.1`
+- Current version: `v9.1.2`
 - Current commit: TBD
-- Current rollback tag: `v9.1.1-godmode-dark-overlay-on-top`
+- Current rollback tag: `v9.1.2-godmode-teaser-unlock-modal`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.2 - Đổi teaser God Mode sang modal unlock kiểu day 6
+
+- Chuyển thông báo God Mode ngày 18 sang cùng phong cách modal unlock như thông báo nâng cấp cửa hàng ở ngày 6.
+- Dùng lại layout `unlock-panel` để thông báo rõ hơn, dễ đọc hơn và ít bị lướt qua.
+- Tag: `v9.1.2-godmode-teaser-unlock-modal`
 
 ### v9.1.1 - Đặt lớp phủ tối đúng trên màn hình God Mode
 
