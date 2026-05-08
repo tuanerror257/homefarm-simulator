@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v8.2.0`
+- Current version: `v8.2.1`
 - Current commit: TBD
-- Current rollback tag: `v8.2.0-simulator-multi-mode`
+- Current rollback tag: `v8.2.1-tutorial-mode-buttons`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v8.2.1 - Chỉnh nút chọn ca ở tutorial
+
+- Đổi hai nút `Ca Part-time` và `Ca Full-time` sang bố cục nằm cạnh nhau.
+- Nút Part-time dùng màu xanh, nút Full-time dùng màu đỏ.
+- Chuyển mô tả Part-time thành một dòng nhỏ bên dưới hai nút.
+- Tag: `v8.2.1-tutorial-mode-buttons`
 
 ### v8.2.0 - Thêm simulator đa mode
 

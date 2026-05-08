@@ -2026,7 +2026,6 @@ function TutorialModal({ onConfirm }: { onConfirm: (name: string, mode: GameMode
             disabled={!name.trim()}
           >
             <span>Ca Part-time</span>
-            <strong>Ca Part-time là chế độ tàu nhanh: ít chờ hơn, God Mode tới sớm hơn hihi.</strong>
           </button>
           <button
             className="hfs-mode-option full-time"
@@ -2034,8 +2033,8 @@ function TutorialModal({ onConfirm }: { onConfirm: (name: string, mode: GameMode
             disabled={!name.trim()}
           >
             <span>Ca Full-time</span>
-            <strong>Ca đầy đủ: build shop từ từ, cân bằng hiện tại, dành cho người chơi kiên nhẫn.</strong>
           </button>
+          <div className="hfs-mode-hint">Ca Part-time là chế độ tàu nhanh.</div>
         </div>
       </div>
     </div>

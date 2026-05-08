@@ -3146,6 +3146,7 @@
 
 .hfs-mode-select {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin-top: 12px;
 }
@@ -3155,10 +3156,10 @@
   border: 3px solid #2d2118;
   border-radius: 14px;
   background: #fff;
-  color: #2d2118;
+  color: #fff;
   box-shadow: 0 3px 0 #2d2118;
-  padding: 10px 12px;
-  text-align: left;
+  padding: 10px 8px;
+  text-align: center;
   cursor: pointer;
   font-family: inherit;
   transition: transform .08s ease, box-shadow .08s ease;
@@ -3171,21 +3172,12 @@
   line-height: 1.1;
 }
 
-.hfs-mode-option strong {
-  display: block;
-  margin-top: 4px;
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 1.35;
-  opacity: .72;
-}
-
 .hfs-mode-option.part-time {
-  background: linear-gradient(180deg, #ecfdf5 0%, #bbf7d0 100%);
+  background: linear-gradient(180deg, #2dd17a 0%, #15803d 100%);
 }
 
 .hfs-mode-option.full-time {
-  background: linear-gradient(180deg, #eff6ff 0%, #bfdbfe 100%);
+  background: linear-gradient(180deg, #ff5a5f 0%, #c1121f 100%);
 }
 
 .hfs-mode-option:disabled {
@@ -3198,6 +3190,15 @@
 .hfs-mode-option:active:not(:disabled) {
   transform: translateY(2px);
   box-shadow: 0 1px 0 #2d2118;
+}
+
+.hfs-mode-hint {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: rgba(45,33,24,.62);
 }
 
 /* v3.9 — game over redesign */
