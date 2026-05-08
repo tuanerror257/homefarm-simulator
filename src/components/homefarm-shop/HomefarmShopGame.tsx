@@ -167,7 +167,7 @@ const UPGRADE_DEFS: Array<{
     icon: "🧑‍🍳",
     name: "Nhân viên phụ",
     description: "Khách kiên nhẫn hơn từ ngày kế tiếp.",
-    effect: "+2,5s kiên nhẫn mỗi level",
+    effect: "+2,5s kiên nhẫn và -6% tụt mood mỗi level",
     costs: [800, 1600, 3200, 5500, 9000],
   },
   {
@@ -373,8 +373,9 @@ export function HomefarmShopGame() {
   useEffect(() => {
     if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showGodModeUnlock || showAds || showLeaderboard || activeEvent || gameOver) return;
 
+    const moodDecay = (0.7 + day * 0.022) * 2.2 * Math.max(0.7, 1 - upgrades.staff * 0.06);
     const timer = setInterval(() => {
-      setMoodScore((m) => Math.max(0, m - (0.7 + day * 0.022) * 2.2));
+      setMoodScore((m) => Math.max(0, m - moodDecay));
       setTimeLeft((t) => {
         if (t <= 1) {
           sfx.fail();
@@ -390,7 +391,7 @@ export function HomefarmShopGame() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeUnlock, showAds, showLeaderboard, activeEvent, gameOver, day, skipCustomer]);
+  }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeUnlock, showAds, showLeaderboard, activeEvent, gameOver, day, upgrades.staff, skipCustomer]);
 
   async function loadLeaderboard() {
     try {

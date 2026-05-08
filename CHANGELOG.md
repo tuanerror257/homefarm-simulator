@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v7.5.7`
+- Current version: `v7.5.8`
 - Current commit: TBD
-- Current rollback tag: `v7.5.7-sign-vip-scaling`
+- Current rollback tag: `v7.5.8-staff-mood-value`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v7.5.8 - Tăng giá trị nâng cấp Nhân viên
+
+- Nhân viên phụ nay ngoài tăng patience còn giảm tốc độ tụt mood khi khách chờ.
+- Mỗi level Staff giảm 6% mood decay, tối đa giảm 30% ở Lv5.
+- Cập nhật mô tả nâng cấp để người chơi thấy lợi ích rõ hơn.
+- Tag: `v7.5.8-staff-mood-value`
 
 ### v7.5.7 - Rebalance Bảng hiệu VIP
 
