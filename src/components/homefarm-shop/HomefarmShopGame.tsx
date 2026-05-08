@@ -272,17 +272,27 @@ export function HomefarmShopGame() {
   const totalTipsRef = useRef(0);
   const sessionStartedAtRef = useRef(Date.now());
   const sessionTelemetryRecordedRef = useRef(false);
+  const godModeStartPlayedRef = useRef(false);
+
+  const isGodModeActive = gamePhase === "playing" && day >= modeConfig.godModeStartDay;
 
   useEffect(() => {
-    if (!showGodModeUnlock || muted) return;
+    if (!isGodModeActive || muted) return;
     const stopAmbience = sfx.godModeAmbience();
     return stopAmbience;
-  }, [showGodModeUnlock, muted]);
+  }, [isGodModeActive, muted]);
+
+  useEffect(() => {
+    if (!isGodModeActive || muted || godModeStartPlayedRef.current) return;
+    godModeStartPlayedRef.current = true;
+    sfx.godModeStart();
+  }, [isGodModeActive, muted]);
 
   useEffect(() => {
     if (gamePhase !== "playing") return;
     sessionStartedAtRef.current = Date.now();
     sessionTelemetryRecordedRef.current = false;
+    godModeStartPlayedRef.current = false;
   }, [gamePhase]);
 
   const customer = customers[customerIndex] || null;
@@ -1246,6 +1256,7 @@ export function HomefarmShopGame() {
     productSoldTotalRef.current = {};
     totalTipsRef.current = 0;
     sessionTelemetryRecordedRef.current = false;
+    godModeStartPlayedRef.current = false;
   }
 
   if (gamePhase === "start") {
@@ -1282,8 +1293,16 @@ export function HomefarmShopGame() {
 
   return (
     <div className="hfs-page">
-      <div className={`hfs-phone ${wrongFlash ? "wrong" : ""}`}>
+      <div className={`hfs-phone ${wrongFlash ? "wrong" : ""} ${isGodModeActive ? "godmode-active" : ""}`}>
         <div className="hfs-bg" />
+        {isGodModeActive && (
+          <div className="hfs-godmode-fx" aria-hidden="true">
+            <span className="hfs-godmode-fx-line" />
+            <span className="hfs-godmode-fx-line hfs-godmode-fx-line-2" />
+            <span className="hfs-godmode-fx-static" />
+            <span className="hfs-godmode-fx-vignette" />
+          </div>
+        )}
         <div className={`hfs-mode-badge ${gameMode === "partTime" ? "part-time" : "full-time"}`}>
           {modeConfig.label}
         </div>

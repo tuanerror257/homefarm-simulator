@@ -32,6 +32,12 @@
 
 .hfs-phone.wrong { border-color: #dc2626; }
 
+.hfs-phone.godmode-active {
+  border-color: #7f1d1d;
+  box-shadow: 0 0 0 2px rgba(239,68,68,.18), 0 18px 35px rgba(0,0,0,.28);
+  animation: hfs-godmode-shell 1.7s ease-in-out infinite;
+}
+
 .hfs-bg {
   position: absolute;
   inset: 0;
@@ -41,6 +47,57 @@
     linear-gradient(45deg,#000 25%,transparent 25%),
     linear-gradient(-45deg,#000 25%,transparent 25%);
   background-size: 10px 10px;
+}
+
+.hfs-godmode-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  mix-blend-mode: screen;
+}
+
+.hfs-godmode-fx-line,
+.hfs-godmode-fx-line-2,
+.hfs-godmode-fx-static,
+.hfs-godmode-fx-vignette {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.hfs-godmode-fx-line {
+  background: linear-gradient(180deg, rgba(255,0,0,0) 0%, rgba(255,90,90,.18) 48%, rgba(255,0,0,0) 100%);
+  height: 18px;
+  top: 20%;
+  animation: hfs-godmode-scan 1.9s linear infinite;
+}
+
+.hfs-godmode-fx-line-2 {
+  background: linear-gradient(180deg, rgba(255,0,0,0) 0%, rgba(255,228,228,.2) 48%, rgba(255,0,0,0) 100%);
+  height: 12px;
+  top: 62%;
+  animation: hfs-godmode-scan-2 2.6s linear infinite;
+}
+
+.hfs-godmode-fx-static {
+  opacity: .18;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255,255,255,.12) 0,
+      rgba(255,255,255,.12) 1px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,0) 6px
+    ),
+    radial-gradient(circle at 50% 40%, rgba(255,0,0,.15), transparent 55%);
+  animation: hfs-godmode-static 0.18s steps(2, end) infinite;
+}
+
+.hfs-godmode-fx-vignette {
+  background: radial-gradient(circle at center, rgba(0,0,0,0) 40%, rgba(70,0,0,.22) 100%);
+  animation: hfs-godmode-vignette 1.3s ease-in-out infinite;
 }
 
 .hfs-mute-btn {
@@ -3393,6 +3450,33 @@
 
 .hfs-phone.wrong {
   animation: hfs-wrong-shake 0.22s linear;
+}
+
+@keyframes hfs-godmode-shell {
+  0%, 100% { filter: brightness(1) saturate(1); transform: translateZ(0); }
+  50% { filter: brightness(1.06) saturate(1.18); transform: translateX(1px); }
+}
+
+@keyframes hfs-godmode-scan {
+  0% { transform: translateY(-22px); opacity: .08; }
+  30% { opacity: .26; }
+  100% { transform: translateY(120vh); opacity: .12; }
+}
+
+@keyframes hfs-godmode-scan-2 {
+  0% { transform: translateY(90vh); opacity: .08; }
+  40% { opacity: .22; }
+  100% { transform: translateY(-30px); opacity: .1; }
+}
+
+@keyframes hfs-godmode-static {
+  0% { opacity: .12; }
+  100% { opacity: .22; }
+}
+
+@keyframes hfs-godmode-vignette {
+  0%, 100% { opacity: .72; }
+  50% { opacity: .96; }
 }
 
 @keyframes hfs-wrong-shake {

@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v8.5.1`
+- Current version: `v8.5.2`
 - Current commit: TBD
-- Current rollback tag: `v8.5.1-part-time-godmode-teaser-day-18`
+- Current rollback tag: `v8.5.2-godmode-screen-fx`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v8.5.2 - Thêm hiệu ứng màn hình khi vào God Mode
+
+- Khi day đạt mốc God Mode, màn hình chuyển sang trạng thái `godmode-active` với scanline, static và viền đỏ nhấp nháy.
+- Thêm hiệu ứng âm thanh `xẹt xẹt` + nhiễu điện ngắn để báo rõ khoảnh khắc bắt đầu God Mode.
+- Giữ ambience God Mode bám theo trạng thái thực, không còn phụ thuộc vào popup nhắc mốc.
+- Tag: `v8.5.2-godmode-screen-fx`
 
 ### v8.5.1 - Dời teaser God Mode của Ca Part-time sang ngày 18
 

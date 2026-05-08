@@ -59,6 +59,12 @@ function swish(duration: number, vol: number, delay: number, filterFreq = 1800) 
   source.stop(c.currentTime + delay + duration + 0.05);
 }
 
+function crackleBurst() {
+  swish(0.04, 0.42, 0, 2200);
+  swish(0.03, 0.34, 0.05, 2600);
+  swish(0.05, 0.48, 0.11, 1700);
+}
+
 function godModeAmbience() {
   if (_muted) return () => {};
   const c = getCtx();
@@ -184,6 +190,13 @@ export const sfx = {
   knife: () => {
     swish(0.065, 0.9, 0, 1600);
     swish(0.065, 0.82, 0.14, 1600);
+  },
+
+  // Vào God Mode — nhiễu điện + xẹt xẹt ngắn
+  godModeStart: () => {
+    tone(96, 0.18, "square", 0.22);
+    tone(72, 0.24, "sawtooth", 0.18, 0.16);
+    crackleBurst();
   },
 
   // Nút UI chung — mở import, mở upgrade
