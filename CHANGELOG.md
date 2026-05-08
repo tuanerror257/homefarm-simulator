@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.3`
+- Current version: `v9.1.4`
 - Current commit: TBD
-- Current rollback tag: `v9.1.3-godmode-teaser-day-18-fix`
+- Current rollback tag: `v9.1.4-godmode-teaser-darker`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.4 - Làm modal teaser God Mode tối hơn
+
+- Đổi palette của modal God Mode sang đen đỏ nặng hơn để hợp với tone cảnh báo.
+- Làm nền, viền, nút và danh sách khủng hoảng tối hơn để thông báo nổi bật nhưng vẫn giữ layout cũ.
+- Tag: `v9.1.4-godmode-teaser-darker`
 
 ### v9.1.3 - Sửa teaser God Mode về đúng ngày 18
 
