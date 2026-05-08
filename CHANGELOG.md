@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.0.6`
+- Current version: `v9.0.7`
 - Current commit: TBD
-- Current rollback tag: `v9.0.6-godmode-event-alert-ui`
+- Current rollback tag: `v9.0.7-godmode-music-switch`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.0.7 - Chuyển sang nhạc God Mode riêng
+
+- Khi vào God Mode, game sẽ pause BGM nền và chuyển sang track `godmode.mp3` mới.
+- Giữ BGM bình thường cho gameplay ngoài God Mode.
+- Loại bỏ lớp ambience nhiễu cũ để âm thanh chuyển phase rõ ràng hơn.
+- Tag: `v9.0.7-godmode-music-switch`
 
 ### v9.0.6 - Nâng God Mode unlock thành event alert
 

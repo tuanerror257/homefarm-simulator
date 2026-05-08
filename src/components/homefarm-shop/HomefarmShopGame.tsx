@@ -212,24 +212,38 @@ export function HomefarmShopGame() {
   const modeConfig = GAME_MODE_CONFIGS[gameMode];
   const [muted, setMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const godModeAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const audio = new Audio("/homefarm-shop/bgm.mp3");
     audio.loop = true;
     audio.volume = 0.45;
     audioRef.current = audio;
-    return () => { audio.pause(); audio.src = ""; };
+    const godModeAudio = new Audio("/homefarm-shop/godmode.mp3");
+    godModeAudio.loop = true;
+    godModeAudio.volume = 0.36;
+    godModeAudioRef.current = godModeAudio;
+    return () => {
+      audio.pause();
+      audio.src = "";
+      godModeAudio.pause();
+      godModeAudio.src = "";
+    };
   }, []);
 
   useEffect(() => {
     if (!audioRef.current) return;
     audioRef.current.muted = muted;
+    if (godModeAudioRef.current) godModeAudioRef.current.muted = muted;
     setSfxMuted(muted);
   }, [muted]);
 
-  function startBgm() {
+  const startBgm = useCallback(() => {
     audioRef.current?.play().catch(() => {});
-  }
+  }, []);
+  const startGodModeMusic = useCallback(() => {
+    godModeAudioRef.current?.play().catch(() => {});
+  }, []);
   const [products, setProducts] = useState(START_PRODUCTS);
   const [day, setDay] = useState(1);
   const [cash, setCash] = useState(1000);
@@ -289,15 +303,41 @@ export function HomefarmShopGame() {
   const sessionStartedAtRef = useRef(Date.now());
   const sessionTelemetryRecordedRef = useRef(false);
   const godModeStartPlayedRef = useRef(false);
+  const godModeMusicActiveRef = useRef(false);
   const runIntroTimerRef = useRef<number | null>(null);
 
   const isGodModeActive = gamePhase === "playing" && day >= modeConfig.godModeStartDay;
 
   useEffect(() => {
-    if (!isGodModeActive || muted) return;
-    const stopAmbience = sfx.godModeAmbience();
-    return stopAmbience;
-  }, [isGodModeActive, muted]);
+    const bgm = audioRef.current;
+    const godModeAudio = godModeAudioRef.current;
+    if (!bgm || !godModeAudio) return;
+
+    if (muted) {
+      bgm.muted = true;
+      godModeAudio.muted = true;
+      return;
+    }
+
+    bgm.muted = false;
+    godModeAudio.muted = false;
+
+    if (isGodModeActive) {
+      if (!godModeMusicActiveRef.current) godModeAudio.currentTime = 0;
+      bgm.pause();
+      startGodModeMusic();
+      godModeMusicActiveRef.current = true;
+      return;
+    }
+
+    if (godModeMusicActiveRef.current) {
+      godModeAudio.pause();
+      godModeAudio.currentTime = 0;
+      godModeMusicActiveRef.current = false;
+    }
+
+    if (gamePhase === "playing") startBgm();
+  }, [gamePhase, isGodModeActive, muted, startBgm, startGodModeMusic]);
 
   useEffect(() => {
     if (!isGodModeActive || muted || godModeStartPlayedRef.current) return;
@@ -310,6 +350,7 @@ export function HomefarmShopGame() {
     sessionStartedAtRef.current = Date.now();
     sessionTelemetryRecordedRef.current = false;
     godModeStartPlayedRef.current = false;
+    godModeMusicActiveRef.current = false;
   }, [gamePhase]);
 
   useEffect(() => {
@@ -1299,6 +1340,8 @@ export function HomefarmShopGame() {
     if (!options.keepMusic) {
       audioRef.current?.pause();
       if (audioRef.current) audioRef.current.currentTime = 0;
+      godModeAudioRef.current?.pause();
+      if (godModeAudioRef.current) godModeAudioRef.current.currentTime = 0;
     }
 
     const unlockedProducts = getUnlockedProducts(nextStartDay, START_PRODUCTS, nextMode);
@@ -1386,6 +1429,7 @@ export function HomefarmShopGame() {
     sessionStartedAtRef.current = Date.now();
     sessionTelemetryRecordedRef.current = false;
     godModeStartPlayedRef.current = false;
+    godModeMusicActiveRef.current = false;
     setSessionTelemetry(null);
     setSessionTelemetryCount(0);
     if (options.keepMusic) startBgm();

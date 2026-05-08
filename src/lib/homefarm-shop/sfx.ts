@@ -65,57 +65,6 @@ function crackleBurst() {
   swish(0.05, 0.48, 0.11, 1700);
 }
 
-function godModeAmbience() {
-  if (_muted) return () => {};
-  const c = getCtx();
-  if (!c) return () => {};
-
-  const master = c.createGain();
-  const hissFilter = c.createBiquadFilter();
-  const hissGain = c.createGain();
-  const hissSource = c.createBufferSource();
-
-  master.gain.setValueAtTime(0.0001, c.currentTime);
-  master.gain.exponentialRampToValueAtTime(0.022, c.currentTime + 0.45);
-  master.connect(c.destination);
-
-  const frameCount = Math.ceil(c.sampleRate * 1.2);
-  const buffer = c.createBuffer(1, frameCount, c.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < frameCount; i += 1) data[i] = Math.random() * 2 - 1;
-
-  hissSource.buffer = buffer;
-  hissSource.loop = true;
-  hissFilter.type = "highpass";
-  hissFilter.frequency.setValueAtTime(2800, c.currentTime);
-  hissFilter.Q.setValueAtTime(0.8, c.currentTime);
-  hissGain.gain.setValueAtTime(0.012, c.currentTime);
-
-  hissSource.connect(hissFilter);
-  hissFilter.connect(hissGain);
-  hissGain.connect(master);
-  hissSource.start();
-
-  const crackleTimers = [
-    window.setInterval(() => crackleBurst(), 5600),
-    window.setTimeout(() => crackleBurst(), 420),
-    window.setTimeout(() => crackleBurst(), 1800),
-  ];
-
-  let stopped = false;
-  return () => {
-    if (stopped) return;
-    stopped = true;
-    const stopAt = c.currentTime + 0.35;
-    master.gain.cancelScheduledValues(c.currentTime);
-    master.gain.setValueAtTime(Math.max(master.gain.value, 0.0001), c.currentTime);
-    master.gain.exponentialRampToValueAtTime(0.0001, stopAt);
-    hissSource.stop(stopAt + 0.05);
-    crackleTimers.forEach((timer) => window.clearInterval(timer));
-    window.setTimeout(() => master.disconnect(), 500);
-  };
-}
-
 export function setSfxMuted(muted: boolean) {
   _muted = muted;
 }
@@ -189,6 +138,4 @@ export const sfx = {
     tone(523, 0.1, "sine", 0.6, 0.11);
     tone(659, 0.22, "sine", 0.65, 0.22);
   },
-
-  godModeAmbience,
 };
