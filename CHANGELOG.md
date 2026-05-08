@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v7.5.8`
+- Current version: `v7.5.9`
 - Current commit: TBD
-- Current rollback tag: `v7.5.8-staff-mood-value`
+- Current rollback tag: `v7.5.9-knife-late-level-roi`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v7.5.9 - Tăng ROI level cao của Dao fillet
+
+- Dao fillet chuyển từ bonus tuyến tính sang bảng yield theo level.
+- Lv3-Lv5 được tăng nhẹ sản lượng để các level đắt hoàn vốn hợp lý hơn khi chơi dài.
+- Cập nhật mô tả nâng cấp hiển thị giá trị Lv5 rõ ràng.
+- Tag: `v7.5.9-knife-late-level-roi`
 
 ### v7.5.8 - Tăng giá trị nâng cấp Nhân viên
 

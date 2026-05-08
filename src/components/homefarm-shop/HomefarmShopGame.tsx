@@ -38,6 +38,8 @@ const GOD_MODE_CHANCE_INCREMENT = 0.03;
 const GOD_MODE_MAX_CHANCE = 0.65;
 // Bot gate: minimum day required to purchase each upgrade level (index = currentLevel)
 const BOT_UPGRADE_DAY_GATE = [8, 14, 20, 24, 27];
+const KNIFE_SALMON_BONUS_BY_LEVEL = [0, 0.35, 0.7, 1.1, 1.55, 2.1] as const;
+const KNIFE_HEAD_BONE_BONUS_BY_LEVEL = [0, 0.1, 0.2, 0.35, 0.5, 0.7] as const;
 
 const GOD_MODE_CRISIS_DEFS: Array<{
   id: GodModeCrisisId;
@@ -159,7 +161,7 @@ const UPGRADE_DEFS: Array<{
     icon: "🔪",
     name: "Dao fillet",
     description: "Fillet cá nguyên ra nhiều thành phẩm hơn.",
-    effect: "+0,35kg fillet và +0,1kg đầu xương mỗi level",
+    effect: "Lv5: +2,1kg fillet và +0,7kg đầu xương mỗi con",
     costs: [500, 1100, 2200, 4000, 7000],
   },
   {
@@ -553,8 +555,10 @@ export function HomefarmShopGame() {
     }
     sfx.knife();
 
-    const salmonYield = 4.8 + upgrades.knife * 0.35;
-    const headBoneYield = 1.2 + upgrades.knife * 0.1;
+    const salmonBonus = KNIFE_SALMON_BONUS_BY_LEVEL[upgrades.knife] ?? KNIFE_SALMON_BONUS_BY_LEVEL[0];
+    const headBoneBonus = KNIFE_HEAD_BONE_BONUS_BY_LEVEL[upgrades.knife] ?? KNIFE_HEAD_BONE_BONUS_BY_LEVEL[0];
+    const salmonYield = 4.8 + salmonBonus;
+    const headBoneYield = 1.2 + headBoneBonus;
 
     setProducts((prev) =>
       prev.map((p) =>
