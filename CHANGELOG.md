@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.0.5`
+- Current version: `v9.0.6`
 - Current commit: TBD
-- Current rollback tag: `v9.0.5-keep-bgm-on-start-run`
+- Current rollback tag: `v9.0.6-godmode-event-alert-ui`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.0.6 - Nâng God Mode unlock thành event alert
+
+- Biến màn hình `GOD MODE is coming` thành một modal sự kiện tối và lớn hơn, khó bị lướt qua.
+- Người chơi phải bấm `Đã hiểu` thì mới tiếp tục vào gameplay.
+- Tăng trọng lượng thị giác cho phần cảnh báo, giữ nguyên logic game phía sau.
+- Tag: `v9.0.6-godmode-event-alert-ui`
 
 ### v9.0.5 - Giữ nhạc nền khi vào run
 
