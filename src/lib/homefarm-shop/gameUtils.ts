@@ -44,6 +44,8 @@ const OVERNIGHT_SPOILAGE_RATES: Record<NonNullable<Product["category"]>, number>
   addon: 0.02,
 };
 
+const FREEZER_REDUCTION_BY_LEVEL = [0, 0.25, 0.5, 0.75, 0.85, 0.95] as const;
+
 export function money(value: number) {
   return `${Math.round(value).toLocaleString("vi-VN")}k`;
 }
@@ -64,6 +66,11 @@ function clamp(value: number, min: number, max: number) {
 function weightedPick(ids: string[]) {
   const pool = ids.flatMap((id) => Array(PRODUCT_WEIGHTS[id] || 1).fill(id));
   return sample(pool);
+}
+
+function getFreezerReduction(level = 0) {
+  const index = Math.max(0, Math.min(level, FREEZER_REDUCTION_BY_LEVEL.length - 1));
+  return FREEZER_REDUCTION_BY_LEVEL[index];
 }
 
 function unlockedCountByDay(day: number) {
@@ -374,7 +381,7 @@ export function applyEventToProducts(
   } = {},
 ) {
   if (!event?.stockDelta) return products;
-  const freezerReduction = Math.min((options.freezerLevel ?? 0) * 0.25, 0.75);
+  const freezerReduction = getFreezerReduction(options.freezerLevel);
 
   return products.map((p) => {
     const delta = event.stockDelta?.[p.id] || 0;
@@ -389,7 +396,7 @@ export function applyOvernightSpoilage(
     freezerLevel?: number;
   } = {},
 ) {
-  const freezerReduction = Math.min((options.freezerLevel ?? 0) * 0.25, 0.75);
+  const freezerReduction = getFreezerReduction(options.freezerLevel);
   let affectedCount = 0;
   let totalLoss = 0;
 

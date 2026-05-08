@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v7.5.5`
+- Current version: `v7.5.6`
 - Current commit: TBD
-- Current rollback tag: `v7.5.5-tip-achievements`
+- Current rollback tag: `v7.5.6-freezer-late-level-value`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v7.5.6 - Fix giá trị nâng cấp Tủ lạnh Lv4-Lv5
+
+- Thay công thức giảm hao hụt của Tủ lạnh từ cap 75% sang bảng theo level.
+- Lv4 nay giảm 85% hao hụt, Lv5 giảm 95% hao hụt thay vì không tăng tác dụng.
+- Cập nhật mô tả nâng cấp để nói rõ áp dụng cho event xấu và hư hỏng qua đêm.
+- Tag: `v7.5.6-freezer-late-level-value`
 
 ### v7.5.5 - Thêm achievement liên quan tới tip
 

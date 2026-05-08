@@ -182,8 +182,8 @@ const UPGRADE_DEFS: Array<{
     id: "freezer",
     icon: "❄️",
     name: "Tủ lạnh xịn",
-    description: "Giảm hao hụt hàng khi gặp sự kiện xấu.",
-    effect: "-25% hao hụt do event mỗi level",
+    description: "Giảm hao hụt hàng do sự kiện xấu và hư hỏng qua đêm.",
+    effect: "Giảm hao hụt: 25% / 50% / 75% / 85% / 95%",
     costs: [650, 1300, 2600, 4200, 7000],
   },
 ];
