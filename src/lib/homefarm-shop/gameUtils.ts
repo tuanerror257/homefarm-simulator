@@ -441,6 +441,9 @@ export const ACHIEVEMENT_BONUS: Partial<Record<AchievementId, number>> = {
   // Dễ
   first_serve:     200,
   combo_5:         500,
+  order_2000:      500,
+  order_5000:      800,
+  order_10000:     1000,
   sold_egg_50:     500,
   bulk_save_200:   500,
   sold_dairy_100:  800,

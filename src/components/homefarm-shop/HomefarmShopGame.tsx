@@ -509,6 +509,9 @@ export function HomefarmShopGame() {
     if (newServedCount >= 100) unlockAchievement("total_100");
     if (nextCombo >= 5) unlockAchievement("combo_5");
     if (nextCombo >= 10) unlockAchievement("combo_10");
+    if (bill >= 2000) unlockAchievement("order_2000");
+    if (bill >= 5000) unlockAchievement("order_5000");
+    if (bill >= 10000) unlockAchievement("order_10000");
     const newCash = cash + bill + tip + comboBonus - shippingFee;
     if (newCash >= 50000) unlockAchievement("millionaire");
     setCombo(nextCombo);

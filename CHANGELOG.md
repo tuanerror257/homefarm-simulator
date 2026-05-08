@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v7.5.3`
+- Current version: `v7.5.4`
 - Current commit: TBD
-- Current rollback tag: `v7.5.3-fix-achievement-lint-warnings`
+- Current rollback tag: `v7.5.4-order-value-achievements`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v7.5.4 - Thêm achievement theo giá trị đơn hàng
+
+- Thêm 3 achievement mới cho đơn hàng đạt 2.000k, 5.000k và 10.000k.
+- Achievement mới: "Đơn khủng!!!", "Khách sộp ghé thăm", "Thần tài tới, thần tài tới".
+- Unlock theo `bill` của từng đơn sau khi giao thành công.
+- Đưa cả 3 vào nhóm bonus điểm đơn giản để cộng vào điểm tổng kết.
+- Tag: `v7.5.4-order-value-achievements`
 
 ### v7.5.3 - Fix warning lint liên quan achievement
 
