@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.0.4`
+- Current version: `v9.0.5`
 - Current commit: TBD
-- Current rollback tag: `v9.0.4-godmode-audio-shake-tune`
+- Current rollback tag: `v9.0.5-keep-bgm-on-start-run`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.0.5 - Giữ nhạc nền khi vào run
+
+- Sửa luồng `startRun()` để không làm pause BGM khi vào game từ tutorial/bot test.
+- Reset về start screen vẫn dừng nhạc như trước.
+- Tag: `v9.0.5-keep-bgm-on-start-run`
 
 ### v9.0.4 - Giảm rè God Mode và thêm rung nhẹ toàn màn hình
 

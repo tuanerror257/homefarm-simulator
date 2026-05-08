@@ -1288,6 +1288,7 @@ export function HomefarmShopGame() {
     startDay?: number;
     botMode?: boolean;
     playerName?: string;
+    keepMusic?: boolean;
   }) => {
     const nextMode = options.mode;
     const nextModeConfig = GAME_MODE_CONFIGS[nextMode];
@@ -1295,8 +1296,10 @@ export function HomefarmShopGame() {
     const nextPlayerName = options.playerName?.trim() || playerName;
     const nextBotMode = options.botMode ?? false;
 
-    audioRef.current?.pause();
-    if (audioRef.current) audioRef.current.currentTime = 0;
+    if (!options.keepMusic) {
+      audioRef.current?.pause();
+      if (audioRef.current) audioRef.current.currentTime = 0;
+    }
 
     const unlockedProducts = getUnlockedProducts(nextStartDay, START_PRODUCTS, nextMode);
     const startEvent = maybeCreateEvent(nextStartDay, unlockedProducts, nextMode);
@@ -1385,6 +1388,7 @@ export function HomefarmShopGame() {
     godModeStartPlayedRef.current = false;
     setSessionTelemetry(null);
     setSessionTelemetryCount(0);
+    if (options.keepMusic) startBgm();
   }, [playerName]);
 
   function resetGame() {
@@ -1394,7 +1398,7 @@ export function HomefarmShopGame() {
     setGamePhase("start");
     setGameMode("fullTime");
     setBotMode(false);
-    startRun({ mode: "fullTime", startDay: 1, botMode: false });
+    startRun({ mode: "fullTime", startDay: 1, botMode: false, keepMusic: false });
   }
 
   if (gamePhase === "start") {
@@ -1424,6 +1428,7 @@ export function HomefarmShopGame() {
               startDay: nextBotStartDay ?? 1,
               botMode: nextBotStartDay !== null,
               playerName: nextName,
+              keepMusic: true,
             });
           }} />
         </div>
