@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.0.9`
+- Current version: `v9.1.0`
 - Current commit: TBD
-- Current rollback tag: `v9.0.9-godmode-fire-border-topmost`
+- Current rollback tag: `v9.1.0-godmode-fire-dark-overlay`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.0 - Tăng lực God Mode và phủ tối màn hình
+
+- Làm viền lửa God Mode mạnh, sáng và dày hơn để hiệu ứng bật lên rõ hơn.
+- Thêm một lớp phủ tối toàn màn hình khi God Mode active để phần còn lại của game chìm xuống.
+- Giữ các hiệu ứng cũ nhưng nâng cảm giác “đi vào địa ngục” cho phase này.
+- Tag: `v9.1.0-godmode-fire-dark-overlay`
 
 ### v9.0.9 - Đẩy hiệu ứng God Mode lên lớp trên cùng
 
