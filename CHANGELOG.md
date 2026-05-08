@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v8.5.0`
+- Current version: `v8.5.1`
 - Current commit: TBD
-- Current rollback tag: `v8.5.0-session-telemetry`
+- Current rollback tag: `v8.5.1-part-time-godmode-teaser-day-18`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v8.5.1 - Dời teaser God Mode của Ca Part-time sang ngày 18
+
+- Dời thông báo `GOD MODE is coming` của Ca Part-time từ ngày 14 sang ngày 18.
+- Giữ nguyên day God Mode của Part-time ở ngày 24, chỉ thay mốc nhắc người chơi chuẩn bị sớm hơn trong run.
+- Đồng bộ mốc teaser này sang simulator để báo cáo và game UI luôn khớp nhau.
+- Tag: `v8.5.1-part-time-godmode-teaser-day-18`
 
 ### v8.5.0 - Thêm telemetry session gần nhất
 

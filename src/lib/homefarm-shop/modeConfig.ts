@@ -32,7 +32,7 @@ export const GAME_MODE_CONFIGS: Record<GameMode, HomefarmModeConfig> = {
     upgradeUnlockDay: 6,
     eventUnlockDay: 9,
     adUnlockDay: 11,
-    godModeTeaserDay: 14,
+    godModeTeaserDay: 18,
     godModeStartDay: 24,
     botUpgradeDayGate: [6, 9, 12, 15, 18],
     productUnlockDayScale: 0.6,
