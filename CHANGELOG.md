@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.0.7`
+- Current version: `v9.0.8`
 - Current commit: TBD
-- Current rollback tag: `v9.0.7-godmode-music-switch`
+- Current rollback tag: `v9.0.8-godmode-fire-border`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.0.8 - Thêm viền lửa phập phù cho God Mode
+
+- Khi God Mode active, toàn bộ viền màn hình giờ có hiệu ứng đỏ phập phù như lửa cháy.
+- Giữ nguyên overlay scanline/static/vignette cũ, chỉ thêm một lớp border riêng để cảm giác phase này nặng hơn.
+- Tag: `v9.0.8-godmode-fire-border`
 
 ### v9.0.7 - Chuyển sang nhạc God Mode riêng
 

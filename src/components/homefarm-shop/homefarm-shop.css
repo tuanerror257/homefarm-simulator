@@ -95,6 +95,7 @@
   mix-blend-mode: screen;
 }
 
+.hfs-godmode-fx-border,
 .hfs-godmode-fx-line,
 .hfs-godmode-fx-line-2,
 .hfs-godmode-fx-static,
@@ -102,6 +103,28 @@
   position: absolute;
   inset: 0;
   display: block;
+}
+
+.hfs-godmode-fx-border {
+  inset: -2px;
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at top left, rgba(255,145,72,.92), transparent 30%) 0 0 / 50% 50% no-repeat,
+    radial-gradient(circle at top right, rgba(255,73,36,.88), transparent 30%) 100% 0 / 50% 50% no-repeat,
+    radial-gradient(circle at bottom left, rgba(255,48,0,.82), transparent 30%) 0 100% / 50% 50% no-repeat,
+    radial-gradient(circle at bottom right, rgba(255,194,92,.9), transparent 30%) 100% 100% / 50% 50% no-repeat,
+    linear-gradient(180deg, rgba(255,92,40,.85), transparent 24%) top / 100% 20px no-repeat,
+    linear-gradient(0deg, rgba(255,57,26,.72), transparent 24%) bottom / 100% 20px no-repeat,
+    linear-gradient(90deg, rgba(255,92,40,.72), transparent 24%) left / 20px 100% no-repeat,
+    linear-gradient(270deg, rgba(255,57,26,.72), transparent 24%) right / 20px 100% no-repeat;
+  filter: blur(1.2px) saturate(1.4);
+  opacity: .72;
+  animation: hfs-godmode-border 1.05s ease-in-out infinite;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,221,180,.18),
+    inset 0 0 26px rgba(255,72,32,.18),
+    inset 0 0 40px rgba(124,0,0,.18);
+  mix-blend-mode: screen;
 }
 
 .hfs-godmode-fx-line {
@@ -3551,6 +3574,29 @@
   54% { transform: translate3d(-0.4px, -0.2px, 0) rotate(-0.04deg); }
   72% { transform: translate3d(0.5px, 0.3px, 0) rotate(0.05deg); }
   50% { filter: brightness(1.03) saturate(1.1); }
+}
+
+@keyframes hfs-godmode-border {
+  0%, 100% {
+    opacity: .62;
+    filter: blur(1.2px) saturate(1.35) brightness(1);
+    transform: scale(1);
+  }
+  20% {
+    opacity: .78;
+    filter: blur(1.5px) saturate(1.55) brightness(1.08);
+    transform: scale(1.004);
+  }
+  45% {
+    opacity: .68;
+    filter: blur(1.1px) saturate(1.45) brightness(.98);
+    transform: scale(0.998);
+  }
+  70% {
+    opacity: .84;
+    filter: blur(1.7px) saturate(1.6) brightness(1.12);
+    transform: scale(1.006);
+  }
 }
 
 @keyframes hfs-godmode-scan {

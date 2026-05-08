@@ -1486,9 +1486,10 @@ export function HomefarmShopGame() {
           <div className="hfs-bg" />
           {isGodModeActive && (
             <div className="hfs-godmode-fx" aria-hidden="true">
+              <span className="hfs-godmode-fx-border" />
               <span className="hfs-godmode-fx-line" />
-            <span className="hfs-godmode-fx-line hfs-godmode-fx-line-2" />
-            <span className="hfs-godmode-fx-static" />
+              <span className="hfs-godmode-fx-line hfs-godmode-fx-line-2" />
+              <span className="hfs-godmode-fx-static" />
               <span className="hfs-godmode-fx-vignette" />
             </div>
           )}
