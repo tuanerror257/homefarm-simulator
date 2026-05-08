@@ -294,7 +294,8 @@ export function HomefarmShopGame() {
   const [lowRatingStreak, setLowRatingStreak] = useState(0);
   const [loanDebt, setLoanDebt] = useState(0);
   const [activeCrises, setActiveCrises] = useState<ActiveCrisis[]>([]);
-  const [showGodModeUnlock, setShowGodModeUnlock] = useState(false);
+  const [showGodModeTeaser, setShowGodModeTeaser] = useState(false);
+  const [showGodModeStart, setShowGodModeStart] = useState(false);
   const [unlockedAchievements, setUnlockedAchievements] = useState<Set<AchievementId>>(new Set());
   const [newAchievement, setNewAchievement] = useState<Achievement | null>(null);
   const totalBulkSavingsRef = useRef(0);
@@ -551,7 +552,7 @@ export function HomefarmShopGame() {
   }, [customerIndex, day, customer, eventMoodPenalty]);
 
   useEffect(() => {
-    if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showGodModeUnlock || showAds || showLeaderboard || activeEvent || gameOver) return;
+    if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showGodModeTeaser || showGodModeStart || showAds || showLeaderboard || activeEvent || gameOver) return;
 
     const moodDecay = (0.7 + day * 0.022) * 2.2 * Math.max(0.7, 1 - upgrades.staff * 0.06);
     const timer = setInterval(() => {
@@ -571,7 +572,7 @@ export function HomefarmShopGame() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeUnlock, showAds, showLeaderboard, activeEvent, gameOver, day, upgrades.staff, skipCustomer]);
+  }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeTeaser, showGodModeStart, showAds, showLeaderboard, activeEvent, gameOver, day, upgrades.staff, skipCustomer]);
 
   async function loadLeaderboard() {
     try {
@@ -885,7 +886,7 @@ export function HomefarmShopGame() {
     let delay = 650;
     if (daySummary) {
       delay = 2000;
-    } else if (showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showGodModeUnlock) {
+    } else if (showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showGodModeTeaser || showGodModeStart) {
       delay = 4000; // pause on unlock notification screens so user can read
     } else if (showUpgrades || showAds) {
       delay = 1500; // pause so user can read modal before bot acts
@@ -911,7 +912,8 @@ export function HomefarmShopGame() {
       if (showUpgradeUnlock)  { setShowUpgradeUnlock(false);  return; }
       if (showEventUnlock)    { setShowEventUnlock(false);    return; }
       if (showAdUnlock)       { setShowAdUnlock(false);       return; }
-      if (showGodModeUnlock)  { setShowGodModeUnlock(false);  return; }
+      if (showGodModeTeaser)   { setShowGodModeTeaser(false);  return; }
+      if (showGodModeStart)    { setShowGodModeStart(false);   return; }
       if (activeEvent)        { setActiveEvent(null);         return; }
 
       // 2. Game over → restart after 3s
@@ -1102,7 +1104,7 @@ export function HomefarmShopGame() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     botActive,
-    showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeUnlock,
+    showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeTeaser, showGodModeStart,
     showImport, showUpgrades, showAds, activeEvent,
     gameOver, daySummary, customer, selected, isComplete,
     upgrades, adRunToday, day, products, productPage, importQty, botImportScrolled, botUpgradedToday,
@@ -1281,7 +1283,8 @@ export function HomefarmShopGame() {
     if (nextDay === modeConfig.upgradeUnlockDay) setShowUpgradeUnlock(true);
     if (nextDay === modeConfig.eventUnlockDay) setShowEventUnlock(true);
     if (nextDay === modeConfig.adUnlockDay) setShowAdUnlock(true);
-    if (nextDay === modeConfig.godModeTeaserDay) setShowGodModeUnlock(true);
+    if (nextDay === modeConfig.godModeTeaserDay) setShowGodModeTeaser(true);
+    if (nextDay === modeConfig.godModeStartDay) setShowGodModeStart(true);
 
     setToast(buildDayToast({
       dayValue: nextDay,
@@ -1420,7 +1423,8 @@ export function HomefarmShopGame() {
     setLowRatingStreak(0);
     setLoanDebt(0);
     setActiveCrises([]);
-    setShowGodModeUnlock(nextStartDay === nextModeConfig.godModeTeaserDay);
+    setShowGodModeTeaser(nextStartDay === nextModeConfig.godModeTeaserDay);
+    setShowGodModeStart(nextStartDay === nextModeConfig.godModeStartDay);
     setUnlockedAchievements(new Set());
     setNewAchievement(null);
     totalBulkSavingsRef.current = 0;
@@ -1890,7 +1894,7 @@ export function HomefarmShopGame() {
           </div>
         )}
 
-        {showGodModeUnlock && (
+        {showGodModeTeaser && (
           <div className="hfs-modal-backdrop hfs-unlock-backdrop">
             <div className="hfs-unlock-panel">
               <div className="hfs-unlock-icon">☠️</div>
@@ -1911,7 +1915,35 @@ export function HomefarmShopGame() {
                   </div>
                 ))}
               </div>
-              <button className="hfs-unlock-btn" onClick={() => setShowGodModeUnlock(false)}>
+              <button className="hfs-unlock-btn" onClick={() => setShowGodModeTeaser(false)}>
+                Đã hiểu
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showGodModeStart && (
+          <div className="hfs-modal-backdrop hfs-unlock-backdrop">
+            <div className="hfs-unlock-panel">
+              <div className="hfs-unlock-icon">☠️</div>
+              <div className="hfs-unlock-title">GOD MODE bắt đầu</div>
+              <div className="hfs-unlock-desc">
+                Hôm nay là ngày {modeConfig.godModeStartDay}. Chế độ hủy diệt đã chính thức kích hoạt.
+                <br /><br />
+                Từ giờ trở đi, mọi ngày đều có thể nổ ra khủng hoảng mới. Hãy giữ đủ tiền mặt, stock hàng và tinh thần để sống sót.
+              </div>
+              <div className="hfs-godmode-unlock-list">
+                {GOD_MODE_CRISIS_DEFS.map((def) => (
+                  <div key={def.id} className="hfs-godmode-unlock-row">
+                    <span className="hfs-godmode-unlock-icon">{def.icon}</span>
+                    <div className="hfs-godmode-unlock-body">
+                      <div className="hfs-godmode-unlock-name">{def.title}</div>
+                      <div className="hfs-godmode-unlock-desc-text">{def.popupDesc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button className="hfs-unlock-btn" onClick={() => setShowGodModeStart(false)}>
                 Đã hiểu
               </button>
             </div>
