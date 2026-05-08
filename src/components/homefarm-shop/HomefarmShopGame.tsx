@@ -23,6 +23,7 @@ import {
   qty,
 } from "@/lib/homefarm-shop/gameUtils";
 import { fetchLeaderboard, getLeaderboardMode, saveLeaderboardEntry, type LeaderboardEntry, type LeaderboardMode } from "@/lib/homefarm-shop/leaderboard";
+import { formatSessionDuration, getLatestSessionTelemetry, getSessionTelemetryCount, recordSessionTelemetry, type SessionOutcome, type SessionTelemetryEntry } from "@/lib/homefarm-shop/sessionTelemetry";
 import { sfx, setSfxMuted } from "@/lib/homefarm-shop/sfx";
 import EndDaySummary from "./EndDaySummary";
 import "./homefarm-shop.css";
@@ -252,6 +253,8 @@ export function HomefarmShopGame() {
   const [eventMoodPenalty, setEventMoodPenalty] = useState(0);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [sessionTelemetry, setSessionTelemetry] = useState<SessionTelemetryEntry | null>(null);
+  const [sessionTelemetryCount, setSessionTelemetryCount] = useState(0);
   const [playerName, setPlayerName] = useState("Tada");
   const [botMode, setBotMode] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
@@ -267,6 +270,8 @@ export function HomefarmShopGame() {
   const totalBulkSavingsRef = useRef(0);
   const productSoldTotalRef = useRef<Record<string, number>>({});
   const totalTipsRef = useRef(0);
+  const sessionStartedAtRef = useRef(Date.now());
+  const sessionTelemetryRecordedRef = useRef(false);
 
   useEffect(() => {
     if (!showGodModeUnlock || muted) return;
@@ -274,9 +279,21 @@ export function HomefarmShopGame() {
     return stopAmbience;
   }, [showGodModeUnlock, muted]);
 
+  useEffect(() => {
+    if (gamePhase !== "playing") return;
+    sessionStartedAtRef.current = Date.now();
+    sessionTelemetryRecordedRef.current = false;
+  }, [gamePhase]);
+
   const customer = customers[customerIndex] || null;
   const botActive = botMode && gamePhase === "playing";
   const leaderboardMode: LeaderboardMode = gameMode === "partTime" ? "part-time" : "full-time";
+
+  useEffect(() => {
+    if (!showLeaderboard) return;
+    setSessionTelemetry(getLatestSessionTelemetry());
+    setSessionTelemetryCount(getSessionTelemetryCount());
+  }, [showLeaderboard, leaderboard.length, scoreSaved]);
 
   // Refs so bot setTimeout always reads latest state
   const botProductsRef = useRef(products);
@@ -301,6 +318,27 @@ export function HomefarmShopGame() {
         : [],
     [customer, products],
   );
+
+  const persistSessionTelemetry = useCallback((outcome: SessionOutcome) => {
+    if (typeof window === "undefined" || sessionTelemetryRecordedRef.current) return;
+    const endedAt = new Date();
+    recordSessionTelemetry({
+      started_at: new Date(sessionStartedAtRef.current).toISOString(),
+      ended_at: endedAt.toISOString(),
+      game_mode: gameMode,
+      outcome,
+      day_reached: day,
+      reached_god_mode: day >= modeConfig.godModeStartDay,
+      playtime_ms: Math.max(0, endedAt.getTime() - sessionStartedAtRef.current),
+      total_revenue: Math.round(totalRevenue),
+      total_profit: Math.round(totalProfit),
+      served_count: servedCount,
+      max_combo: maxCombo,
+    });
+    sessionTelemetryRecordedRef.current = true;
+    setSessionTelemetry(getLatestSessionTelemetry());
+    setSessionTelemetryCount(getSessionTelemetryCount());
+  }, [day, gameMode, maxCombo, modeConfig.godModeStartDay, servedCount, totalProfit, totalRevenue]);
 
   const done = customer ? customer.order.filter((o) => selected.includes(o.id)).length : 0;
   const totalCustomers = customers.length;
@@ -358,9 +396,13 @@ export function HomefarmShopGame() {
   }, [customerIndex, customers.length]);
 
   useEffect(() => {
-    if (gameOver) { sfx.gameOver(); saveScore(); }
+    if (gameOver) {
+      persistSessionTelemetry("game_over");
+      sfx.gameOver();
+      saveScore();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameOver]);
+  }, [gameOver, persistSessionTelemetry]);
 
   useEffect(() => {
     if (!customer) {
@@ -1144,6 +1186,9 @@ export function HomefarmShopGame() {
   }
 
   function resetGame() {
+    if (gamePhase === "playing" && !gameOver) {
+      persistSessionTelemetry("restart");
+    }
     audioRef.current?.pause();
     if (audioRef.current) audioRef.current.currentTime = 0;
     const initCustomers = generateCustomers(START_PRODUCTS, 1);
@@ -1200,6 +1245,7 @@ export function HomefarmShopGame() {
     totalBulkSavingsRef.current = 0;
     productSoldTotalRef.current = {};
     totalTipsRef.current = 0;
+    sessionTelemetryRecordedRef.current = false;
   }
 
   if (gamePhase === "start") {
@@ -1793,6 +1839,34 @@ export function HomefarmShopGame() {
                   className="hfs-name-input"
                   placeholder="Tên người chơi"
                 />
+                <div className="hfs-session-box">
+                  <div className="hfs-session-title">Telemetry gần nhất</div>
+                  {sessionTelemetry ? (
+                    <>
+                      <div className="hfs-session-row">
+                        <span>Thời lượng</span>
+                        <strong>{formatSessionDuration(sessionTelemetry.playtime_ms)}</strong>
+                      </div>
+                      <div className="hfs-session-row">
+                        <span>Kết quả</span>
+                        <strong>{sessionTelemetry.outcome === "game_over" ? "Game over" : "Restart"}</strong>
+                      </div>
+                      <div className="hfs-session-row">
+                        <span>Mốc ngày</span>
+                        <strong>
+                          Day {sessionTelemetry.day_reached}
+                          {sessionTelemetry.reached_god_mode ? " · đã tới God Mode" : ""}
+                        </strong>
+                      </div>
+                      <div className="hfs-session-row">
+                        <span>Session đã ghi</span>
+                        <strong>{sessionTelemetryCount}</strong>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="hfs-session-empty">Chưa có telemetry nào được ghi.</div>
+                  )}
+                </div>
                 <div className="hfs-leaderboard-actions">
                   <button className="hfs-save-score" onClick={saveScore} disabled={scoreSaved}>
                     {scoreSaved ? "Đã lưu" : "Lưu điểm"}

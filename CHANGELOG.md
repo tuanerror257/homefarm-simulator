@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v8.4.0`
+- Current version: `v8.5.0`
 - Current commit: TBD
-- Current rollback tag: `v8.4.0-leaderboard-mode-polish`
+- Current rollback tag: `v8.5.0-session-telemetry`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v8.5.0 - Thêm telemetry session gần nhất
+
+- Ghi lại session gần nhất khi người chơi game over hoặc restart giữa chừng.
+- Hiển thị thời lượng run, kết quả, mốc ngày và số session đã ghi trong modal leaderboard.
+- Giữ telemetry cục bộ trong localStorage để đo nhanh hành vi chơi thật trước khi nối server analytics.
+- Tag: `v8.5.0-session-telemetry`
 
 ### v8.4.0 - Polished mode info on leaderboard
 
