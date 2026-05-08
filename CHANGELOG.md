@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v7.5.11`
+- Current version: `v7.5.12`
 - Current commit: TBD
-- Current rollback tag: `v7.5.11-balance-simulator`
+- Current rollback tag: `v7.5.12-godmode-teaser-day-22`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v7.5.12 - Thêm teaser God Mode ngày 22
+
+- Thêm cảnh báo ở toast ngày 22 rằng GOD MODE sắp tới.
+- Nhắc người chơi chuẩn bị tiền mặt và stock hàng trước chế độ hủy diệt.
+- Tag: `v7.5.12-godmode-teaser-day-22`
 
 ### v7.5.11 - Thêm dev balance simulator
 

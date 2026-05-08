@@ -33,6 +33,7 @@ const PRODUCT_EXPANSION_DAY = 6;
 const UPGRADE_UNLOCK_DAY = 8;
 const EVENT_UNLOCK_DAY = 12;
 const AD_UNLOCK_DAY = 15;
+const GOD_MODE_TEASER_DAY = 22;
 const GOD_MODE_START_DAY = 36;
 const GOD_MODE_CHANCE_INCREMENT = 0.03;
 const GOD_MODE_MAX_CHANCE = 0.65;
@@ -1113,10 +1114,11 @@ export function HomefarmShopGame() {
     const upgradeText = nextDay === UPGRADE_UNLOCK_DAY ? " · đã mở Nâng cấp cửa hàng" : "";
     const eventText = nextDay === EVENT_UNLOCK_DAY ? " · các vấn đề vận hành bắt đầu xuất hiện" : "";
     const adText = nextDay === AD_UNLOCK_DAY ? " · đã mở Quảng Cáo" : pendingExtraCustomers > 0 ? ` · +${pendingExtraCustomers} khách từ quảng cáo` : "";
+    const godModeTeaserText = nextDay === GOD_MODE_TEASER_DAY ? " · GOD MODE is coming: chuẩn bị tiền mặt và stock hàng, chế độ hủy diệt sẽ tới trong vài ngày nữa" : "";
     const godModeText = nextDay === GOD_MODE_START_DAY ? " · ⚠️ GOD MODE bắt đầu!" : "";
     const crisisText = crisisToastParts.length > 0 ? ` · 🚨 Crisis: ${crisisToastParts.join(", ")}` : "";
     const closedText = closedByEpidemic ? " · 😷 Đóng cửa hôm nay!" : "";
-    setToast(`Ngày ${nextDay}: ${nextProducts.length} mặt hàng · ${nextCustomers.length} khách${skippedText}${spoilageText}${catalogText}${upgradeText}${eventText}${adText}${godModeText}${crisisText}${closedText}. Combo: ${maxCombo}.`);
+    setToast(`Ngày ${nextDay}: ${nextProducts.length} mặt hàng · ${nextCustomers.length} khách${skippedText}${spoilageText}${catalogText}${upgradeText}${eventText}${adText}${godModeTeaserText}${godModeText}${crisisText}${closedText}. Combo: ${maxCombo}.`);
   }
 
   async function saveScore() {
