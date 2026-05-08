@@ -261,7 +261,9 @@ export function generateCustomers(
   const appCustomer = CUSTOMER_TYPES.find((customer) => customer.name === "Shipper app");
 
   return Array.from({ length: count }).map((_, index) => {
-    const vipChance = day >= 3 ? Math.min(0.08 + day * 0.012 + signLevel * 0.035, 0.32) : 0;
+    const vipBaseChance = 0.08 + day * 0.012;
+    const vipCap = Math.min(0.32 + signLevel * 0.035, 0.5);
+    const vipChance = day >= 3 ? Math.min(vipBaseChance + signLevel * 0.025, vipCap) : 0;
     const isVip = Math.random() < vipChance;
     let type = sample(CUSTOMER_TYPES);
     if (isVip) {

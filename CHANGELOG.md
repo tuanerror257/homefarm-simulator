@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v7.5.6`
+- Current version: `v7.5.7`
 - Current commit: TBD
-- Current rollback tag: `v7.5.6-freezer-late-level-value`
+- Current rollback tag: `v7.5.7-sign-vip-scaling`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v7.5.7 - Rebalance Bảng hiệu VIP
+
+- Bảng hiệu VIP nay tăng cả xác suất VIP cơ bản và trần xác suất VIP.
+- Trần VIP tăng từ 32% lên tối đa 50% theo level Sign để nâng cấp muộn vẫn có tác dụng.
+- Cập nhật mô tả nâng cấp để phản ánh cơ chế mới.
+- Tag: `v7.5.7-sign-vip-scaling`
 
 ### v7.5.6 - Fix giá trị nâng cấp Tủ lạnh Lv4-Lv5
 

@@ -175,7 +175,7 @@ const UPGRADE_DEFS: Array<{
     icon: "💎",
     name: "Bảng hiệu VIP",
     description: "Tăng xác suất gặp khách VIP từ ngày kế tiếp.",
-    effect: "+3,5% cơ hội VIP mỗi level",
+    effect: "+2,5% cơ hội VIP và +3,5% trần VIP mỗi level",
     costs: [700, 1400, 2800, 4800, 8000],
   },
   {
