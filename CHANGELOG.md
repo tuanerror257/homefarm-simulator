@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.0.2`
+- Current version: `v9.0.3`
 - Current commit: TBD
-- Current rollback tag: `v9.0.2-bot-start-toast-helper`
+- Current rollback tag: `v9.0.3-run-intro-banner`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.0.3 - Thêm banner đầu run cho bot test
+
+- Khi bot `tadadevNN` bắt đầu ở day bất kỳ > 1, game sẽ hiện banner đầu run để không bị trôi toast khi bot tự chạy.
+- Banner dùng chung với toast ngày đầu, giúp test nhiều event/unlock ở các mốc khác nhau dễ nhìn hơn.
+- Tag: `v9.0.3-run-intro-banner`
 
 ### v9.0.2 - Đồng bộ toast ngày bắt đầu cho bot test
 

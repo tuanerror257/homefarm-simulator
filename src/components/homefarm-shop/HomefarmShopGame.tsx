@@ -270,6 +270,7 @@ export function HomefarmShopGame() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [sessionTelemetry, setSessionTelemetry] = useState<SessionTelemetryEntry | null>(null);
   const [sessionTelemetryCount, setSessionTelemetryCount] = useState(0);
+  const [runIntroMessage, setRunIntroMessage] = useState<string | null>(null);
   const [playerName, setPlayerName] = useState("Tada");
   const [botMode, setBotMode] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
@@ -288,6 +289,7 @@ export function HomefarmShopGame() {
   const sessionStartedAtRef = useRef(Date.now());
   const sessionTelemetryRecordedRef = useRef(false);
   const godModeStartPlayedRef = useRef(false);
+  const runIntroTimerRef = useRef<number | null>(null);
 
   const isGodModeActive = gamePhase === "playing" && day >= modeConfig.godModeStartDay;
 
@@ -309,6 +311,12 @@ export function HomefarmShopGame() {
     sessionTelemetryRecordedRef.current = false;
     godModeStartPlayedRef.current = false;
   }, [gamePhase]);
+
+  useEffect(() => {
+    return () => {
+      if (runIntroTimerRef.current) window.clearTimeout(runIntroTimerRef.current);
+    };
+  }, []);
 
   const customer = customers[customerIndex] || null;
   const botActive = botMode && gamePhase === "playing";
@@ -468,6 +476,15 @@ export function HomefarmShopGame() {
     const closedText = closedByEpidemic ? " · 😷 Đóng cửa hôm nay!" : "";
 
     return `Ngày ${dayValue}: ${productCount} mặt hàng · ${customerCount} khách${skippedText}${spoilageText}${catalogText}${upgradeText}${eventText}${adText}${godModeTeaserText}${godModeText}${eventLabelText}${crisisText}${closedText}. Combo: ${maxCombo}.`;
+  }
+
+  function showRunIntro(message: string) {
+    setRunIntroMessage(message);
+    if (runIntroTimerRef.current) window.clearTimeout(runIntroTimerRef.current);
+    runIntroTimerRef.current = window.setTimeout(() => {
+      setRunIntroMessage(null);
+      runIntroTimerRef.current = null;
+    }, 3200);
   }
 
   useEffect(() => {
@@ -1315,22 +1332,22 @@ export function HomefarmShopGame() {
     setCustomerIndex(0);
     setSelected([]);
     setTimeLeft(nextCustomers[0]?.patience ?? 30);
-    setToast(
-      nextStartDay === 1
-        ? "Tap từng món khách cần mua trên kệ hàng"
-        : buildDayToast({
-            dayValue: nextStartDay,
-            productCount: nextProducts.length,
-            customerCount: nextCustomers.length,
-            catalogUnlocked: nextStartDay === nextModeConfig.productExpansionDay,
-            upgradeUnlocked: nextStartDay === nextModeConfig.upgradeUnlockDay,
-            eventUnlocked: nextStartDay === nextModeConfig.eventUnlockDay,
-            adUnlocked: nextStartDay === nextModeConfig.adUnlockDay,
-            godModeTeaser: nextStartDay === nextModeConfig.godModeTeaserDay,
-            godModeStart: nextStartDay === nextModeConfig.godModeStartDay,
-            eventLabel: startEvent?.title ?? "",
-          }),
-    );
+    const startMessage = nextStartDay === 1
+      ? "Tap từng món khách cần mua trên kệ hàng"
+      : buildDayToast({
+          dayValue: nextStartDay,
+          productCount: nextProducts.length,
+          customerCount: nextCustomers.length,
+          catalogUnlocked: nextStartDay === nextModeConfig.productExpansionDay,
+          upgradeUnlocked: nextStartDay === nextModeConfig.upgradeUnlockDay,
+          eventUnlocked: nextStartDay === nextModeConfig.eventUnlockDay,
+          adUnlocked: nextStartDay === nextModeConfig.adUnlockDay,
+          godModeTeaser: nextStartDay === nextModeConfig.godModeTeaserDay,
+          godModeStart: nextStartDay === nextModeConfig.godModeStartDay,
+          eventLabel: startEvent?.title ?? "",
+        });
+    setToast(startMessage);
+    if (nextStartDay > 1) showRunIntro(startMessage);
     setShowImport(false);
     setShowUpgrades(false);
     setShowCatalogUnlock(nextStartDay === nextModeConfig.productExpansionDay);
@@ -1416,19 +1433,25 @@ export function HomefarmShopGame() {
 
   return (
     <div className="hfs-page">
-      <div className={`hfs-phone ${wrongFlash ? "wrong" : ""} ${isGodModeActive ? "godmode-active" : ""}`}>
-        <div className="hfs-bg" />
-        {isGodModeActive && (
-          <div className="hfs-godmode-fx" aria-hidden="true">
-            <span className="hfs-godmode-fx-line" />
+        <div className={`hfs-phone ${wrongFlash ? "wrong" : ""} ${isGodModeActive ? "godmode-active" : ""}`}>
+          <div className="hfs-bg" />
+          {isGodModeActive && (
+            <div className="hfs-godmode-fx" aria-hidden="true">
+              <span className="hfs-godmode-fx-line" />
             <span className="hfs-godmode-fx-line hfs-godmode-fx-line-2" />
             <span className="hfs-godmode-fx-static" />
-            <span className="hfs-godmode-fx-vignette" />
+              <span className="hfs-godmode-fx-vignette" />
+            </div>
+          )}
+          {runIntroMessage && (
+            <div className="hfs-run-intro-banner" aria-live="polite">
+              <span className="hfs-run-intro-chip">RUN START</span>
+              <span className="hfs-run-intro-text">{runIntroMessage}</span>
+            </div>
+          )}
+          <div className={`hfs-mode-badge ${gameMode === "partTime" ? "part-time" : "full-time"}`}>
+            {modeConfig.label}
           </div>
-        )}
-        <div className={`hfs-mode-badge ${gameMode === "partTime" ? "part-time" : "full-time"}`}>
-          {modeConfig.label}
-        </div>
         <div className="hfs-version-badge">v{GAME_VERSION}</div>
         {botActive && <div className="hfs-bot-badge">🤖 BOT</div>}
         <button className="hfs-mute-btn" onClick={() => setMuted(m => !m)} aria-label="Toggle music">
