@@ -22,7 +22,7 @@ import {
   money,
   qty,
 } from "@/lib/homefarm-shop/gameUtils";
-import { fetchLeaderboard, getLeaderboardMode, saveLeaderboardEntry, type LeaderboardEntry } from "@/lib/homefarm-shop/leaderboard";
+import { fetchLeaderboard, getLeaderboardMode, saveLeaderboardEntry, type LeaderboardEntry, type LeaderboardMode } from "@/lib/homefarm-shop/leaderboard";
 import { sfx, setSfxMuted } from "@/lib/homefarm-shop/sfx";
 import EndDaySummary from "./EndDaySummary";
 import "./homefarm-shop.css";
@@ -276,6 +276,7 @@ export function HomefarmShopGame() {
 
   const customer = customers[customerIndex] || null;
   const botActive = botMode && gamePhase === "playing";
+  const leaderboardMode: LeaderboardMode = gameMode === "partTime" ? "part-time" : "full-time";
 
   // Refs so bot setTimeout always reads latest state
   const botProductsRef = useRef(products);
@@ -1125,6 +1126,7 @@ export function HomefarmShopGame() {
     try {
       await saveLeaderboardEntry({
         player_name: playerName.trim() || "Ẩn danh",
+        game_mode: leaderboardMode,
         score: currentScore,
         day_reached: day,
         cash: Math.round(cash),
@@ -1716,6 +1718,7 @@ export function HomefarmShopGame() {
               </div>
               <div className="hfs-gameover-stats">
                 <div><span>Ngày đạt được</span><strong>{day}</strong></div>
+                <div><span>Chế độ</span><strong>{modeConfig.label}</strong></div>
                 <div><span>Doanh thu</span><strong>{money(totalRevenue)}</strong></div>
                 <div><span>Lợi nhuận</span><strong>{money(totalProfit)}</strong></div>
                 <div><span>Khách phục vụ</span><strong>{servedCount}</strong></div>
@@ -1782,6 +1785,7 @@ export function HomefarmShopGame() {
                 <div className="hfs-rank-meta">
                   Day {day} · Cash {money(cash)} · DT {money(totalRevenue)} · Lãi {money(totalProfit)} · Max combo x{maxCombo}
                 </div>
+                <div className={`hfs-score-mode ${gameMode === "partTime" ? "part-time" : "full-time"}`}>{modeConfig.label}</div>
                 <input
                   value={playerName}
                   onChange={(e) => setPlayerName(e.target.value)}
@@ -1810,6 +1814,7 @@ export function HomefarmShopGame() {
 
                   const myGhost = {
                     player_name: playerName || "Bạn",
+                    game_mode: leaderboardMode,
                     score: currentScore,
                     day_reached: day,
                     cash: Math.round(cash),
@@ -1823,7 +1828,12 @@ export function HomefarmShopGame() {
                     <div key={`r${rank}`} className={`hfs-rank-row${isMe ? " hfs-rank-row-me" : ""}`}>
                       <div className="hfs-rank-pos">{rank <= 3 ? MEDALS[rank - 1] : `#${rank}`}</div>
                       <div>
-                        <div className="hfs-rank-name">{row.player_name}</div>
+                        <div className="hfs-rank-name">
+                          {row.player_name}
+                          <span className={`hfs-rank-mode ${row.game_mode === "part-time" ? "part-time" : "full-time"}`}>
+                            {row.game_mode === "part-time" ? "Ca Part-time" : "Ca Full-time"}
+                          </span>
+                        </div>
                         <div className="hfs-rank-meta">Day {row.day_reached} · Lãi {money(row.total_profit)} · Combo x{row.max_combo}</div>
                       </div>
                       <div className="hfs-rank-score">{row.score.toLocaleString("vi-VN")}</div>

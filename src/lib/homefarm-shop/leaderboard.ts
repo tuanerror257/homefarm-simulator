@@ -1,8 +1,11 @@
 import { isSupabaseReady, supabase } from "@/lib/supabaseClient";
 
+export type LeaderboardMode = "part-time" | "full-time";
+
 export type LeaderboardEntry = {
   id?: string;
   player_name: string;
+  game_mode?: LeaderboardMode;
   score: number;
   day_reached: number;
   cash: number;

@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v8.3.0`
+- Current version: `v8.4.0`
 - Current commit: TBD
-- Current rollback tag: `v8.3.0-part-time-speed-tune`
+- Current rollback tag: `v8.4.0-leaderboard-mode-polish`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v8.4.0 - Polished mode info on leaderboard
+
+- Lưu `game_mode` vào leaderboard entry để phân biệt run Part-time và Full-time.
+- Hiển thị badge mode trong gameover và từng dòng leaderboard.
+- Đồng bộ schema Supabase bằng cột `game_mode`.
+- Tag: `v8.4.0-leaderboard-mode-polish`
 
 ### v8.3.0 - Tuning nhanh cho Ca Part-time
 
