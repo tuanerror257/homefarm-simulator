@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.0.0`
+- Current version: `v9.0.1`
 - Current commit: TBD
-- Current rollback tag: `v9.0.0-bot-start-day`
+- Current rollback tag: `v9.0.1-bot-start-day-teaser-fix`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.0.1 - Hiện teaser God Mode khi bot bắt đầu đúng ngày teaser
+
+- Khi bot `tadadevNN` bắt đầu đúng tại ngày teaser, toast `GOD MODE is coming` sẽ hiện ngay trong màn hình khởi tạo run.
+- Giữ nguyên logic cũ cho bot `tadadev` và các bot ngày khác.
+- Tag: `v9.0.1-bot-start-day-teaser-fix`
 
 ### v9.0.0 - Thêm bot test bắt đầu từ ngày tùy chọn
 

@@ -1259,7 +1259,15 @@ export function HomefarmShopGame() {
     setCustomerIndex(0);
     setSelected([]);
     setTimeLeft(nextCustomers[0]?.patience ?? 30);
-    setToast(nextStartDay === 1 ? "Tap từng món khách cần mua trên kệ hàng" : `Bắt đầu từ ngày ${nextStartDay}. Tap từng món khách cần mua trên kệ hàng`);
+    const teaserText = nextStartDay === nextModeConfig.godModeTeaserDay
+      ? " · GOD MODE is coming: chuẩn bị tiền mặt và stock hàng, chế độ hủy diệt sẽ tới trong vài ngày nữa"
+      : "";
+    const godModeText = nextStartDay === nextModeConfig.godModeStartDay ? " · ⚠️ GOD MODE bắt đầu!" : "";
+    setToast(
+      nextStartDay === 1
+        ? "Tap từng món khách cần mua trên kệ hàng"
+        : `Bắt đầu từ ngày ${nextStartDay}. Tap từng món khách cần mua trên kệ hàng${teaserText}${godModeText}`,
+    );
     setShowImport(false);
     setShowUpgrades(false);
     setShowCatalogUnlock(nextStartDay === nextModeConfig.productExpansionDay);
