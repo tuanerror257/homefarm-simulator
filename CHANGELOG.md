@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v8.2.3`
+- Current version: `v8.2.4`
 - Current commit: TBD
-- Current rollback tag: `v8.2.3-badge-stack-order`
+- Current rollback tag: `v8.2.4-smaller-corner-tags`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v8.2.4 - Thu nhỏ cụm tag góc trái
+
+- Giảm kích thước tag chế độ chơi, phiên bản và bot khoảng 15%.
+- Căn lại vị trí xếp chồng để cụm tag gọn hơn và ít che logo hơn.
+- Tag: `v8.2.4-smaller-corner-tags`
 
 ### v8.2.3 - Đổi thứ tự badge góc trái
 
