@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.0.8`
+- Current version: `v9.0.9`
 - Current commit: TBD
-- Current rollback tag: `v9.0.8-godmode-fire-border`
+- Current rollback tag: `v9.0.9-godmode-fire-border-topmost`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.0.9 - Đẩy hiệu ứng God Mode lên lớp trên cùng
+
+- Nâng z-index của lớp God Mode FX lên trên toàn bộ layer game để viền lửa và overlay không bị content che mất.
+- Giữ nguyên hiệu ứng lửa, scanline, static và vignette; chỉ thay thứ tự chồng lớp.
+- Tag: `v9.0.9-godmode-fire-border-topmost`
 
 ### v9.0.8 - Thêm viền lửa phập phù cho God Mode
 
