@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.11`
+- Current version: `v9.1.12`
 - Current commit: TBD
-- Current rollback tag: `v9.1.11-manual-leaderboard-interaction`
+- Current rollback tag: `v9.1.12-saved-score-entry-panel`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.12 - Hiện kết quả vừa lưu ngay trong panel leaderboard
+
+- Khi bấm `Lưu điểm`, leaderboard panel giờ hiện thêm khối `Kết quả vừa lưu` ngay dưới nút hành động.
+- Khối này hiển thị tên người chơi, mode, ngày đạt được, lãi và điểm số để người chơi thấy kết quả của run hiện tại ngay lập tức.
+- Vẫn giữ nguyên hành vi: bấm `BXH` chỉ mở bảng, còn lưu điểm chỉ chạy khi bấm `Lưu điểm`.
+- Tag: `v9.1.12-saved-score-entry-panel`
 
 ### v9.1.11 - Tách mở BXH khỏi lưu điểm, thêm feedback nút leaderboard
 

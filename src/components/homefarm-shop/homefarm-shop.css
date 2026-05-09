@@ -2427,6 +2427,47 @@
 .hfs-save-score { background: #24c96b; color: #fff; }
 .hfs-close-board { background: #d1d5db; color: #2d2118; }
 
+.hfs-saved-entry {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 2px solid #2d2118;
+  background: linear-gradient(180deg, #fffaf0 0%, #f6eddc 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
+  text-align: left;
+}
+
+.hfs-saved-entry-title {
+  font-size: 12px;
+  font-weight: 900;
+  color: #d71920;
+  margin-bottom: 6px;
+}
+
+.hfs-saved-entry-main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  font-weight: 900;
+  color: #2d2118;
+}
+
+.hfs-saved-entry-meta {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(45,33,24,.8);
+}
+
+.hfs-saved-entry-score {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 900;
+  color: #24c96b;
+}
+
 .hfs-rank-list {
   display: grid;
   gap: 6px;

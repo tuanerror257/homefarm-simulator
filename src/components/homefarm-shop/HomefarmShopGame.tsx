@@ -282,6 +282,7 @@ export function HomefarmShopGame() {
   const [eventMoodPenalty, setEventMoodPenalty] = useState(0);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [savedScoreEntry, setSavedScoreEntry] = useState<LeaderboardEntry | null>(null);
   const [runIntroMessage, setRunIntroMessage] = useState<string | null>(null);
   const [playerName, setPlayerName] = useState("Tada");
   const [botMode, setBotMode] = useState(false);
@@ -1266,6 +1267,7 @@ export function HomefarmShopGame() {
     setActiveEvent(nextEvent);
     setDaySummary(null);
     setScoreSaved(false);
+    setSavedScoreEntry(null);
     setPendingExtraCustomers(0);
     setAdRunToday(null);
     setBotUpgradedToday(false);
@@ -1298,20 +1300,22 @@ export function HomefarmShopGame() {
   async function saveScore() {
     const lockedPlayerName = initialPlayerNameRef.current.trim() || "Ẩn danh";
     if (isBotTestName(lockedPlayerName)) return;
+    const scoreEntry: LeaderboardEntry = {
+      player_name: lockedPlayerName,
+      game_mode: leaderboardMode,
+      score: currentScore,
+      day_reached: day,
+      cash: Math.round(cash),
+      total_revenue: Math.round(totalRevenue),
+      total_profit: Math.round(totalProfit),
+      max_combo: maxCombo,
+      served_count: servedCount,
+    };
     try {
       sfx.button();
-      await saveLeaderboardEntry({
-        player_name: lockedPlayerName,
-        game_mode: leaderboardMode,
-        score: currentScore,
-        day_reached: day,
-        cash: Math.round(cash),
-        total_revenue: Math.round(totalRevenue),
-        total_profit: Math.round(totalProfit),
-        max_combo: maxCombo,
-        served_count: servedCount,
-      });
+      await saveLeaderboardEntry(scoreEntry);
       setScoreSaved(true);
+      setSavedScoreEntry(scoreEntry);
       await loadLeaderboard();
       setToast(getLeaderboardMode() === "supabase" ? "Đã lưu điểm lên Supabase leaderboard." : "Đã lưu điểm local. Kiểm tra .env.local để bật Supabase.");
     } catch {
@@ -1421,6 +1425,7 @@ export function HomefarmShopGame() {
     setDaySummary(null);
     setShowLeaderboard(false);
     setScoreSaved(false);
+    setSavedScoreEntry(null);
     setGameOver(false);
     setGameOverReason("");
     setLowRatingStreak(0);
@@ -2103,6 +2108,23 @@ export function HomefarmShopGame() {
                   </button>
                   <button className="hfs-close-board" onClick={closeLeaderboard}>Đóng</button>
                 </div>
+                {scoreSaved && savedScoreEntry && (
+                  <div className="hfs-saved-entry">
+                    <div className="hfs-saved-entry-title">Kết quả vừa lưu</div>
+                    <div className="hfs-saved-entry-main">
+                      <strong>{savedScoreEntry.player_name}</strong>
+                      <span className={`hfs-rank-mode ${savedScoreEntry.game_mode === "part-time" ? "part-time" : "full-time"}`}>
+                        {savedScoreEntry.game_mode === "part-time" ? "Ca Part-time" : "Ca Full-time"}
+                      </span>
+                    </div>
+                    <div className="hfs-saved-entry-meta">
+                      Day {savedScoreEntry.day_reached} · Lãi {money(savedScoreEntry.total_profit)} · Combo x{savedScoreEntry.max_combo}
+                    </div>
+                    <div className="hfs-saved-entry-score">
+                      Score {savedScoreEntry.score.toLocaleString("vi-VN")}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="hfs-rank-list">
