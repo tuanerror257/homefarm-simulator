@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.9`
+- Current version: `v9.1.10`
 - Current commit: TBD
-- Current rollback tag: `v9.1.9-bright-unlocks-dark-godmode-teaser`
+- Current rollback tag: `v9.1.10-manual-leaderboard-save`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.10 - Chỉ lưu điểm khi bấm nút, không lưu khi mở BXH
+
+- Bỏ dòng nhắc "Tên đã khóa từ lúc bắt đầu run." khỏi panel leaderboard.
+- Bỏ khối "Telemetry gần nhất" và trạng thái "Chưa có telemetry nào được ghi." khỏi panel leaderboard.
+- Sửa luồng leaderboard để bấm `🏆 BXH` hoặc `🏆 Leaderboard` chỉ mở bảng, không tự lưu điểm nữa.
+- Điểm chỉ được ghi khi người chơi bấm nút `Lưu điểm`.
+- Tag: `v9.1.10-manual-leaderboard-save`
 
 ### v9.1.9 - Trả unlock thường về màu sáng, giữ teaser God Mode màu tối
 
