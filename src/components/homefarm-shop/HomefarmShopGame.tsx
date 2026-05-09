@@ -221,7 +221,7 @@ export function HomefarmShopGame() {
     audioRef.current = audio;
     const godModeAudio = new Audio("/homefarm-shop/godmode.mp3");
     godModeAudio.loop = true;
-    godModeAudio.volume = 0.52;
+    godModeAudio.volume = 0.72;
     godModeAudioRef.current = godModeAudio;
     return () => {
       audio.pause();

@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.16`
+- Current version: `v9.1.17`
 - Current commit: TBD
-- Current rollback tag: `v9.1.16-godmode-effects-after-start`
+- Current rollback tag: `v9.1.17-godmode-music-louder`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.17 - Tăng volume nhạc God Mode
+
+- Nhạc `godmode.mp3` được tăng volume lên rõ hơn để phase God Mode nghe mạnh và nổi hơn.
+- Không đổi volume BGM bình thường.
+- Tag: `v9.1.17-godmode-music-louder`
 
 ### v9.1.16 - Chỉ bật hiệu ứng God Mode sau khi đóng màn cảnh báo ngày 24
 
