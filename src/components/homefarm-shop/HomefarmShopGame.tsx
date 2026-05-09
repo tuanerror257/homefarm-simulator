@@ -1299,6 +1299,7 @@ export function HomefarmShopGame() {
     const lockedPlayerName = initialPlayerNameRef.current.trim() || "Ẩn danh";
     if (isBotTestName(lockedPlayerName)) return;
     try {
+      sfx.button();
       await saveLeaderboardEntry({
         player_name: lockedPlayerName,
         game_mode: leaderboardMode,
@@ -1316,6 +1317,16 @@ export function HomefarmShopGame() {
     } catch {
       setToast("Lưu điểm lỗi. Kiểm tra Supabase table/env nhé.");
     }
+  }
+
+  function openLeaderboard() {
+    sfx.button();
+    setShowLeaderboard(true);
+  }
+
+  function closeLeaderboard() {
+    sfx.button();
+    setShowLeaderboard(false);
   }
 
   const startRun = useCallback((options: {
@@ -1642,7 +1653,7 @@ export function HomefarmShopGame() {
                 <button
                   className="hfs-board-pill"
                   onClick={async () => {
-                    setShowLeaderboard(true);
+                    openLeaderboard();
                     await loadLeaderboard();
                   }}
                 >
@@ -2020,7 +2031,7 @@ export function HomefarmShopGame() {
               <div className="hfs-gameover-actions">
                 <button
                   className="hfs-gameover-btn-board"
-                  onClick={async () => { setShowLeaderboard(true); await loadLeaderboard(); }}
+                  onClick={async () => { openLeaderboard(); await loadLeaderboard(); }}
                 >
                   🏆 Leaderboard
                 </button>
@@ -2090,7 +2101,7 @@ export function HomefarmShopGame() {
                   <button className="hfs-save-score" onClick={saveScore} disabled={scoreSaved}>
                     {scoreSaved ? "Đã lưu" : "Lưu điểm"}
                   </button>
-                  <button className="hfs-close-board" onClick={() => setShowLeaderboard(false)}>Đóng</button>
+                  <button className="hfs-close-board" onClick={closeLeaderboard}>Đóng</button>
                 </div>
               </div>
 
