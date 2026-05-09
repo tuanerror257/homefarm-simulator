@@ -1449,10 +1449,8 @@ export function HomefarmShopGame() {
     if (gamePhase === "playing" && !gameOver) {
       persistSessionTelemetry("restart");
     }
-    setGamePhase("start");
-    setGameMode("fullTime");
     setBotMode(false);
-    startRun({ mode: "fullTime", startDay: 1, botMode: false, keepMusic: false });
+    startRun({ mode: gameMode, startDay: 1, botMode: false, keepMusic: false });
   }
 
   if (gamePhase === "start") {

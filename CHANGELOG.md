@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.13`
+- Current version: `v9.1.14`
 - Current commit: TBD
-- Current rollback tag: `v9.1.13-button-press-feedback`
+- Current rollback tag: `v9.1.14-restart-keeps-current-mode`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.14 - Chơi lại giữ nguyên Ca Part-time / Ca Full-time hiện tại
+
+- Sửa nút `Chơi lại` để không ép quay về `Ca Full-time` nữa.
+- Khi người chơi đang ở `Ca Part-time` mà thua rồi bấm chơi lại, game sẽ restart lại đúng `Ca Part-time`.
+- Tag: `v9.1.14-restart-keeps-current-mode`
 
 ### v9.1.13 - Thêm press-down cho toàn bộ nút trong game
 
