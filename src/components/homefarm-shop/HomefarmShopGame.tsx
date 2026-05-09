@@ -364,12 +364,6 @@ export function HomefarmShopGame() {
   const botActive = botMode && gamePhase === "playing";
   const leaderboardMode: LeaderboardMode = gameMode === "partTime" ? "part-time" : "full-time";
 
-  useEffect(() => {
-    if (!showLeaderboard) return;
-    setSessionTelemetry(getLatestSessionTelemetry());
-    setSessionTelemetryCount(getSessionTelemetryCount());
-  }, [showLeaderboard, leaderboard.length, scoreSaved]);
-
   // Refs so bot setTimeout always reads latest state
   const botProductsRef = useRef(products);
   botProductsRef.current = products;
@@ -394,6 +388,11 @@ export function HomefarmShopGame() {
     [customer, products],
   );
 
+  const refreshSessionTelemetry = useCallback(() => {
+    setSessionTelemetry(getLatestSessionTelemetry());
+    setSessionTelemetryCount(getSessionTelemetryCount());
+  }, []);
+
   const persistSessionTelemetry = useCallback((outcome: SessionOutcome) => {
     if (typeof window === "undefined" || sessionTelemetryRecordedRef.current) return;
     const endedAt = new Date();
@@ -411,9 +410,8 @@ export function HomefarmShopGame() {
       max_combo: maxCombo,
     });
     sessionTelemetryRecordedRef.current = true;
-    setSessionTelemetry(getLatestSessionTelemetry());
-    setSessionTelemetryCount(getSessionTelemetryCount());
-  }, [day, gameMode, maxCombo, modeConfig.godModeStartDay, servedCount, totalProfit, totalRevenue]);
+    refreshSessionTelemetry();
+  }, [day, gameMode, maxCombo, modeConfig.godModeStartDay, refreshSessionTelemetry, servedCount, totalProfit, totalRevenue]);
 
   const done = customer ? customer.order.filter((o) => selected.includes(o.id)).length : 0;
   const totalCustomers = customers.length;
@@ -470,7 +468,7 @@ export function HomefarmShopGame() {
     }
   }, [customerIndex, customers.length]);
 
-  function buildDayToast(params: {
+  const buildDayToast = useCallback((params: {
     dayValue: number;
     productCount: number;
     customerCount: number;
@@ -486,7 +484,7 @@ export function HomefarmShopGame() {
     crisisToastParts?: string[];
     closedByEpidemic?: boolean;
     eventLabel?: string;
-  }) {
+  }) => {
     const {
       dayValue,
       productCount,
@@ -518,7 +516,7 @@ export function HomefarmShopGame() {
     const closedText = closedByEpidemic ? " · 😷 Đóng cửa hôm nay!" : "";
 
     return `Ngày ${dayValue}: ${productCount} mặt hàng · ${customerCount} khách${skippedText}${spoilageText}${catalogText}${upgradeText}${eventText}${adText}${godModeTeaserText}${godModeText}${eventLabelText}${crisisText}${closedText}. Combo: ${maxCombo}.`;
-  }
+  }, [maxCombo]);
 
   function showRunIntro(message: string) {
     setRunIntroMessage(message);
@@ -1437,7 +1435,7 @@ export function HomefarmShopGame() {
     setSessionTelemetry(null);
     setSessionTelemetryCount(0);
     if (options.keepMusic) startBgm();
-  }, [playerName]);
+  }, [buildDayToast, playerName, startBgm]);
 
   function resetGame() {
     if (gamePhase === "playing" && !gameOver) {
@@ -1652,6 +1650,7 @@ export function HomefarmShopGame() {
                 <button
                   className="hfs-board-pill"
                   onClick={async () => {
+                    refreshSessionTelemetry();
                     setShowLeaderboard(true);
                     await loadLeaderboard();
                   }}
@@ -2030,7 +2029,7 @@ export function HomefarmShopGame() {
               <div className="hfs-gameover-actions">
                 <button
                   className="hfs-gameover-btn-board"
-                  onClick={async () => { setShowLeaderboard(true); await loadLeaderboard(); }}
+                  onClick={async () => { refreshSessionTelemetry(); setShowLeaderboard(true); await loadLeaderboard(); }}
                 >
                   🏆 Leaderboard
                 </button>

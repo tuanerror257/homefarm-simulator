@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.6`
+- Current version: `v9.1.7`
 - Current commit: TBD
-- Current rollback tag: `v9.1.6-godmode-start-screen-restored`
+- Current rollback tag: `v9.1.7-healthcheck-tool`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.7 - Thêm healthcheck tool cho toàn bộ game
+
+- Thêm `npm run healthcheck` để chạy build, lint và simulator cho full-time/part-time trong một lệnh.
+- Healthcheck ghi report JSON vào `.claude/game-healthcheck-latest.json` để lưu kết quả và lỗi phát hiện được.
+- Build trong healthcheck dùng `next build --webpack` để tránh lỗi Turbopack spawn trong child process, còn build chính của project vẫn giữ nguyên.
+- Tag: `v9.1.7-healthcheck-tool`
 
 ### v9.1.6 - Khôi phục nội dung đầy đủ cho màn God Mode bắt đầu
 
