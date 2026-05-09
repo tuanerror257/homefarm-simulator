@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.8`
+- Current version: `v9.1.9`
 - Current commit: TBD
-- Current rollback tag: `v9.1.8-lock-leaderboard-name`
+- Current rollback tag: `v9.1.9-bright-unlocks-dark-godmode-teaser`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.9 - Trả unlock thường về màu sáng, giữ teaser God Mode màu tối
+
+- Các modal unlock thường như mở khóa nâng cấp, danh mục, event và quảng cáo quay lại palette sáng như ban đầu.
+- Chỉ riêng teaser God Mode ngày 18 giữ tone đen đỏ riêng bằng modifier CSS tách biệt.
+- Tag: `v9.1.9-bright-unlocks-dark-godmode-teaser`
 
 ### v9.1.8 - Khóa tên lưu điểm theo tên nhập từ đầu run
 

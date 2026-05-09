@@ -1898,15 +1898,15 @@ export function HomefarmShopGame() {
 
         {showGodModeTeaser && (
           <div className="hfs-modal-backdrop hfs-unlock-backdrop">
-            <div className="hfs-unlock-panel">
-              <div className="hfs-unlock-icon">☠️</div>
-              <div className="hfs-unlock-title">GOD MODE sắp tới</div>
-              <div className="hfs-unlock-desc">
+            <div className="hfs-unlock-panel hfs-godmode-teaser-panel">
+              <div className="hfs-unlock-icon hfs-godmode-teaser-icon">☠️</div>
+              <div className="hfs-unlock-title hfs-godmode-teaser-title">GOD MODE sắp tới</div>
+              <div className="hfs-unlock-desc hfs-godmode-teaser-desc">
                 Từ ngày {modeConfig.godModeStartDay}, chế độ hủy diệt sẽ bắt đầu.
                 <br /><br />
                 Bạn còn vài ngày để chuẩn bị tiền mặt, stock hàng và tinh thần trước khi địa ngục chính thức mở cửa.
               </div>
-              <div className="hfs-godmode-unlock-list">
+              <div className="hfs-godmode-unlock-list hfs-godmode-teaser-list">
                 {GOD_MODE_CRISIS_DEFS.slice(0, 4).map((def) => (
                   <div key={def.id} className="hfs-godmode-unlock-row">
                     <span className="hfs-godmode-unlock-icon">{def.icon}</span>
@@ -1917,7 +1917,7 @@ export function HomefarmShopGame() {
                   </div>
                 ))}
               </div>
-              <button className="hfs-unlock-btn" onClick={() => setShowGodModeTeaser(false)}>
+              <button className="hfs-unlock-btn hfs-godmode-teaser-btn" onClick={() => setShowGodModeTeaser(false)}>
                 Đã hiểu
               </button>
             </div>
