@@ -733,6 +733,12 @@
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
+  transition: transform .08s ease, box-shadow .08s ease, filter .08s ease;
+}
+
+.hfs-action:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #2d2118;
 }
 
 .hfs-fillet { background: #ffcf3f; color: #2d2118; }
@@ -801,6 +807,12 @@
   color: #fff;
   font-weight: 900;
   cursor: pointer;
+  transition: transform .08s ease, box-shadow .08s ease, filter .08s ease;
+}
+
+.hfs-modal-close:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
 }
 
 .hfs-import-list {
@@ -899,6 +911,12 @@
   border-radius: 10px;
   font-weight: 900;
   cursor: pointer;
+  transition: transform .08s ease, box-shadow .08s ease, filter .08s ease;
+}
+
+.hfs-stepper button:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
 }
 
 .hfs-step-minus { background: #e5e7eb; }
@@ -918,6 +936,12 @@
   border: 4px solid #2d2118;
   font-weight: 900;
   cursor: pointer;
+  transition: transform .08s ease, box-shadow .08s ease, filter .08s ease;
+}
+
+.hfs-modal-actions button:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
 }
 
 .hfs-modal-actions button:only-child {
@@ -2579,6 +2603,15 @@
   border-radius: 28px;
 }
 
+.hfs-phone button {
+  transition: transform .08s ease, box-shadow .08s ease, filter .08s ease, opacity .08s ease;
+  will-change: transform;
+}
+
+.hfs-phone button:active {
+  transform: translateY(2px);
+}
+
 .hfs-header {
   height: 82px;
   flex-basis: 82px;
@@ -2746,6 +2779,11 @@
   align-items: center;
   font-size: 10px;
   padding: 0 9px;
+  transition: transform .08s ease, box-shadow .08s ease, filter .08s ease;
+}
+
+.hfs-inventory-pill:active {
+  transform: translateY(1px);
 }
 
 .hfs-page-tab {

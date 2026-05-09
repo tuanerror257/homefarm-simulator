@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.12`
+- Current version: `v9.1.13`
 - Current commit: TBD
-- Current rollback tag: `v9.1.12-saved-score-entry-panel`
+- Current rollback tag: `v9.1.13-button-press-feedback`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.13 - Thêm press-down cho toàn bộ nút trong game
+
+- Tất cả nút trong khung game giờ có hiệu ứng nhấn xuống đồng nhất khi bấm.
+- Các nút fillet, giao, nhập, qua ngày, modal buttons, leaderboard buttons, pills và stepper đều được phủ press-state.
+- Tag: `v9.1.13-button-press-feedback`
 
 ### v9.1.12 - Hiện kết quả vừa lưu ngay trong panel leaderboard
 
