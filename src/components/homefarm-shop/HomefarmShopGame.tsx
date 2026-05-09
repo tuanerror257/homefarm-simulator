@@ -303,6 +303,7 @@ export function HomefarmShopGame() {
   const totalTipsRef = useRef(0);
   const sessionStartedAtRef = useRef(Date.now());
   const sessionTelemetryRecordedRef = useRef(false);
+  const initialPlayerNameRef = useRef(playerName);
   const godModeStartPlayedRef = useRef(false);
   const godModeMusicActiveRef = useRef(false);
   const runIntroTimerRef = useRef<number | null>(null);
@@ -1304,10 +1305,11 @@ export function HomefarmShopGame() {
   }
 
   async function saveScore() {
-    if (isBotTestName(playerName)) return;
+    const lockedPlayerName = initialPlayerNameRef.current.trim() || "Ẩn danh";
+    if (isBotTestName(lockedPlayerName)) return;
     try {
       await saveLeaderboardEntry({
-        player_name: playerName.trim() || "Ẩn danh",
+        player_name: lockedPlayerName,
         game_mode: leaderboardMode,
         score: currentScore,
         day_reached: day,
@@ -1337,6 +1339,7 @@ export function HomefarmShopGame() {
     const nextStartDay = Math.max(1, Math.min(60, Math.floor(options.startDay ?? 1)));
     const nextPlayerName = options.playerName?.trim() || playerName;
     const nextBotMode = options.botMode ?? false;
+    initialPlayerNameRef.current = nextPlayerName;
 
     if (!options.keepMusic) {
       audioRef.current?.pause();
@@ -2088,12 +2091,14 @@ export function HomefarmShopGame() {
                 </div>
                 <div className={`hfs-score-mode ${gameMode === "partTime" ? "part-time" : "full-time"}`}>{modeConfig.label}</div>
                 <input
-                  value={playerName}
-                  onChange={(e) => setPlayerName(e.target.value)}
+                  value={initialPlayerNameRef.current}
                   maxLength={32}
                   className="hfs-name-input"
                   placeholder="Tên người chơi"
+                  readOnly
+                  aria-readonly="true"
                 />
+                <div className="hfs-name-lock-note">Tên đã khóa từ lúc bắt đầu run.</div>
                 <div className="hfs-session-box">
                   <div className="hfs-session-title">Telemetry gần nhất</div>
                   {sessionTelemetry ? (
@@ -2142,7 +2147,7 @@ export function HomefarmShopGame() {
                   const myBelowAll = myRank > n;
 
                   const myGhost = {
-                    player_name: playerName || "Bạn",
+                    player_name: initialPlayerNameRef.current || "Bạn",
                     game_mode: leaderboardMode,
                     score: currentScore,
                     day_reached: day,

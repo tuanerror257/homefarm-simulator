@@ -2302,6 +2302,20 @@
   font-weight: 900;
 }
 
+.hfs-name-input[readonly] {
+  background: #f3f4f6;
+  color: rgba(45, 33, 24, .82);
+  cursor: default;
+}
+
+.hfs-name-lock-note {
+  margin-top: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #6b7280;
+  text-align: left;
+}
+
 .hfs-session-box {
   margin-top: 8px;
   border: 2px solid rgba(45,33,24,.18);

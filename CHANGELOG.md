@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.7`
+- Current version: `v9.1.8`
 - Current commit: TBD
-- Current rollback tag: `v9.1.7-healthcheck-tool`
+- Current rollback tag: `v9.1.8-lock-leaderboard-name`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.8 - Khóa tên lưu điểm theo tên nhập từ đầu run
+
+- Leaderboard giờ dùng tên đã nhập từ đầu run để lưu điểm, không cho đổi tên ở cuối màn hình leaderboard nữa.
+- Ô tên trong leaderboard chuyển sang chỉ đọc, kèm note rõ là tên đã khóa từ lúc bắt đầu.
+- Bot `tadadev` vẫn không được lưu điểm.
+- Tag: `v9.1.8-lock-leaderboard-name`
 
 ### v9.1.7 - Thêm healthcheck tool cho toàn bộ game
 
