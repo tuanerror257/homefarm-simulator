@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.14`
+- Current version: `v9.1.15`
 - Current commit: TBD
-- Current rollback tag: `v9.1.14-restart-keeps-current-mode`
+- Current rollback tag: `v9.1.15-godmode-teaser-no-fire`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.15 - Bỏ hiệu ứng lửa khỏi teaser God Mode, tăng nhạc God Mode
+
+- Teaser `GOD MODE sắp tới` ở day 18 quay về palette thông báo thường, không còn lửa/viền cháy.
+- Hiệu ứng cháy chỉ còn xuất hiện ở màn God Mode thật khi day 24 bắt đầu.
+- Tăng volume nhạc God Mode để phase này nghe rõ hơn.
+- Tag: `v9.1.15-godmode-teaser-no-fire`
 
 ### v9.1.14 - Chơi lại giữ nguyên Ca Part-time / Ca Full-time hiện tại
 

@@ -1138,8 +1138,8 @@
   margin-top: 12px;
   padding: 10px;
   border-radius: 16px;
-  background: rgba(220, 38, 38, .08);
-  border: 2px solid rgba(220, 38, 38, .14);
+  background: rgba(255, 247, 228, .92);
+  border: 2px solid rgba(45,33,24,.14);
   text-align: left;
 }
 
@@ -1202,50 +1202,6 @@
   margin-top: 8px;
   background: #d1d5db;
   color: #2d2118;
-}
-
-.hfs-godmode-teaser-panel {
-  background: linear-gradient(180deg, #1a0505 0%, #090101 100%);
-  border-color: #160707;
-  box-shadow: 0 10px 0 rgba(0,0,0,.4), 0 0 40px rgba(220,38,38,.18);
-}
-
-.hfs-godmode-teaser-icon {
-  border-color: #160707;
-  background: linear-gradient(180deg, #6b0f0f 0%, #2d0404 100%);
-  box-shadow: 0 4px 0 #160707;
-}
-
-.hfs-godmode-teaser-title {
-  color: #ff8a8a;
-}
-
-.hfs-godmode-teaser-desc {
-  color: rgba(255,228,228,.78);
-}
-
-.hfs-godmode-teaser-list {
-  background: rgba(255, 50, 50, .08);
-  border-color: rgba(255, 110, 110, .18);
-}
-
-.hfs-godmode-teaser-list .hfs-godmode-unlock-icon {
-  background: #160707;
-  border-color: rgba(255,110,110,.18);
-}
-
-.hfs-godmode-teaser-list .hfs-godmode-unlock-name {
-  color: #ffe6e6;
-}
-
-.hfs-godmode-teaser-list .hfs-godmode-unlock-desc-text {
-  color: rgba(255,230,230,.66);
-}
-
-.hfs-godmode-teaser-btn {
-  background: linear-gradient(180deg, #ff6a6a, #b31212);
-  border-color: #2d2118;
-  box-shadow: 0 3px 0 #2d2118;
 }
 
 @media (max-height: 790px) {
