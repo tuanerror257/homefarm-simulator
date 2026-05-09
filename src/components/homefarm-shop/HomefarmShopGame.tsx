@@ -307,7 +307,8 @@ export function HomefarmShopGame() {
   const godModeMusicActiveRef = useRef(false);
   const runIntroTimerRef = useRef<number | null>(null);
 
-  const isGodModeActive = gamePhase === "playing" && day >= modeConfig.godModeStartDay;
+  const isGodModeStartModalOpen = showGodModeStart;
+  const isGodModeActive = gamePhase === "playing" && day >= modeConfig.godModeStartDay && !isGodModeStartModalOpen;
 
   useEffect(() => {
     const bgm = audioRef.current;
