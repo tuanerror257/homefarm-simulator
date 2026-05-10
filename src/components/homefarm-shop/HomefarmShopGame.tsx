@@ -45,6 +45,7 @@ const GOD_MODE_CHANCE_INCREMENT = 0.03;
 const GOD_MODE_MAX_CHANCE = 0.65;
 const GOD_MODE_SURVIVAL_DAYS = 14;
 const SURVIVOR_TAG = "God mode Survivor";
+const BANKRUPT_TAG = "Phá sản";
 // Bot gate: minimum day required to purchase each upgrade level (index = currentLevel)
 const KNIFE_SALMON_BONUS_BY_LEVEL = [0, 0.35, 0.7, 1.1, 1.55, 2.1] as const;
 const KNIFE_HEAD_BONE_BONUS_BY_LEVEL = [0, 0.1, 0.2, 0.35, 0.5, 0.7] as const;
@@ -1397,10 +1398,11 @@ export function HomefarmShopGame() {
   async function saveScore() {
     const lockedPlayerName = initialPlayerNameRef.current.trim() || "Ẩn danh";
     if (isBotTestName(lockedPlayerName)) return;
+    const achievementTag = hasSurvivedGodMode ? SURVIVOR_TAG : gameOver ? BANKRUPT_TAG : null;
     const scoreEntry: LeaderboardEntry = {
       player_name: lockedPlayerName,
       game_mode: leaderboardMode,
-      achievement_tag: hasSurvivedGodMode ? SURVIVOR_TAG : null,
+      achievement_tag: achievementTag,
       score: currentScore,
       day_reached: day,
       cash: Math.round(cash),
@@ -2382,7 +2384,7 @@ export function HomefarmShopGame() {
                   const myGhost = {
                     player_name: initialPlayerNameRef.current || "Bạn",
                     game_mode: leaderboardMode,
-                    achievement_tag: hasSurvivedGodMode ? SURVIVOR_TAG : null,
+                    achievement_tag: hasSurvivedGodMode ? SURVIVOR_TAG : gameOver ? BANKRUPT_TAG : null,
                     score: currentScore,
                     day_reached: day,
                     cash: Math.round(cash),

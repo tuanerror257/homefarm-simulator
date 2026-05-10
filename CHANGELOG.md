@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v10.0.0`
+- Current version: `v10.0.1`
 - Current commit: TBD
-- Current rollback tag: `v10.0.0-godmode-survivor-ending`
+- Current rollback tag: `v10.0.1-bankrupt-leaderboard-tag`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v10.0.1 - Tag phá sản trên leaderboard
+
+- Leaderboard chỉ hiện tag đặc biệt khi có kết quả đặc biệt: phá đảo là `God mode Survivor`, thua/game over là `Phá sản`.
+- Các lần lưu điểm bình thường không có achievement tag.
+- Tag: `v10.0.1-bankrupt-leaderboard-tag`
 
 ### v10.0.0 - God Mode Survivor ending
 
