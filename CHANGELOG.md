@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.20`
+- Current version: `v9.1.21`
 - Current commit: TBD
-- Current rollback tag: `v9.1.20-full-leaderboard-rank`
+- Current rollback tag: `v9.1.21-godmode-import-crisis-cost`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.21 - Áp đúng giá nhập khi God Mode khủng hoảng nguồn hàng
+
+- Modal nhập hàng giờ hiển thị giá từng món đã nhân hiệu ứng `Khủng hoảng nguồn hàng`.
+- Bot test cũng ước lượng chi phí nhập theo crisis multiplier để không mở nhập hàng khi thực tế không đủ tiền.
+- Tag: `v9.1.21-godmode-import-crisis-cost`
 
 ### v9.1.20 - Query đầy đủ leaderboard để tính hạng cuối
 

@@ -1013,7 +1013,7 @@ export function HomefarmShopGame() {
             const need = Math.max(0, target - p.stock);
             if (need > 0) {
               refillQty[p.id] = need;
-              refillCost += need * getDailyCost(p, nextDay);
+              refillCost += need * getDailyCost(p, nextDay) * crisisImportMultiplier;
             }
           }
 
@@ -1073,7 +1073,7 @@ export function HomefarmShopGame() {
           if (!short || p.cost <= 0) continue;
           const need = Math.ceil(short.qty - p.stock) + 3;
           importItems[p.id] = need;
-          totalImportCost += need * getDailyCost(p, day);
+          totalImportCost += need * getDailyCost(p, day) * crisisImportMultiplier;
         }
         if (totalImportCost > 0 && curCash >= totalImportCost) {
           botImportTargetRef.current = importItems;
@@ -1739,8 +1739,15 @@ export function HomefarmShopGame() {
                 {products.filter((p) => p.cost > 0).map((product) => {
                   const q = importQty[product.id] || 0;
                   const dailyCost = getDailyCost(product, day);
+                  const crisisAdjustedCost = Math.round(dailyCost * crisisImportMultiplier);
                   const delta = getDailyCostDelta(product, day);
                   const hasBulk = q >= BULK_THRESHOLD;
+                  const displayUnitCost = hasBulk
+                    ? Math.round(crisisAdjustedCost * (1 - BULK_DISCOUNT))
+                    : crisisAdjustedCost;
+                  const unitCostText = product.id === "wholeSalmon"
+                    ? `1 con = 6kg · Vốn ${money(displayUnitCost)}/con`
+                    : `Vốn ${money(displayUnitCost)}/${product.unit}`;
                   return (
                     <div key={product.id} className="hfs-import-row" data-import-id={product.id}>
                       <div className="hfs-import-icon">{product.icon}</div>
@@ -1755,7 +1762,10 @@ export function HomefarmShopGame() {
                           {hasBulk && <span className="hfs-bulk-badge">Giá sỉ -6%</span>}
                         </div>
                         <div className="hfs-import-sub">
-                          Tồn {qty(product.stock)} {product.unit} · {product.id === "wholeSalmon" ? "1 con = 6kg · Vốn 2.580k/con" : `Vốn ${money(hasBulk ? Math.round(dailyCost * (1 - BULK_DISCOUNT)) : dailyCost)}/${product.unit}`}
+                          Tồn {qty(product.stock)} {product.unit} · {unitCostText}
+                          {crisisImportMultiplier > 1 && (
+                            <span className="hfs-price-delta up">Khủng hoảng nguồn hàng x{crisisImportMultiplier}</span>
+                          )}
                         </div>
                       </div>
                       <div className="hfs-stepper">
