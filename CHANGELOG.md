@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.2.0`
+- Current version: `v9.3.0`
 - Current commit: TBD
-- Current rollback tag: `v9.2.0-godmode-crisis-alerts`
+- Current rollback tag: `v9.3.0-100-customer-types`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.3.0 - Mở rộng lên 100 loại khách hàng
+
+- Danh sách khách hàng runtime tăng từ 25 lên đúng 100 persona với tên gọi, mood, quote và sở thích mua hàng riêng.
+- Simulator balance mirror cùng 100 loại khách để healthcheck phản ánh đúng pool khách thực tế.
+- Kiểm tra toàn bộ `prefer` của khách đều trỏ tới product id hợp lệ.
+- Tag: `v9.3.0-100-customer-types`
 
 ### v9.2.0 - Thông báo rõ từng God Mode crisis
 
