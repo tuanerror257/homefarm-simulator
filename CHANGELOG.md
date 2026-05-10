@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v10.0.1`
+- Current version: `v10.0.2`
 - Current commit: TBD
-- Current rollback tag: `v10.0.1-bankrupt-leaderboard-tag`
+- Current rollback tag: `v10.0.2-reputation-leaderboard-tag`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v10.0.2 - Tag mất uy tín trên leaderboard
+
+- Ending mất uy tín giờ lưu leaderboard tag `Mất uy tín`.
+- Các game over còn lại vẫn lưu tag `Phá sản`; phá đảo vẫn lưu `God mode Survivor`.
+- Tag: `v10.0.2-reputation-leaderboard-tag`
 
 ### v10.0.1 - Tag phá sản trên leaderboard
 
