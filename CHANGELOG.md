@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.21`
+- Current version: `v9.2.0`
 - Current commit: TBD
-- Current rollback tag: `v9.1.21-godmode-import-crisis-cost`
+- Current rollback tag: `v9.2.0-godmode-crisis-alerts`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.2.0 - Thông báo rõ từng God Mode crisis
+
+- Khi God Mode roll trúng crisis, game hiện modal `CRISIS ALERT` tone u tối dùng cùng hệ khung với màn God Mode.
+- Modal gom nhiều crisis trong cùng ngày, hiển thị tên, icon, duration, xác suất roll ngày đó và cơ chế ảnh hưởng cụ thể.
+- Timer khách và bot test đều coi crisis alert là modal chặn để người chơi có thời gian đọc trước khi tiếp tục.
+- Tag: `v9.2.0-godmode-crisis-alerts`
 
 ### v9.1.21 - Áp đúng giá nhập khi God Mode khủng hoảng nguồn hàng
 

@@ -1490,6 +1490,11 @@
   letter-spacing: 5px;
   text-shadow: 0 0 20px rgba(255,0,0,0.6);
 }
+.hfs-crisis-alert-panel .hfs-godmode-title {
+  font-size: 24px;
+  letter-spacing: 2px;
+  text-align: center;
+}
 .hfs-godmode-sub {
   font-size: 12px;
   font-weight: 800;
@@ -1548,6 +1553,21 @@
   color: #ff6666;
   flex-shrink: 0;
   align-self: center;
+  white-space: nowrap;
+}
+.hfs-active-crisis-row {
+  align-items: stretch;
+}
+.hfs-crisis-mechanic {
+  margin-top: 5px;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.4;
+  color: #ffe8e8;
+  background: rgba(255,68,68,0.1);
+  border: 1px solid rgba(255,68,68,0.18);
+  border-radius: 8px;
+  padding: 6px 7px;
 }
 .hfs-godmode-warning {
   font-size: 11px;

@@ -47,6 +47,16 @@ const GOD_MODE_MAX_CHANCE = 0.65;
 const KNIFE_SALMON_BONUS_BY_LEVEL = [0, 0.35, 0.7, 1.1, 1.55, 2.1] as const;
 const KNIFE_HEAD_BONE_BONUS_BY_LEVEL = [0, 0.1, 0.2, 0.35, 0.5, 0.7] as const;
 
+type GodModeCrisisAlert = {
+  id: GodModeCrisisId;
+  icon: string;
+  title: string;
+  detail: string;
+  mechanic: string;
+  duration: number;
+  chancePercent: number;
+};
+
 const GOD_MODE_CRISIS_DEFS: Array<{
   id: GodModeCrisisId;
   icon: string;
@@ -302,6 +312,7 @@ export function HomefarmShopGame() {
   const [lowRatingStreak, setLowRatingStreak] = useState(0);
   const [loanDebt, setLoanDebt] = useState(0);
   const [activeCrises, setActiveCrises] = useState<ActiveCrisis[]>([]);
+  const [pendingCrisisAlerts, setPendingCrisisAlerts] = useState<GodModeCrisisAlert[]>([]);
   const [showGodModeTeaser, setShowGodModeTeaser] = useState(false);
   const [showGodModeStart, setShowGodModeStart] = useState(false);
   const [unlockedAchievements, setUnlockedAchievements] = useState<Set<AchievementId>>(new Set());
@@ -552,7 +563,7 @@ export function HomefarmShopGame() {
   }, [customerIndex, day, customer, eventMoodPenalty]);
 
   useEffect(() => {
-    if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showGodModeTeaser || showGodModeStart || showAds || showLeaderboard || activeEvent || gameOver) return;
+    if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showGodModeTeaser || showGodModeStart || pendingCrisisAlerts.length > 0 || showAds || showLeaderboard || activeEvent || gameOver) return;
 
     const moodDecay = (0.7 + day * 0.022) * 2.2 * Math.max(0.7, 1 - upgrades.staff * 0.06);
     const timer = setInterval(() => {
@@ -572,7 +583,7 @@ export function HomefarmShopGame() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeTeaser, showGodModeStart, showAds, showLeaderboard, activeEvent, gameOver, day, upgrades.staff, skipCustomer]);
+  }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeTeaser, showGodModeStart, pendingCrisisAlerts.length, showAds, showLeaderboard, activeEvent, gameOver, day, upgrades.staff, skipCustomer]);
 
   async function loadLeaderboard() {
     try {
@@ -887,7 +898,7 @@ export function HomefarmShopGame() {
     let delay = 650;
     if (daySummary) {
       delay = 2000;
-    } else if (showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showGodModeTeaser || showGodModeStart) {
+    } else if (showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showGodModeTeaser || showGodModeStart || pendingCrisisAlerts.length > 0) {
       delay = 4000; // pause on unlock notification screens so user can read
     } else if (showUpgrades || showAds) {
       delay = 1500; // pause so user can read modal before bot acts
@@ -915,6 +926,7 @@ export function HomefarmShopGame() {
       if (showAdUnlock)       { setShowAdUnlock(false);       return; }
       if (showGodModeTeaser)   { setShowGodModeTeaser(false);  return; }
       if (showGodModeStart)    { setShowGodModeStart(false);   return; }
+      if (pendingCrisisAlerts.length > 0) { setPendingCrisisAlerts([]); return; }
       if (activeEvent)        { setActiveEvent(null);         return; }
 
       // 2. Game over → restart after 3s
@@ -1105,7 +1117,7 @@ export function HomefarmShopGame() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     botActive,
-    showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeTeaser, showGodModeStart,
+    showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeTeaser, showGodModeStart, pendingCrisisAlerts.length,
     showImport, showUpgrades, showAds, activeEvent,
     gameOver, daySummary, customer, selected, isComplete,
     upgrades, adRunToday, day, products, productPage, importQty, botImportScrolled, botUpgradedToday,
@@ -1177,6 +1189,7 @@ export function HomefarmShopGame() {
 
     const newCrises: ActiveCrisis[] = [];
     const crisisToastParts: string[] = [];
+    const crisisAlerts: GodModeCrisisAlert[] = [];
 
     if (nextDay >= modeConfig.godModeStartDay) {
       const daysInGodMode = nextDay - modeConfig.godModeStartDay;
@@ -1184,23 +1197,54 @@ export function HomefarmShopGame() {
         const chance = Math.min(def.baseChance + daysInGodMode * GOD_MODE_CHANCE_INCREMENT, GOD_MODE_MAX_CHANCE);
         if (Math.random() >= chance) continue;
 
+        let alertDetail = def.popupDesc;
+        let alertMechanic = def.popupDesc;
+
         // Apply immediate effects
         if (def.id === "fire") {
           nextProducts = nextProducts.map((p) =>
             ["seafood", "meat"].includes(p.category ?? "") ? { ...p, stock: 0 } : p,
           );
+          alertDetail = "Kho lạnh gặp sự cố nghiêm trọng. Toàn bộ hải sản và thịt trong kho đã mất sạch ngay đầu ngày.";
+          alertMechanic = "Stock nhóm hải sản và thịt bị đưa về 0. Hãy kiểm tra tồn kho và nhập lại trước khi phục vụ.";
         }
         if (def.id === "food_safety") {
           const fine = Math.round((3000 + Math.random() * 3000) / 100) * 100;
           cashFinal -= fine;
           crisisToastParts.push(`bị phạt ${money(fine)}`);
+          alertDetail = `Đoàn kiểm tra vệ sinh an toàn thực phẩm bất ngờ ập vào. Bạn bị phạt ${money(fine)} và khách hôm nay giảm mạnh.`;
+          alertMechanic = `Trừ tiền mặt ${money(fine)} ngay lập tức. Lượng khách trong ngày chỉ còn 40%.`;
         }
         if (def.id === "tax_audit") {
           const rate = 0.25 + Math.random() * 0.15;
           const loss = Math.round(cashFinal * rate);
           cashFinal -= loss;
           crisisToastParts.push(`thuế hồi tố -${money(loss)}`);
+          alertDetail = `Cơ quan thuế truy thu khoản cũ. Bạn mất ${money(loss)} tiền mặt ngay lập tức.`;
+          alertMechanic = `Trừ ${Math.round(rate * 100)}% tiền mặt hiện có. Nếu tiền mặt xuống âm, cửa hàng phá sản.`;
         }
+        if (def.id === "competitor") {
+          alertDetail = "Một cửa hàng mới mở ngay cạnh bên và kéo bớt khách của bạn.";
+          alertMechanic = "Trong 3 ngày, lượng khách bị nhân 0.65, tức giảm khoảng 35%.";
+        }
+        if (def.id === "supply_crisis") {
+          alertDetail = "Chuỗi cung ứng bị gián đoạn, nhà cung cấp đồng loạt tăng giá.";
+          alertMechanic = "Trong 3 ngày, toàn bộ giá nhập hàng bị nhân 1.5. Giá này hiển thị trực tiếp trong modal nhập hàng.";
+        }
+        if (def.id === "epidemic") {
+          alertDetail = "Dịch cúm khu phố bùng phát. Cơ quan y tế yêu cầu cửa hàng đóng cửa tạm thời.";
+          alertMechanic = "Trong 2 ngày, lượng khách bị đưa về 0. Bạn vẫn cần sống sót qua chi phí vận hành.";
+        }
+
+        crisisAlerts.push({
+          id: def.id,
+          icon: def.icon,
+          title: def.title,
+          detail: alertDetail,
+          mechanic: alertMechanic,
+          duration: def.duration,
+          chancePercent: Math.round(chance * 100),
+        });
 
         // Add or refresh crisis (reset duration if already active)
         const existingIdx = survivingCrises.findIndex((c) => c.id === def.id);
@@ -1255,6 +1299,7 @@ export function HomefarmShopGame() {
     setLoanDebt(newLoanDebt);
     setCash(cashFinal);
     setActiveCrises(nextActiveCrises);
+    setPendingCrisisAlerts(crisisAlerts);
 
     setDay(nextDay);
     setRevenue(0);
@@ -1442,6 +1487,7 @@ export function HomefarmShopGame() {
     setLowRatingStreak(0);
     setLoanDebt(0);
     setActiveCrises([]);
+    setPendingCrisisAlerts([]);
     setShowGodModeTeaser(nextStartDay === nextModeConfig.godModeTeaserDay);
     setShowGodModeStart(nextStartDay === nextModeConfig.godModeStartDay);
     setUnlockedAchievements(new Set());
@@ -1981,6 +2027,51 @@ export function HomefarmShopGame() {
               </div>
               <button className="hfs-godmode-btn" onClick={() => setShowGodModeStart(false)}>
                 Đã hiểu
+              </button>
+            </div>
+          </div>
+        )}
+
+        {pendingCrisisAlerts.length > 0 && (
+          <div className="hfs-modal-backdrop hfs-godmode-backdrop">
+            <div className="hfs-godmode-panel hfs-crisis-alert-panel">
+              <div className="hfs-godmode-alert-top">
+                <div className="hfs-godmode-badge">CRISIS ALERT</div>
+                <div className="hfs-godmode-skull">⚠️</div>
+                <div className="hfs-godmode-title">CRISIS ALERT</div>
+                <div className="hfs-godmode-sub">
+                  God Mode đang gây ra {pendingCrisisAlerts.length} biến cố trong ngày {day}.
+                </div>
+              </div>
+
+              <div className="hfs-godmode-alert-card">
+                <div className="hfs-godmode-desc">
+                  Kiểm tra kỹ tiền mặt, tồn kho và kế hoạch nhập hàng trước khi phục vụ khách.
+                </div>
+
+                <div className="hfs-godmode-crisis-list">
+                  {pendingCrisisAlerts.map((alert) => (
+                    <div key={alert.id} className="hfs-godmode-crisis-row hfs-active-crisis-row">
+                      <span className="hfs-godmode-crisis-icon">{alert.icon}</span>
+                      <div className="hfs-godmode-crisis-body">
+                        <div className="hfs-godmode-crisis-name">{alert.title}</div>
+                        <div className="hfs-godmode-crisis-desc">{alert.detail}</div>
+                        <div className="hfs-crisis-mechanic">{alert.mechanic}</div>
+                      </div>
+                      <span className="hfs-godmode-crisis-chance">
+                        {alert.duration}d · {alert.chancePercent}%
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="hfs-godmode-warning">
+                  Nhiều crisis có thể chồng lên nhau. Nếu cùng một crisis roll lại, thời hạn hiệu lực sẽ được reset.
+                </div>
+              </div>
+
+              <button className="hfs-godmode-btn" onClick={() => setPendingCrisisAlerts([])}>
+                Đã hiểu, tiếp tục sống sót
               </button>
             </div>
           </div>
