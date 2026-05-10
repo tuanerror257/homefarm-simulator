@@ -1,7 +1,7 @@
 create table if not exists public.homefarm_shop_leaderboard (
   id uuid primary key default gen_random_uuid(),
   player_name text not null,
-  game_mode text not null default 'full-time',
+  game_mode text default 'full-time',
   score integer not null,
   day_reached integer not null,
   cash integer not null,
@@ -13,7 +13,10 @@ create table if not exists public.homefarm_shop_leaderboard (
 );
 
 alter table if exists public.homefarm_shop_leaderboard
-  add column if not exists game_mode text not null default 'full-time';
+  add column if not exists game_mode text;
+
+alter table if exists public.homefarm_shop_leaderboard
+  alter column game_mode set default 'full-time';
 
 alter table public.homefarm_shop_leaderboard enable row level security;
 
@@ -33,5 +36,5 @@ with check (
   length(player_name) between 1 and 32
   and score >= 0
   and day_reached >= 1
-  and game_mode in ('full-time', 'part-time')
+  and (game_mode is null or game_mode in ('full-time', 'part-time'))
 );

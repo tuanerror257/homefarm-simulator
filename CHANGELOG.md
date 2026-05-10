@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.18`
+- Current version: `v9.1.19`
 - Current commit: TBD
-- Current rollback tag: `v9.1.18-leaderboard-mode-diagnostics`
+- Current rollback tag: `v9.1.19-leaderboard-mode-migration`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.19 - Giữ row cũ ở trạng thái chưa rõ ca
+
+- Chỉnh migration Supabase để khi thêm `game_mode` vào bảng đã có dữ liệu, row cũ không bị backfill nhầm thành `Ca Full-time`.
+- Row mới vẫn có default hợp lệ và policy insert vẫn cho phép `full-time` / `part-time`.
+- Tag: `v9.1.19-leaderboard-mode-migration`
 
 ### v9.1.18 - Sửa hiển thị mode và lỗi Supabase leaderboard
 
