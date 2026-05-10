@@ -22,7 +22,16 @@ import {
   money,
   qty,
 } from "@/lib/homefarm-shop/gameUtils";
-import { fetchLeaderboard, getLeaderboardMode, saveLeaderboardEntry, type LeaderboardEntry, type LeaderboardMode } from "@/lib/homefarm-shop/leaderboard";
+import {
+  fetchLeaderboard,
+  getLeaderboardErrorMessage,
+  getLeaderboardMode,
+  getLeaderboardModeLabel,
+  getLeaderboardModeView,
+  saveLeaderboardEntry,
+  type LeaderboardEntry,
+  type LeaderboardMode,
+} from "@/lib/homefarm-shop/leaderboard";
 import { recordSessionTelemetry, type SessionOutcome } from "@/lib/homefarm-shop/sessionTelemetry";
 import { sfx, setSfxMuted } from "@/lib/homefarm-shop/sfx";
 import EndDaySummary from "./EndDaySummary";
@@ -527,7 +536,6 @@ export function HomefarmShopGame() {
       persistSessionTelemetry("game_over");
       sfx.gameOver();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameOver, persistSessionTelemetry]);
 
   useEffect(() => {
@@ -570,8 +578,9 @@ export function HomefarmShopGame() {
     try {
       const data = await fetchLeaderboard();
       setLeaderboard(data);
-    } catch {
-      setToast("Không tải được leaderboard. Kiểm tra Supabase/env nhé.");
+    } catch (error) {
+      console.error("Homefarm leaderboard load failed", error);
+      setToast(`Không tải được leaderboard: ${getLeaderboardErrorMessage(error)}`);
     }
   }
 
@@ -1319,8 +1328,9 @@ export function HomefarmShopGame() {
       setSavedScoreEntry(scoreEntry);
       await loadLeaderboard();
       setToast(getLeaderboardMode() === "supabase" ? "Đã lưu điểm lên Supabase leaderboard." : "Đã lưu điểm local. Kiểm tra .env.local để bật Supabase.");
-    } catch {
-      setToast("Lưu điểm lỗi. Kiểm tra Supabase table/env nhé.");
+    } catch (error) {
+      console.error("Homefarm leaderboard save failed", error);
+      setToast(`Lưu điểm lỗi: ${getLeaderboardErrorMessage(error)}`);
     }
   }
 
@@ -2112,8 +2122,8 @@ export function HomefarmShopGame() {
                     <div className="hfs-saved-entry-title">Kết quả vừa lưu</div>
                     <div className="hfs-saved-entry-main">
                       <strong>{savedScoreEntry.player_name}</strong>
-                      <span className={`hfs-rank-mode ${savedScoreEntry.game_mode === "part-time" ? "part-time" : "full-time"}`}>
-                        {savedScoreEntry.game_mode === "part-time" ? "Ca Part-time" : "Ca Full-time"}
+                      <span className={`hfs-rank-mode ${getLeaderboardModeView(savedScoreEntry.game_mode)}`}>
+                        {getLeaderboardModeLabel(savedScoreEntry.game_mode)}
                       </span>
                     </div>
                     <div className="hfs-saved-entry-meta">
@@ -2155,8 +2165,8 @@ export function HomefarmShopGame() {
                       <div>
                         <div className="hfs-rank-name">
                           {row.player_name}
-                          <span className={`hfs-rank-mode ${row.game_mode === "part-time" ? "part-time" : "full-time"}`}>
-                            {row.game_mode === "part-time" ? "Ca Part-time" : "Ca Full-time"}
+                          <span className={`hfs-rank-mode ${getLeaderboardModeView(row.game_mode)}`}>
+                            {getLeaderboardModeLabel(row.game_mode)}
                           </span>
                         </div>
                         <div className="hfs-rank-meta">Day {row.day_reached} · Lãi {money(row.total_profit)} · Combo x{row.max_combo}</div>

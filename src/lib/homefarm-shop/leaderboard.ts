@@ -1,6 +1,7 @@
 import { isSupabaseReady, supabase } from "@/lib/supabaseClient";
 
 export type LeaderboardMode = "part-time" | "full-time";
+export type LeaderboardModeView = LeaderboardMode | "unknown";
 
 export type LeaderboardEntry = {
   id?: string;
@@ -43,6 +44,30 @@ export async function fetchLeaderboard() {
   }
 
   return getLocalLeaderboard().sort((a, b) => b.score - a.score).slice(0, 20);
+}
+
+export function getLeaderboardModeView(mode?: string | null): LeaderboardModeView {
+  if (mode === "part-time" || mode === "full-time") return mode;
+  return "unknown";
+}
+
+export function getLeaderboardModeLabel(mode?: string | null) {
+  const view = getLeaderboardModeView(mode);
+  if (view === "part-time") return "Ca Part-time";
+  if (view === "full-time") return "Ca Full-time";
+  return "Ca chưa rõ";
+}
+
+export function getLeaderboardErrorMessage(error: unknown) {
+  if (error && typeof error === "object" && "message" in error) {
+    const message = String((error as { message?: unknown }).message || "").trim();
+    const code = String((error as { code?: unknown }).code || "").trim();
+    if (code === "42703" && message.includes("game_mode")) {
+      return "Supabase thiếu cột game_mode. Chạy migration supabase/homefarm_shop_leaderboard.sql.";
+    }
+    if (message) return message;
+  }
+  return "Không rõ nguyên nhân";
 }
 
 function getLocalLeaderboard(): LeaderboardEntry[] {

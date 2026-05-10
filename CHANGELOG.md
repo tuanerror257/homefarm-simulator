@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.17`
+- Current version: `v9.1.18`
 - Current commit: TBD
-- Current rollback tag: `v9.1.17-godmode-music-louder`
+- Current rollback tag: `v9.1.18-leaderboard-mode-diagnostics`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,12 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.18 - Sửa hiển thị mode và lỗi Supabase leaderboard
+
+- Leaderboard không còn hiển thị mặc định dữ liệu thiếu `game_mode` thành `Ca Full-time`; các row cũ/thiếu mode sẽ hiện `Ca chưa rõ`.
+- Khi Supabase thiếu cột `game_mode`, toast và console giờ báo đúng lỗi cần chạy migration `supabase/homefarm_shop_leaderboard.sql`.
+- Tag: `v9.1.18-leaderboard-mode-diagnostics`
 
 ### v9.1.17 - Tăng volume nhạc God Mode
 
