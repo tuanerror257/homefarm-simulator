@@ -1350,6 +1350,11 @@
   border: 1px solid #ff444488;
   animation: hfs-godmode-pulse 1.5s ease-in-out infinite;
 }
+.hfs-theme-badge.survivor {
+  background: #fff7c2;
+  color: #9a5b00;
+  border: 1px solid #f6c453;
+}
 
 .hfs-mode-badge {
   position: absolute;
@@ -2532,6 +2537,17 @@
 .hfs-rank-mode.unknown {
   background: #f3f4f6;
   color: #6b5f55;
+}
+.hfs-rank-tag {
+  flex-shrink: 0;
+  font-size: 8px;
+  font-weight: 900;
+  color: #7a4b00;
+  background: #fff3bf;
+  border: 1px solid #f6c453;
+  border-radius: 999px;
+  padding: 1px 5px;
+  line-height: 1;
 }
 
 .hfs-rank-score {
@@ -3743,6 +3759,195 @@
 .hfs-gameover-btn-restart {
   background: #ffcf3f;
   color: #2d2118;
+}
+
+.hfs-survivor-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 44;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,236,128,.72), transparent 34%),
+    linear-gradient(180deg, rgba(255,250,221,.96), rgba(255,220,119,.94));
+}
+
+.hfs-survivor-panel {
+  position: relative;
+  width: min(100%, 392px);
+  max-height: calc(100% - 20px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 14px 14px;
+  color: #2d2118;
+  background: linear-gradient(180deg, #fffdf2, #fff1b8);
+  border: 4px solid #b7791f;
+  border-radius: 24px;
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,.75) inset,
+    0 16px 34px rgba(130,78,0,.34);
+}
+
+.hfs-survivor-burst {
+  position: absolute;
+  inset: -25%;
+  z-index: 0;
+  opacity: .22;
+  background:
+    conic-gradient(from 0deg, transparent 0 8deg, #f59e0b 8deg 13deg, transparent 13deg 24deg);
+  animation: hfs-survivor-burst 12s linear infinite;
+  pointer-events: none;
+}
+
+.hfs-survivor-panel > *:not(.hfs-survivor-burst) {
+  position: relative;
+  z-index: 1;
+}
+
+.hfs-survivor-kicker {
+  align-self: flex-start;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .14em;
+  color: #8a4f00;
+  background: #fff8dc;
+  border: 1px solid #eab308;
+  border-radius: 999px;
+  padding: 4px 9px;
+}
+
+.hfs-survivor-icon {
+  font-size: 56px;
+  filter: drop-shadow(0 5px 0 rgba(154,91,0,.18));
+}
+
+.hfs-survivor-title {
+  font-size: 26px;
+  font-weight: 900;
+  color: #9a5b00;
+  text-align: center;
+  text-shadow: 0 2px 0 #fff7bf;
+}
+
+.hfs-survivor-desc {
+  font-size: 13px;
+  font-weight: 900;
+  color: #4b3621;
+  text-align: center;
+  line-height: 1.45;
+}
+
+.hfs-survivor-tag {
+  font-size: 11px;
+  font-weight: 900;
+  color: #7a4b00;
+  background: #fff3bf;
+  border: 2px solid #d99b18;
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+.hfs-survivor-stats {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.hfs-survivor-stats > div {
+  min-width: 0;
+  background: rgba(255,255,255,.78);
+  border: 2px solid rgba(154,91,0,.34);
+  border-radius: 12px;
+  padding: 7px 8px;
+  text-align: center;
+}
+
+.hfs-survivor-stats span {
+  display: block;
+  font-size: 9px;
+  font-weight: 900;
+  color: rgba(45,33,24,.6);
+}
+
+.hfs-survivor-stats strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 900;
+  color: #2d2118;
+}
+
+.hfs-survivor-score-cell {
+  grid-column: span 2;
+  background: #fff8dc !important;
+  border-color: #d99b18 !important;
+}
+
+.hfs-survivor-score-cell strong {
+  font-size: 22px;
+  color: #b45309;
+}
+
+.hfs-survivor-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.hfs-survivor-actions button {
+  min-height: 42px;
+  border: 3px solid #2d2118;
+  border-radius: 14px;
+  box-shadow: 0 3px 0 #2d2118;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.hfs-survivor-save {
+  grid-column: span 2;
+  background: #22c55e;
+  color: #fff;
+}
+
+.hfs-survivor-save:disabled {
+  opacity: .65;
+  cursor: default;
+}
+
+.hfs-survivor-endless {
+  background: #38bdf8;
+  color: #083344;
+}
+
+.hfs-survivor-restart {
+  background: #facc15;
+  color: #2d2118;
+}
+
+.hfs-survivor-saved {
+  width: 100%;
+  font-size: 11px;
+  font-weight: 800;
+  color: #5f3b00;
+  text-align: center;
+  line-height: 1.4;
+  background: rgba(255,255,255,.62);
+  border: 1px solid rgba(154,91,0,.22);
+  border-radius: 10px;
+  padding: 7px 8px;
+}
+
+@keyframes hfs-survivor-burst {
+  to { transform: rotate(1turn); }
 }
 
 

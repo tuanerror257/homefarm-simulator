@@ -113,6 +113,12 @@ export const sfx = {
     tone(220, 0.38, "sawtooth", 0.62, 0.66);
   },
 
+  survivor: () => {
+    [523, 659, 784, 1047, 1319].forEach((freq, index) => {
+      tone(freq, 0.16, "triangle", 0.62, index * 0.1);
+    });
+  },
+
   // Fillet dao — "xẹt xẹt"
   knife: () => {
     swish(0.065, 0.9, 0, 1600);

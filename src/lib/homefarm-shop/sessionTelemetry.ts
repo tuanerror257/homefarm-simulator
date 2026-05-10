@@ -1,6 +1,6 @@
 import type { GameMode } from "@/types/homefarm-shop";
 
-export type SessionOutcome = "game_over" | "restart";
+export type SessionOutcome = "game_over" | "restart" | "win";
 
 export type SessionTelemetryEntry = {
   id: string;

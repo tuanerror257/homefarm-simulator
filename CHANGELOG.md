@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.3.0`
+- Current version: `v10.0.0`
 - Current commit: TBD
-- Current rollback tag: `v9.3.0-100-customer-types`
+- Current rollback tag: `v10.0.0-godmode-survivor-ending`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v10.0.0 - God Mode Survivor ending
+
+- Thêm win condition: sống sót qua 14 ngày God Mode sẽ phá đảo game và hiện màn `God Mode Survivor` tone sáng, hoành tráng.
+- Leaderboard entry có thể lưu tag `God mode Survivor`; Supabase migration thêm cột `achievement_tag`.
+- Sau khi phá đảo, người chơi có thể lưu điểm, chơi lại hoặc vào Endless mode; Endless tắt God Mode FX, nhạc u tối và crisis, quay về nhạc nền thường.
+- Người chơi trong Endless vẫn có thể tiếp tục mở leaderboard và lưu điểm mới.
+- Tag: `v10.0.0-godmode-survivor-ending`
 
 ### v9.3.0 - Mở rộng lên 100 loại khách hàng
 

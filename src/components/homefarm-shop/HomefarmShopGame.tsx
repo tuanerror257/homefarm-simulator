@@ -43,6 +43,8 @@ const PAGE_SIZE = 8;
 const APP_ORDER_SHIPPING_FEE = 20;
 const GOD_MODE_CHANCE_INCREMENT = 0.03;
 const GOD_MODE_MAX_CHANCE = 0.65;
+const GOD_MODE_SURVIVAL_DAYS = 14;
+const SURVIVOR_TAG = "God mode Survivor";
 // Bot gate: minimum day required to purchase each upgrade level (index = currentLevel)
 const KNIFE_SALMON_BONUS_BY_LEVEL = [0, 0.35, 0.7, 1.1, 1.55, 2.1] as const;
 const KNIFE_HEAD_BONE_BONUS_BY_LEVEL = [0, 0.1, 0.2, 0.35, 0.5, 0.7] as const;
@@ -309,6 +311,9 @@ export function HomefarmShopGame() {
   const [daySummary, setDaySummary] = useState<EndDaySummaryData | null>(null);
   const [gameOver, setGameOver] = useState(false);
   const [gameOverReason, setGameOverReason] = useState<"" | "bankrupt" | "stolen" | "reputation">("");
+  const [gameWon, setGameWon] = useState(false);
+  const [endlessMode, setEndlessMode] = useState(false);
+  const [hasSurvivedGodMode, setHasSurvivedGodMode] = useState(false);
   const [lowRatingStreak, setLowRatingStreak] = useState(0);
   const [loanDebt, setLoanDebt] = useState(0);
   const [activeCrises, setActiveCrises] = useState<ActiveCrisis[]>([]);
@@ -328,7 +333,9 @@ export function HomefarmShopGame() {
   const runIntroTimerRef = useRef<number | null>(null);
 
   const isGodModeStartModalOpen = showGodModeStart;
-  const isGodModeActive = gamePhase === "playing" && day >= modeConfig.godModeStartDay && !isGodModeStartModalOpen;
+  const godModeSurvivorDay = modeConfig.godModeStartDay + GOD_MODE_SURVIVAL_DAYS;
+  const godModeDaysCleared = Math.max(0, Math.min(GOD_MODE_SURVIVAL_DAYS, day - modeConfig.godModeStartDay));
+  const isGodModeActive = gamePhase === "playing" && day >= modeConfig.godModeStartDay && !isGodModeStartModalOpen && !gameWon && !endlessMode;
 
   useEffect(() => {
     const bgm = audioRef.current;
@@ -547,7 +554,11 @@ export function HomefarmShopGame() {
       persistSessionTelemetry("game_over");
       sfx.gameOver();
     }
-  }, [gameOver, persistSessionTelemetry]);
+    if (gameWon) {
+      persistSessionTelemetry("win");
+      sfx.survivor();
+    }
+  }, [gameOver, gameWon, persistSessionTelemetry]);
 
   useEffect(() => {
     if (!customer) {
@@ -563,7 +574,7 @@ export function HomefarmShopGame() {
   }, [customerIndex, day, customer, eventMoodPenalty]);
 
   useEffect(() => {
-    if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showGodModeTeaser || showGodModeStart || pendingCrisisAlerts.length > 0 || showAds || showLeaderboard || activeEvent || gameOver) return;
+    if (gamePhase !== "playing" || !customer || showImport || showUpgrades || showCatalogUnlock || showUpgradeUnlock || showEventUnlock || showAdUnlock || showGodModeTeaser || showGodModeStart || pendingCrisisAlerts.length > 0 || showAds || showLeaderboard || activeEvent || gameOver || gameWon) return;
 
     const moodDecay = (0.7 + day * 0.022) * 2.2 * Math.max(0.7, 1 - upgrades.staff * 0.06);
     const timer = setInterval(() => {
@@ -583,7 +594,7 @@ export function HomefarmShopGame() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeTeaser, showGodModeStart, pendingCrisisAlerts.length, showAds, showLeaderboard, activeEvent, gameOver, day, upgrades.staff, skipCustomer]);
+  }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeTeaser, showGodModeStart, pendingCrisisAlerts.length, showAds, showLeaderboard, activeEvent, gameOver, gameWon, day, upgrades.staff, skipCustomer]);
 
   async function loadLeaderboard() {
     try {
@@ -929,8 +940,8 @@ export function HomefarmShopGame() {
       if (pendingCrisisAlerts.length > 0) { setPendingCrisisAlerts([]); return; }
       if (activeEvent)        { setActiveEvent(null);         return; }
 
-      // 2. Game over → restart after 3s
-      if (gameOver) return;
+      // 2. Game over / survivor ending → stop bot actions
+      if (gameOver || gameWon) return;
 
       // 3. End-day summary → advance
       if (daySummary) { startNextDay(); return; }
@@ -1119,7 +1130,7 @@ export function HomefarmShopGame() {
     botActive,
     showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeTeaser, showGodModeStart, pendingCrisisAlerts.length,
     showImport, showUpgrades, showAds, activeEvent,
-    gameOver, daySummary, customer, selected, isComplete,
+    gameOver, gameWon, daySummary, customer, selected, isComplete,
     upgrades, adRunToday, day, products, productPage, importQty, botImportScrolled, botUpgradedToday,
   ]);
   // ── END BOT ─────────────────────────────────────────────────────────────────
@@ -1168,6 +1179,37 @@ export function HomefarmShopGame() {
       return;
     }
 
+    if (!endlessMode && nextDay >= godModeSurvivorDay) {
+      const survivorProducts = getUnlockedProducts(nextDay, overnightSpoilage.products, gameMode);
+      setCash(cashAfterCost);
+      setDay(nextDay);
+      setProducts(survivorProducts);
+      setCustomers([]);
+      setCustomerIndex(0);
+      setTimeLeft(30);
+      setSelected([]);
+      setProductPage(0);
+      setDaySummary(null);
+      setActiveEvent(null);
+      setPendingCrisisAlerts([]);
+      setActiveCrises([]);
+      setShowCatalogUnlock(false);
+      setShowUpgradeUnlock(false);
+      setShowEventUnlock(false);
+      setShowAdUnlock(false);
+      setShowGodModeTeaser(false);
+      setShowGodModeStart(false);
+      setShowAds(false);
+      setShowImport(false);
+      setShowUpgrades(false);
+      setScoreSaved(false);
+      setSavedScoreEntry(null);
+      setHasSurvivedGodMode(true);
+      setGameWon(true);
+      setToast(`Bạn đã sống sót qua ${GOD_MODE_SURVIVAL_DAYS} ngày God Mode và phá đảo trò chơi này.`);
+      return;
+    }
+
     const cashWithEvent = cashAfterCost + (nextEvent?.cashDelta ?? 0);
     if (cashWithEvent < 0) {
       setCash(cashWithEvent);
@@ -1191,7 +1233,7 @@ export function HomefarmShopGame() {
     const crisisToastParts: string[] = [];
     const crisisAlerts: GodModeCrisisAlert[] = [];
 
-    if (nextDay >= modeConfig.godModeStartDay) {
+    if (!endlessMode && nextDay >= modeConfig.godModeStartDay) {
       const daysInGodMode = nextDay - modeConfig.godModeStartDay;
       for (const def of GOD_MODE_CRISIS_DEFS) {
         const chance = Math.min(def.baseChance + daysInGodMode * GOD_MODE_CHANCE_INCREMENT, GOD_MODE_MAX_CHANCE);
@@ -1358,6 +1400,7 @@ export function HomefarmShopGame() {
     const scoreEntry: LeaderboardEntry = {
       player_name: lockedPlayerName,
       game_mode: leaderboardMode,
+      achievement_tag: hasSurvivedGodMode ? SURVIVOR_TAG : null,
       score: currentScore,
       day_reached: day,
       cash: Math.round(cash),
@@ -1387,6 +1430,45 @@ export function HomefarmShopGame() {
   function closeLeaderboard() {
     sfx.button();
     setShowLeaderboard(false);
+  }
+
+  function continueEndlessMode() {
+    sfx.survivor();
+    const nextProducts = getUnlockedProducts(day, products, gameMode);
+    const nextCustomers = generateCustomers(nextProducts, day, {
+      signLevel: upgrades.sign,
+      staffLevel: upgrades.staff,
+      rainyDay: false,
+      extraCount: 0,
+      theme: getDayTheme(day),
+      crisisMultiplier: 1,
+      mode: gameMode,
+    });
+    setProducts(nextProducts);
+    setCustomers(nextCustomers);
+    setCustomerIndex(0);
+    setTimeLeft(nextCustomers[0]?.patience ?? 30);
+    setSelected([]);
+    setProductPage(0);
+    setRevenue(0);
+    setProfit(0);
+    setServedTodayCount(0);
+    setSkippedTodayCount(0);
+    setSoldByProduct({});
+    setCombo(0);
+    setDayMaxCombo(0);
+    setMoodScore(100);
+    setMascotState("idle");
+    setActiveEvent(null);
+    setActiveCrises([]);
+    setPendingCrisisAlerts([]);
+    setEndlessMode(true);
+    setGameWon(false);
+    setBotMode(false);
+    setScoreSaved(false);
+    setSavedScoreEntry(null);
+    startBgm();
+    setToast("Endless mode đã mở: cửa hàng quay lại nhịp bình thường, không còn bóng tối God Mode.");
   }
 
   const startRun = useCallback((options: {
@@ -1484,6 +1566,9 @@ export function HomefarmShopGame() {
     setSavedScoreEntry(null);
     setGameOver(false);
     setGameOverReason("");
+    setGameWon(false);
+    setEndlessMode(false);
+    setHasSurvivedGodMode(false);
     setLowRatingStreak(0);
     setLoanDebt(0);
     setActiveCrises([]);
@@ -1602,8 +1687,11 @@ export function HomefarmShopGame() {
                   {getDayTheme(day) === "busy" ? "🔥 Mùa bận" : "😴 Ế ẩm"}
                 </span>
               )}
-              {day >= modeConfig.godModeStartDay && (
+              {day >= modeConfig.godModeStartDay && !endlessMode && (
                 <span className="hfs-theme-badge god-mode">☠️ GOD</span>
+              )}
+              {endlessMode && (
+                <span className="hfs-theme-badge survivor">🏆 SURVIVOR</span>
               )}
             </div>
 
@@ -2114,6 +2202,46 @@ export function HomefarmShopGame() {
           </div>
         )}
 
+        {gameWon && !showLeaderboard && (
+          <div className="hfs-survivor-backdrop">
+            <div className="hfs-survivor-panel">
+              <div className="hfs-survivor-burst" aria-hidden="true" />
+              <div className="hfs-survivor-kicker">FINAL TRIAL COMPLETE</div>
+              <div className="hfs-survivor-icon">🏆</div>
+              <div className="hfs-survivor-title">God Mode Survivor</div>
+              <div className="hfs-survivor-desc">
+                Bạn đã sống sót qua {GOD_MODE_SURVIVAL_DAYS} ngày God Mode và phá đảo trò chơi này.
+              </div>
+              <div className="hfs-survivor-tag">{SURVIVOR_TAG}</div>
+              <div className="hfs-survivor-stats">
+                <div><span>Ngày phá đảo</span><strong>{day}</strong></div>
+                <div><span>Chế độ</span><strong>{modeConfig.label}</strong></div>
+                <div><span>God Mode đã vượt</span><strong>{godModeDaysCleared}/{GOD_MODE_SURVIVAL_DAYS} ngày</strong></div>
+                <div><span>Tiền mặt</span><strong>{money(cash)}</strong></div>
+                <div><span>Khách phục vụ</span><strong>{servedCount}</strong></div>
+                <div><span>Combo tốt nhất</span><strong>x{maxCombo}</strong></div>
+                <div className="hfs-survivor-score-cell"><span>Điểm số</span><strong>{currentScore.toLocaleString("vi-VN")}</strong></div>
+              </div>
+              <div className="hfs-survivor-actions">
+                <button className="hfs-survivor-save" onClick={saveScore} disabled={scoreSaved}>
+                  {scoreSaved ? "Đã lưu Survivor" : "Lưu điểm Survivor"}
+                </button>
+                <button className="hfs-survivor-endless" onClick={continueEndlessMode}>
+                  Chơi Endless
+                </button>
+                <button className="hfs-survivor-restart" onClick={resetGame}>
+                  Chơi lại
+                </button>
+              </div>
+              {scoreSaved && (
+                <div className="hfs-survivor-saved">
+                  Điểm đã lưu với tag <strong>{SURVIVOR_TAG}</strong>. Bạn vẫn có thể chơi Endless và lưu điểm mới sau.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {gameOver && !showLeaderboard && (
           <div className="hfs-gameover-backdrop">
             <div className="hfs-gameover-panel">
@@ -2226,6 +2354,9 @@ export function HomefarmShopGame() {
                       <span className={`hfs-rank-mode ${getLeaderboardModeView(savedScoreEntry.game_mode)}`}>
                         {getLeaderboardModeLabel(savedScoreEntry.game_mode)}
                       </span>
+                      {savedScoreEntry.achievement_tag && (
+                        <span className="hfs-rank-tag">{savedScoreEntry.achievement_tag}</span>
+                      )}
                     </div>
                     <div className="hfs-saved-entry-meta">
                       Day {savedScoreEntry.day_reached} · Lãi {money(savedScoreEntry.total_profit)} · Combo x{savedScoreEntry.max_combo}
@@ -2251,6 +2382,7 @@ export function HomefarmShopGame() {
                   const myGhost = {
                     player_name: initialPlayerNameRef.current || "Bạn",
                     game_mode: leaderboardMode,
+                    achievement_tag: hasSurvivedGodMode ? SURVIVOR_TAG : null,
                     score: currentScore,
                     day_reached: day,
                     cash: Math.round(cash),
@@ -2269,6 +2401,9 @@ export function HomefarmShopGame() {
                           <span className={`hfs-rank-mode ${getLeaderboardModeView(row.game_mode)}`}>
                             {getLeaderboardModeLabel(row.game_mode)}
                           </span>
+                          {row.achievement_tag && (
+                            <span className="hfs-rank-tag">{row.achievement_tag}</span>
+                          )}
                         </div>
                         <div className="hfs-rank-meta">Day {row.day_reached} · Lãi {money(row.total_profit)} · Combo x{row.max_combo}</div>
                       </div>

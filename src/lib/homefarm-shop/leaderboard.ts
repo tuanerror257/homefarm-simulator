@@ -7,6 +7,7 @@ export type LeaderboardEntry = {
   id?: string;
   player_name: string;
   game_mode?: LeaderboardMode;
+  achievement_tag?: string | null;
   score: number;
   day_reached: number;
   cash: number;
@@ -75,8 +76,13 @@ export function getLeaderboardErrorMessage(error: unknown) {
   if (error && typeof error === "object" && "message" in error) {
     const message = String((error as { message?: unknown }).message || "").trim();
     const code = String((error as { code?: unknown }).code || "").trim();
-    if (code === "42703" && message.includes("game_mode")) {
-      return "Supabase thiếu cột game_mode. Chạy migration supabase/homefarm_shop_leaderboard.sql.";
+    if (code === "42703") {
+      if (message.includes("game_mode")) {
+        return "Supabase thiếu cột game_mode. Chạy migration supabase/homefarm_shop_leaderboard.sql.";
+      }
+      if (message.includes("achievement_tag")) {
+        return "Supabase thiếu cột achievement_tag. Chạy migration supabase/homefarm_shop_leaderboard.sql.";
+      }
     }
     if (message) return message;
   }
