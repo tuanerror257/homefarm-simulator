@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v9.1.19`
+- Current version: `v9.1.20`
 - Current commit: TBD
-- Current rollback tag: `v9.1.19-leaderboard-mode-migration`
+- Current rollback tag: `v9.1.20-full-leaderboard-rank`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,13 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v9.1.20 - Query đầy đủ leaderboard để tính hạng cuối
+
+- Supabase leaderboard giờ đọc toàn bộ bảng theo từng page 1000 row thay vì chỉ lấy top 20.
+- Dòng cuối trong leaderboard sẽ là người có điểm thấp nhất toàn DB, với số hạng bằng tổng số người chơi đã query.
+- Local leaderboard cũng không còn bị cắt khi đọc/lưu để giữ cùng logic xếp hạng.
+- Tag: `v9.1.20-full-leaderboard-rank`
 
 ### v9.1.19 - Giữ row cũ ở trạng thái chưa rõ ca
 

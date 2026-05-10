@@ -18,6 +18,7 @@ export type LeaderboardEntry = {
 };
 
 const LOCAL_KEY = "homefarm_shop_leaderboard";
+const SUPABASE_PAGE_SIZE = 1000;
 
 export async function saveLeaderboardEntry(entry: LeaderboardEntry) {
   if (isSupabaseReady && supabase) {
@@ -28,22 +29,34 @@ export async function saveLeaderboardEntry(entry: LeaderboardEntry) {
 
   const current = getLocalLeaderboard();
   current.push({ ...entry, id: crypto.randomUUID(), created_at: new Date().toISOString() });
-  localStorage.setItem(LOCAL_KEY, JSON.stringify(current.sort((a, b) => b.score - a.score).slice(0, 50)));
+  localStorage.setItem(LOCAL_KEY, JSON.stringify(current.sort(sortLeaderboardEntries)));
 }
 
 export async function fetchLeaderboard() {
   if (isSupabaseReady && supabase) {
-    const { data, error } = await supabase
-      .from("homefarm_shop_leaderboard")
-      .select("*")
-      .order("score", { ascending: false })
-      .limit(20);
+    const entries: LeaderboardEntry[] = [];
+    let from = 0;
 
-    if (error) throw error;
-    return data || [];
+    while (true) {
+      const { data, error } = await supabase
+        .from("homefarm_shop_leaderboard")
+        .select("*")
+        .order("score", { ascending: false })
+        .order("created_at", { ascending: true })
+        .range(from, from + SUPABASE_PAGE_SIZE - 1);
+
+      if (error) throw error;
+      if (!data || data.length === 0) break;
+
+      entries.push(...data);
+      if (data.length < SUPABASE_PAGE_SIZE) break;
+      from += SUPABASE_PAGE_SIZE;
+    }
+
+    return entries;
   }
 
-  return getLocalLeaderboard().sort((a, b) => b.score - a.score).slice(0, 20);
+  return getLocalLeaderboard().sort(sortLeaderboardEntries);
 }
 
 export function getLeaderboardModeView(mode?: string | null): LeaderboardModeView {
@@ -79,6 +92,10 @@ function getLocalLeaderboard(): LeaderboardEntry[] {
   }
 }
 
+function sortLeaderboardEntries(a: LeaderboardEntry, b: LeaderboardEntry) {
+  if (b.score !== a.score) return b.score - a.score;
+  return String(a.created_at || "").localeCompare(String(b.created_at || ""));
+}
 
 export function getLeaderboardMode() {
   return isSupabaseReady && supabase ? "supabase" : "local";
