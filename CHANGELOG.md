@@ -4,9 +4,9 @@ Single source of truth for the project snapshot, feature map, and version histor
 
 ## Current Snapshot
 
-- Current version: `v10.0.2`
+- Current version: `v10.1.0`
 - Current commit: TBD
-- Current rollback tag: `v10.0.2-reputation-leaderboard-tag`
+- Current rollback tag: `v10.1.0-season-autosave-leaderboard`
 - Main route: `/homefarm-shop-simulator`
 - Rollback rule: use the tag that matches the version you want to restore
 
@@ -79,6 +79,14 @@ supabase/
 - Version badge visible in the game UI.
 
 ## Version History
+
+### v10.1.0 - Season autosave leaderboard
+
+- Mỗi lần Start Game tạo một `session_id` riêng cho season chơi.
+- Leaderboard autosave khi bắt đầu season, qua ngày mới, phá sản, mất uy tín, hoặc phá đảo God Mode.
+- Lưu điểm dùng upsert theo `session_id`, nên mỗi season chỉ có một record và các ngày sau sẽ ghi đè record trước đó.
+- Supabase migration thêm `session_id`, `outcome`, `last_saved_at`, unique index và update policy cho autosave.
+- Tag: `v10.1.0-season-autosave-leaderboard`
 
 ### v10.0.2 - Tag mất uy tín trên leaderboard
 

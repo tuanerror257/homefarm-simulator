@@ -31,6 +31,7 @@ import {
   saveLeaderboardEntry,
   type LeaderboardEntry,
   type LeaderboardMode,
+  type LeaderboardOutcome,
 } from "@/lib/homefarm-shop/leaderboard";
 import { recordSessionTelemetry, type SessionOutcome } from "@/lib/homefarm-shop/sessionTelemetry";
 import { sfx, setSfxMuted } from "@/lib/homefarm-shop/sfx";
@@ -60,6 +61,11 @@ type GodModeCrisisAlert = {
   duration: number;
   chancePercent: number;
 };
+
+function createLeaderboardSessionId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
+  return `season-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+}
 
 const GOD_MODE_CRISIS_DEFS: Array<{
   id: GodModeCrisisId;
@@ -330,6 +336,8 @@ export function HomefarmShopGame() {
   const sessionStartedAtRef = useRef(Date.now());
   const sessionTelemetryRecordedRef = useRef(false);
   const initialPlayerNameRef = useRef(playerName);
+  const leaderboardSessionIdRef = useRef<string | null>(null);
+  const leaderboardAutosaveKeyRef = useRef<string | null>(null);
   const godModeStartPlayedRef = useRef(false);
   const godModeMusicActiveRef = useRef(false);
   const runIntroTimerRef = useRef<number | null>(null);
@@ -598,7 +606,7 @@ export function HomefarmShopGame() {
     return () => clearInterval(timer);
   }, [gamePhase, customerIndex, customer, showImport, showUpgrades, showCatalogUnlock, showUpgradeUnlock, showEventUnlock, showAdUnlock, showGodModeTeaser, showGodModeStart, pendingCrisisAlerts.length, showAds, showLeaderboard, activeEvent, gameOver, gameWon, day, upgrades.staff, skipCustomer]);
 
-  async function loadLeaderboard() {
+  const loadLeaderboard = useCallback(async () => {
     try {
       const data = await fetchLeaderboard();
       setLeaderboard(data);
@@ -606,7 +614,81 @@ export function HomefarmShopGame() {
       console.error("Homefarm leaderboard load failed", error);
       setToast(`Không tải được leaderboard: ${getLeaderboardErrorMessage(error)}`);
     }
-  }
+  }, []);
+
+  const getCurrentLeaderboardOutcome = useCallback((manual = false): LeaderboardOutcome => {
+    if (gameWon || hasSurvivedGodMode) return "god_mode_survivor";
+    if (gameOver) return gameOverReason === "reputation" ? "reputation_loss" : "bankrupt";
+    return manual ? "manual_saved" : "playing";
+  }, [gameOver, gameOverReason, gameWon, hasSurvivedGodMode]);
+
+  const getAchievementTagForOutcome = useCallback((outcome: LeaderboardOutcome) => {
+    if (outcome === "god_mode_survivor") return SURVIVOR_TAG;
+    if (outcome === "reputation_loss") return REPUTATION_LOSS_TAG;
+    if (outcome === "bankrupt") return BANKRUPT_TAG;
+    return null;
+  }, []);
+
+  const buildLeaderboardEntry = useCallback((outcome: LeaderboardOutcome): LeaderboardEntry | null => {
+    const lockedPlayerName = initialPlayerNameRef.current.trim() || "Ẩn danh";
+    if (isBotTestName(lockedPlayerName)) return null;
+    return {
+      session_id: leaderboardSessionIdRef.current ?? undefined,
+      player_name: lockedPlayerName,
+      game_mode: leaderboardMode,
+      achievement_tag: getAchievementTagForOutcome(outcome),
+      outcome,
+      score: currentScore,
+      day_reached: day,
+      cash: Math.round(cash),
+      total_revenue: Math.round(totalRevenue),
+      total_profit: Math.round(totalProfit),
+      max_combo: maxCombo,
+      served_count: servedCount,
+      last_saved_at: new Date().toISOString(),
+    };
+  }, [
+    cash,
+    currentScore,
+    day,
+    getAchievementTagForOutcome,
+    leaderboardMode,
+    maxCombo,
+    servedCount,
+    totalProfit,
+    totalRevenue,
+  ]);
+
+  const persistLeaderboardScore = useCallback(async (params: {
+    outcome: LeaderboardOutcome;
+    silent?: boolean;
+    markSaved?: boolean;
+  }) => {
+    const scoreEntry = buildLeaderboardEntry(params.outcome);
+    if (!scoreEntry) return;
+    try {
+      await saveLeaderboardEntry(scoreEntry);
+      if (params.markSaved) setScoreSaved(true);
+      setSavedScoreEntry(scoreEntry);
+      if (!params.silent) {
+        sfx.button();
+        await loadLeaderboard();
+        setToast(getLeaderboardMode() === "supabase" ? "Đã lưu điểm lên Supabase leaderboard." : "Đã lưu điểm local. Kiểm tra .env.local để bật Supabase.");
+      }
+    } catch (error) {
+      console.error("Homefarm leaderboard save failed", error);
+      if (!params.silent) setToast(`Lưu điểm lỗi: ${getLeaderboardErrorMessage(error)}`);
+    }
+  }, [buildLeaderboardEntry, loadLeaderboard]);
+
+  useEffect(() => {
+    if (gamePhase !== "playing" || botMode || !leaderboardSessionIdRef.current) return;
+    const outcome = getCurrentLeaderboardOutcome(false);
+    const autosaveKey = `${leaderboardSessionIdRef.current}:${day}:${outcome}`;
+    if (leaderboardAutosaveKeyRef.current === autosaveKey) return;
+    leaderboardAutosaveKeyRef.current = autosaveKey;
+    void persistLeaderboardScore({ outcome, silent: true, markSaved: false });
+  }, [botMode, day, gameOver, gameOverReason, gamePhase, gameWon, getCurrentLeaderboardOutcome, hasSurvivedGodMode, persistLeaderboardScore]);
 
   function tapProduct(id: string) {
     if (!customer) return;
@@ -1397,36 +1479,11 @@ export function HomefarmShopGame() {
   }
 
   async function saveScore() {
-    const lockedPlayerName = initialPlayerNameRef.current.trim() || "Ẩn danh";
-    if (isBotTestName(lockedPlayerName)) return;
-    const achievementTag = hasSurvivedGodMode
-      ? SURVIVOR_TAG
-      : gameOver
-        ? gameOverReason === "reputation" ? REPUTATION_LOSS_TAG : BANKRUPT_TAG
-        : null;
-    const scoreEntry: LeaderboardEntry = {
-      player_name: lockedPlayerName,
-      game_mode: leaderboardMode,
-      achievement_tag: achievementTag,
-      score: currentScore,
-      day_reached: day,
-      cash: Math.round(cash),
-      total_revenue: Math.round(totalRevenue),
-      total_profit: Math.round(totalProfit),
-      max_combo: maxCombo,
-      served_count: servedCount,
-    };
-    try {
-      sfx.button();
-      await saveLeaderboardEntry(scoreEntry);
-      setScoreSaved(true);
-      setSavedScoreEntry(scoreEntry);
-      await loadLeaderboard();
-      setToast(getLeaderboardMode() === "supabase" ? "Đã lưu điểm lên Supabase leaderboard." : "Đã lưu điểm local. Kiểm tra .env.local để bật Supabase.");
-    } catch (error) {
-      console.error("Homefarm leaderboard save failed", error);
-      setToast(`Lưu điểm lỗi: ${getLeaderboardErrorMessage(error)}`);
-    }
+    await persistLeaderboardScore({
+      outcome: getCurrentLeaderboardOutcome(true),
+      silent: false,
+      markSaved: true,
+    });
   }
 
   function openLeaderboard() {
@@ -1491,6 +1548,8 @@ export function HomefarmShopGame() {
     const nextPlayerName = options.playerName?.trim() || playerName;
     const nextBotMode = options.botMode ?? false;
     initialPlayerNameRef.current = nextPlayerName;
+    leaderboardSessionIdRef.current = createLeaderboardSessionId();
+    leaderboardAutosaveKeyRef.current = null;
 
     if (!options.keepMusic) {
       audioRef.current?.pause();
@@ -2387,6 +2446,7 @@ export function HomefarmShopGame() {
                   const myBelowAll = myRank > n;
 
                   const myGhost = {
+                    session_id: leaderboardSessionIdRef.current ?? undefined,
                     player_name: initialPlayerNameRef.current || "Bạn",
                     game_mode: leaderboardMode,
                     achievement_tag: hasSurvivedGodMode
@@ -2394,6 +2454,7 @@ export function HomefarmShopGame() {
                       : gameOver
                         ? gameOverReason === "reputation" ? REPUTATION_LOSS_TAG : BANKRUPT_TAG
                         : null,
+                    outcome: getCurrentLeaderboardOutcome(false),
                     score: currentScore,
                     day_reached: day,
                     cash: Math.round(cash),

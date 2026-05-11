@@ -2,12 +2,15 @@ import { isSupabaseReady, supabase } from "@/lib/supabaseClient";
 
 export type LeaderboardMode = "part-time" | "full-time";
 export type LeaderboardModeView = LeaderboardMode | "unknown";
+export type LeaderboardOutcome = "playing" | "manual_saved" | "bankrupt" | "reputation_loss" | "god_mode_survivor";
 
 export type LeaderboardEntry = {
   id?: string;
+  session_id?: string;
   player_name: string;
   game_mode?: LeaderboardMode;
   achievement_tag?: string | null;
+  outcome?: LeaderboardOutcome;
   score: number;
   day_reached: number;
   cash: number;
@@ -16,6 +19,7 @@ export type LeaderboardEntry = {
   max_combo: number;
   served_count: number;
   created_at?: string;
+  last_saved_at?: string;
 };
 
 const LOCAL_KEY = "homefarm_shop_leaderboard";
@@ -23,13 +27,35 @@ const SUPABASE_PAGE_SIZE = 1000;
 
 export async function saveLeaderboardEntry(entry: LeaderboardEntry) {
   if (isSupabaseReady && supabase) {
-    const { error } = await supabase.from("homefarm_shop_leaderboard").insert(entry);
+    const query = entry.session_id
+      ? supabase.from("homefarm_shop_leaderboard").upsert(entry, { onConflict: "session_id" })
+      : supabase.from("homefarm_shop_leaderboard").insert(entry);
+    const { error } = await query;
     if (error) throw error;
     return;
   }
 
   const current = getLocalLeaderboard();
-  current.push({ ...entry, id: crypto.randomUUID(), created_at: new Date().toISOString() });
+  const existingIndex = entry.session_id
+    ? current.findIndex((item) => item.session_id === entry.session_id)
+    : -1;
+  const now = new Date().toISOString();
+  if (existingIndex >= 0) {
+    current[existingIndex] = {
+      ...current[existingIndex],
+      ...entry,
+      id: current[existingIndex].id,
+      created_at: current[existingIndex].created_at,
+      last_saved_at: now,
+    };
+  } else {
+    current.push({
+      ...entry,
+      id: crypto.randomUUID(),
+      created_at: now,
+      last_saved_at: now,
+    });
+  }
   localStorage.setItem(LOCAL_KEY, JSON.stringify(current.sort(sortLeaderboardEntries)));
 }
 
@@ -82,6 +108,12 @@ export function getLeaderboardErrorMessage(error: unknown) {
       }
       if (message.includes("achievement_tag")) {
         return "Supabase thiếu cột achievement_tag. Chạy migration supabase/homefarm_shop_leaderboard.sql.";
+      }
+      if (message.includes("session_id")) {
+        return "Supabase thiếu cột session_id. Chạy migration supabase/homefarm_shop_leaderboard.sql.";
+      }
+      if (message.includes("outcome")) {
+        return "Supabase thiếu cột outcome. Chạy migration supabase/homefarm_shop_leaderboard.sql.";
       }
     }
     if (message) return message;
